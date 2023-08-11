@@ -6,5 +6,5 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
-    'Routing\\' => array($baseDir . '/classes'),
+    'Classes\\' => array($baseDir . '/classes'),
 );

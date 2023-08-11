@@ -1,17 +1,18 @@
 <?php 
 require_once 'shared/vendor/autoload.php'; 
-use Routing\Router;
+use Classes\Router;
 
 $router = new Router(basename(__DIR__));
 
 $router->setErrorRedirect("/");
 
-$router->addRoute('*', '/', function () {
+$router->addRoute('*', '/', function () use ($router) {
+    $router->setPageTitle("Home Page"); // Set the page title
     echo "<h1>Your on the index of this App</1>";
 });
 
 $router->addRoute('GET', '/test', function () use ($router) {
-    $variables = ['page' => "/test", 'url' => $router->toolName];
+    $variables = ['page' => "/test", 'url' => $router->projectName];
     $router->getSite('test', $variables);
 });
 

@@ -1,5 +1,6 @@
 <?php
-namespace Routing;
+namespace Classes;
+use Classes\HTMLBuilder;
 
 /**
  * @author Leon.Schmidt
@@ -12,9 +13,9 @@ class Router {
     protected array $routes = [];
 
     /**
-     * Store the name of the tool
+     * Store the name of the project
      */
-    public string $toolName = "";
+    public string $projectName = "";
 
     /**
      * Store the url to redirect
@@ -22,10 +23,15 @@ class Router {
     public string $redirectUrl = "";
 
     /**
+     * Store for the html title
+     */
+    protected string $pageTitle = "Meine Website"; 
+
+    /**
      * Set the name of the tool
      */
-    public function __construct($toolName) {
-        $this->toolName = $toolName;
+    public function __construct($projectName) {
+        $this->projectName = $projectName;
     }
 
     /**
@@ -33,7 +39,7 @@ class Router {
      * to close the application correctly at the end.
      */
     public static function APP_CLOSE() {
-        echo '</div></div></body></html>';
+        echo '</body></html>';
         exit;
     }
 
@@ -58,6 +64,15 @@ class Router {
      */
     public function setErrorRedirect(string $url){
         return $this->redirectUrl = $url;
+    }
+
+    /**
+     * Set the page title
+     *
+     * @param string $title The title for the page
+     */
+    public function setPageTitle(string $title) {
+        $this->pageTitle = $title;
     }
 
     /**
@@ -104,13 +119,13 @@ class Router {
         $url = $_SERVER['REQUEST_URI']; // get the URL from the curet page
         if ($url != "/") {rtrim($_SERVER['REQUEST_URI'], '/');} // Remove slash from the end 
         $url = strtok($url, '?'); // Remove query parameters from the URL
-        $url = str_replace("/$this->toolName", "", $url); // add basename of the application folder
+        $url = str_replace("/$this->projectName", "", $url); // add basename of the application folder
         if ($url == "/index.php") { $url = "/";} // check if url is index.php if so send to the / route
 
         $method = $_SERVER['REQUEST_METHOD']; // indicates the client's action (GET, POST, etc.)
 
         // Process given action on GET, POST etc.
-        if (isset($this->routes[$method])) {
+        if (isset($this->routes[$method])) {            
             $this->processRoutes($url, $this->routes[$method]);
         }
 
@@ -121,7 +136,7 @@ class Router {
 
         // call this if route not found and redirect url is set
         if(!isset($this->routes[$method][$url]) && !empty($this->redirectUrl)){
-            $redirect = "/".$this->toolName.$this->redirectUrl;
+            $redirect = "/".$this->projectName.$this->redirectUrl;
             header("Location: ".$redirect);
             die;
         } else {
@@ -130,7 +145,6 @@ class Router {
         }
 
     }
-
     /**
      *
      * Loop through the routes to find a match for the given URL.
@@ -140,7 +154,6 @@ class Router {
      *
      */
     protected function processRoutes(string $url, array $routes) {
-
         foreach ($routes as $routeUrl => $routeData) {
 
             // Convert route URL to a regular expression pattern for the ':' parameter
@@ -175,10 +188,16 @@ class Router {
      * 
      */
     public function getSite($siteName, $variables = []) {
-        $sitePath = "../".$this->toolName."/sites/$siteName.php";
+        $sitePath = "../".$this->projectName."/sites/$siteName.php";
 
         if (file_exists($sitePath)) {
             extract($variables); // Make the variables available
+
+            // Set the page title if available
+            if (!empty($this->pageTitle)) {
+                $pageTitle = $this->pageTitle;
+            }
+
             include $sitePath;
         } else {
             header("HTTP/1.1 404 Not Found");
