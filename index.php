@@ -1,5 +1,6 @@
 <?php 
 require_once 'shared/vendor/autoload.php'; 
+use Classes\HTMLBuilder;
 use Classes\Router;
 
 $router = new Router(basename(__DIR__));
@@ -7,8 +8,9 @@ $router = new Router(basename(__DIR__));
 $router->setErrorRedirect("/");
 
 $router->addRoute('*', '/', function () use ($router) {
-    $router->setPageTitle("Home Page"); // Set the page title
-    echo "<h1>Your on the index of this App</1>";
+    echo "<h1>Your on the index of this App</h1>";
+    // $router->setPageTitle("etst");
+    include "shared/classes/Datenbank.php";
 });
 
 $router->addRoute('GET', '/test', function () use ($router) {
@@ -27,6 +29,6 @@ $router->addGroup('/admin', function($router, $prefix) {
         echo "Admin Users";
     });
 });
-    
+
 $router->matchRoute();  
 ?>

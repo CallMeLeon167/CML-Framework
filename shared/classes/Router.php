@@ -192,12 +192,6 @@ class Router {
 
         if (file_exists($sitePath)) {
             extract($variables); // Make the variables available
-
-            // Set the page title if available
-            if (!empty($this->pageTitle)) {
-                $pageTitle = $this->pageTitle;
-            }
-
             include $sitePath;
         } else {
             header("HTTP/1.1 404 Not Found");
