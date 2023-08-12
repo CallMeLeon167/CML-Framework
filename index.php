@@ -4,10 +4,15 @@ use Classes\HTMLBuilder;
 use Classes\Router;
 
 $router = new Router(basename(__DIR__));
-
 $router->setErrorRedirect("/");
+$router->setProjectTitle("Was geht");
 
 $router->addRoute('*', '/', function () use ($router) {
+    $router->setTitle("Home");
+    $router->addStyle('/styles.css');
+    $router->addScript('/scripts.js');
+    $router->build();
+
     echo "<h1>Your on the index of this App</h1>";
 });
 
@@ -16,6 +21,8 @@ $router->addRoute('*', '/api', function () use ($router) {
 });
 
 $router->addRoute('GET', '/test', function () use ($router) {
+    $router->build();
+
     $variables = ['page' => "/test", 'url' => $router->projectName];
     $router->getSite('test', $variables);
 });

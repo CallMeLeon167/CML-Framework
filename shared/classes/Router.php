@@ -5,8 +5,7 @@ use Classes\HTMLBuilder;
 /**
  * @author Leon.Schmidt
  */
-class Router {
-
+class Router extends HTMLBuilder{
     /**
      * Stores routes
      */
