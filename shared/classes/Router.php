@@ -22,6 +22,11 @@ class Router extends HTMLBuilder{
     public string $redirectUrl = "";
 
     /**
+     * Store the bool if its an api route
+     */
+    public bool $isApi = false;
+
+    /**
      * Set the name of the tool
      */
     public function __construct($projectName) {
@@ -59,6 +64,13 @@ class Router extends HTMLBuilder{
      */
     public function setErrorRedirect(string $url){
         return $this->redirectUrl = $url;
+    }
+
+    /**
+     * Set a tht isApi to true
+     */
+    public function isApi(){
+        return $this->isApi = true;
     }
 
     /**
@@ -160,7 +172,7 @@ class Router extends HTMLBuilder{
                 call_user_func_array($routeData['target'], $this->sanitizeStringsArray($params));
                 
                 //Close the application
-                Router::APP_CLOSE();
+                ($this->isApi == false) ? Router::APP_CLOSE() : exit;
             }
 
         }

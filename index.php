@@ -1,6 +1,5 @@
 <?php 
 require_once 'shared/vendor/autoload.php'; 
-use Classes\HTMLBuilder;
 use Classes\Router;
 
 $router = new Router(basename(__DIR__));
@@ -17,6 +16,7 @@ $router->addRoute('*', '/', function () use ($router) {
 });
 
 $router->addRoute('*', '/api', function () use ($router) {
+    $router->isApi();
     echo json_encode(["penis" => "penis"]);
 });
 
