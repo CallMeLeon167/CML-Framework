@@ -9,8 +9,10 @@ $router->setErrorRedirect("/");
 
 $router->addRoute('*', '/', function () use ($router) {
     echo "<h1>Your on the index of this App</h1>";
-    // $router->setPageTitle("etst");
-    include "shared/classes/Datenbank.php";
+});
+
+$router->addRoute('*', '/api', function () use ($router) {
+    echo json_encode(["penis" => "penis"]);
 });
 
 $router->addRoute('GET', '/test', function () use ($router) {
@@ -19,7 +21,7 @@ $router->addRoute('GET', '/test', function () use ($router) {
 });
 
 $router->addGroup('/admin', function($router, $prefix) {
-    $router->addRoute('GET', $prefix . '/', function () {
+    $router->addRoute('GET', $prefix . '', function () {
         echo "Admin Home";
     });
     $router->addRoute('GET', $prefix . '/dashboard', function () {

@@ -4,7 +4,7 @@ namespace Classes;
 
 
 class HTMLBuilder {
-    private $title;
+    private $title = "Meine Website";
     private $styles = [];
     private $scripts = [];
 

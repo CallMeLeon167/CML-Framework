@@ -67,8 +67,8 @@ class DB {
 }
 
 // Beispielverwendung
-$db = new DB();
+// $db = new DB();
 // $resultArray = $db->sql2array("SELECT * FROM cml_code");
 // $resultArray = $db->sql2db("INSERT into  cml_code (code, code_share) VALUES ('test', 'test')");
-var_dump($resultArray);
+// var_dump($resultArray);
 ?>

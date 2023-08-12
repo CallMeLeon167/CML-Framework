@@ -23,11 +23,6 @@ class Router {
     public string $redirectUrl = "";
 
     /**
-     * Store for the html title
-     */
-    protected string $pageTitle = "Meine Website"; 
-
-    /**
      * Set the name of the tool
      */
     public function __construct($projectName) {
@@ -39,7 +34,8 @@ class Router {
      * to close the application correctly at the end.
      */
     public static function APP_CLOSE() {
-        echo '</body></html>';
+        echo PHP_EOL .'</body>';
+        echo PHP_EOL .'</html>';
         exit;
     }
 
@@ -54,7 +50,7 @@ class Router {
         header("HTTP/1.1 404 Not Found");
         echo "Site not found.<br>
         <h3>Route not found for URL: <b>$url</b> (Method: <b>$method</b>)</h3>";
-        self::APP_CLOSE();
+        Router::APP_CLOSE();
     }
 
     /**
@@ -64,15 +60,6 @@ class Router {
      */
     public function setErrorRedirect(string $url){
         return $this->redirectUrl = $url;
-    }
-
-    /**
-     * Set the page title
-     *
-     * @param string $title The title for the page
-     */
-    public function setPageTitle(string $title) {
-        $this->pageTitle = $title;
     }
 
     /**
@@ -172,7 +159,7 @@ class Router {
 
                 // Call the target function with the extracted parameter values
                 call_user_func_array($routeData['target'], $this->sanitizeStringsArray($params));
-
+                
                 //Close the application
                 Router::APP_CLOSE();
             }
