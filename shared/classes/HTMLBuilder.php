@@ -4,13 +4,14 @@ namespace Classes;
 
 
 class HTMLBuilder {
-    private $projectTitle = "";
-    private $title = "Meine Website";
+    private $projectName = "";
+    private $title = "";
     private $styles = [];
     private $scripts = [];
 
-    public function setProjectTitle($projectTitle) {
-        $this->projectTitle = $projectTitle;
+    public function setProjectName($projectName) {
+        $this->projectName = $projectName;
+        $this->setTitle($this->projectName);
     }
 
     public function setTitle($title) {
@@ -28,7 +29,7 @@ class HTMLBuilder {
     public function build() {
         $html = '<!DOCTYPE html>' . PHP_EOL;
         $html .= '<html>' . PHP_EOL;
-        $html .= $this->init_comment($this->projectTitle, "CallMeLeon") . PHP_EOL;
+        $html .= $this->init_comment($this->projectName, "CallMeLeon") . PHP_EOL;
         $html .= '<head>' . PHP_EOL;
         $html .= '<title>' . $this->title . '</title>' . PHP_EOL;
         

@@ -4,7 +4,7 @@ use Classes\Router;
 
 $router = new Router(basename(__DIR__));
 $router->setErrorRedirect("/");
-$router->setProjectTitle("Was geht");
+$router->setProjectName("Was geht");
 
 $router->addRoute('*', '/', function () use ($router) {
     $router->setTitle("Home");
