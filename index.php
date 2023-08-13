@@ -16,6 +16,13 @@ $router->addRoute('*', '/', function () use ($router, $db) {
     $router->build();
 
     echo "<h1>Your on the index of this App</h1>";
+
+    // Beispiel 1: SELECT-Abfrage mit sql2array
+    $query = "SELECT * FROM cml_code WHERE id = ?";
+    $id = 53;
+    $resultArray = $db->sql2array($query, [$id]);
+    var_dump($resultArray);
+    $db->close();
 });
 
 $router->addRoute('*', '/api', function () use ($router) {
