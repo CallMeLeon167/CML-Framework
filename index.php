@@ -1,12 +1,15 @@
 <?php 
 require_once 'shared/vendor/autoload.php'; 
 use Classes\Router;
+use Classes\DB;
 
+$db = new DB();
 $router = new Router(basename(__DIR__));
+
 $router->setErrorRedirect("/");
 $router->setProjectName("Was geht");
 
-$router->addRoute('*', '/', function () use ($router) {
+$router->addRoute('*', '/', function () use ($router, $db) {
     $router->setTitle("Home");
     $router->addStyle('/styles.css');
     $router->addScript('/scripts.js');
