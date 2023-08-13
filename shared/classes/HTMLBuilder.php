@@ -1,8 +1,5 @@
 <?php 
-
 namespace Classes;
-
-
 class HTMLBuilder {
     private $projectName = "";
     private $title = "";
