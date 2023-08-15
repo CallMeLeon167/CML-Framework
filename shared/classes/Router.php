@@ -169,7 +169,19 @@ class Router extends HTMLBuilder{
      *
      */
     public function addGroup(string $prefix, \Closure $callback) {
-        return $callback($this, $prefix);
+        // Backup current middlewares
+        $originalMiddlewares = $this->middlewares;
+
+        // Add the group prefix to the current route
+        $this->currentRoute = $prefix . $this->currentRoute;
+
+        // Execute the callback to define routes within the group
+        $callback($this, $prefix);
+
+        // Restore the original middlewares and apply them to all routes within the group
+        $this->middlewares = $originalMiddlewares;
+
+        return $this;
     }
 
     /**

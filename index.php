@@ -43,15 +43,14 @@ $router->addRoute('GET', '/test', function () use ($router) {
 });
 
 $router->addGroup('/admin', function($router, $prefix) {
-    $router->addRoute('GET', $prefix . '', function () {
-        echo "Admin Home";
-    });
     $router->addRoute('GET', $prefix . '/dashboard', function () {
         echo "Admin Dashboard";
     });
     $router->addRoute('GET', $prefix . '/users', function () {
         echo "Admin Users";
     });
+})->addMiddleware(function () {
+    echo "ADMIN MIDDLeWARE ";
 });
 
 $router->matchRoute();  
