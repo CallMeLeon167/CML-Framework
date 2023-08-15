@@ -7,7 +7,11 @@ $db = new DB();
 $router = new Router(basename(__DIR__));
 
 $router->setErrorRedirect("/");
-$router->setProjectName("Was geht");
+$router->setProjectName("Backend Version v1");
+
+$router->setGlobalMiddleware(["/login", "/api"], function () {
+    echo "<h1>GLOBAL ist gesetzt!!!!!!!!</h1>";
+});
 
 $router->addRoute('*', '/', function () use ($router, $db) {
     $router->setTitle("Home");
@@ -25,6 +29,10 @@ $router->addRoute('*', '/', function () use ($router, $db) {
 $router->addRoute('*', '/api', function () use ($router) {
     $router->isApi();
     echo json_encode(["penis" => "penis"]);
+});
+
+$router->addRoute('*', '/login', function () use ($router) {
+    echo "login ";
 });
 
 $router->addRoute('GET', '/test', function () use ($router) {

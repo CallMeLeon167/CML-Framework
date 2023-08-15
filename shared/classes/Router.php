@@ -16,6 +16,7 @@ class Router extends HTMLBuilder{
      * Stores middlewares
      */
     protected array $middlewares = [];
+    protected array $globalMiddleware = [];
 
     /**
      * Stores aliases
@@ -75,6 +76,19 @@ class Router extends HTMLBuilder{
      */
     public function setErrorRedirect(string $url){
         return $this->redirectUrl = $url;
+    }
+
+    /**
+     * Set a global middleware for every route that is not in the array
+     *
+     * @param    array      $urls URLs for the redirect
+     * @param    function   $gloMiddleware
+     */
+    public function setGlobalMiddleware(array $urls, \Closure $gloMiddleware){
+        $this->globalMiddleware['function'][] = $gloMiddleware;
+        foreach ($urls as $url) {
+            $this->globalMiddleware['url'][] = $url;
+        }
     }
 
     /**
@@ -223,12 +237,16 @@ class Router extends HTMLBuilder{
                 if ($routeData['statusCode'] > 0) {
                     http_response_code($routeData['statusCode']);
                 }
+                
+                // Execute global middleware function
+                if(!in_array($url, $this->globalMiddleware["url"])) {
+                    call_user_func($this->globalMiddleware["function"][0]);
+                }
 
                 // Execute middleware functions
                 $mdPosition = array_search($url, $this->middlewares["route"]);
                 if(is_int($mdPosition)) call_user_func($this->middlewares["function"][$mdPosition]);
                 
-
                 // Call the target function with the extracted parameter values
                 call_user_func_array($routeData['target'], $this->sanitizeStringsArray($params));
                 
