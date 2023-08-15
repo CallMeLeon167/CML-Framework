@@ -13,6 +13,11 @@ class Router extends HTMLBuilder{
     protected string $currentRoute = '';
 
     /**
+     * Stores middlewares
+     */
+    protected array $middlewares = [];
+
+    /**
      * Stores aliases
      */
     protected array $aliases = [];
@@ -97,6 +102,18 @@ class Router extends HTMLBuilder{
             'statusCode' => $statusCode
         ];
 
+        return $this;
+    }
+
+    /**
+     * Add a middleware to be executed before a route callback.
+     *
+     * @param \Closure $middleware The middleware function to be added.
+     * @return $this
+     */
+    public function addMiddleware(\Closure $middleware) {
+        $this->middlewares["function"][] = $middleware;
+        $this->middlewares["route"][] = $this->currentRoute;
         return $this;
     }
 
@@ -206,6 +223,11 @@ class Router extends HTMLBuilder{
                 if ($routeData['statusCode'] > 0) {
                     http_response_code($routeData['statusCode']);
                 }
+
+                // Execute middleware functions
+                $mdPosition = array_search($url, $this->middlewares["route"]);
+                if(is_int($mdPosition)) call_user_func($this->middlewares["function"][$mdPosition]);
+                
 
                 // Call the target function with the extracted parameter values
                 call_user_func_array($routeData['target'], $this->sanitizeStringsArray($params));

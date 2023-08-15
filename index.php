@@ -16,6 +16,8 @@ $router->addRoute('*', '/', function () use ($router, $db) {
     $router->build();
 
     echo "<h1>Your on the index of this App</h1>";
+})->addMiddleware(function () {
+    echo "Willkommen ";
 })
 ->setAlias('/pe')
 ->setAlias('/pen');
