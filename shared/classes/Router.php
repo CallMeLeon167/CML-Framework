@@ -84,7 +84,7 @@ class Router extends HTMLBuilder{
      * @param    array      $urls URLs for the redirect
      * @param    function   $gloMiddleware
      */
-    public function setGlobalMiddleware(array $urls, \Closure $gloMiddleware){
+    public function addGlobalMiddleware(array $urls, \Closure $gloMiddleware){
         $this->globalMiddleware['function'][] = $gloMiddleware;
         foreach ($urls as $url) {
             $this->globalMiddleware['url'][] = $url;
@@ -239,13 +239,15 @@ class Router extends HTMLBuilder{
                 }
                 
                 // Execute global middleware function
-                if(!in_array($url, $this->globalMiddleware["url"])) {
+                if(!empty($this->globalMiddleware) && !in_array($url, $this->globalMiddleware["url"])) {
                     call_user_func($this->globalMiddleware["function"][0]);
                 }
 
                 // Execute middleware functions
-                $mdPosition = array_search($url, $this->middlewares["route"]);
-                if(is_int($mdPosition)) call_user_func($this->middlewares["function"][$mdPosition]);
+                if(!empty($this->middlewares)){
+                    $mdPosition = array_search($url, $this->middlewares["route"]);
+                    if(is_int($mdPosition)) call_user_func($this->middlewares["function"][$mdPosition]);
+                }
                 
                 // Call the target function with the extracted parameter values
                 call_user_func_array($routeData['target'], $this->sanitizeStringsArray($params));

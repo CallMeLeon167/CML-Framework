@@ -9,7 +9,7 @@ $router = new Router(basename(__DIR__));
 $router->setErrorRedirect("/");
 $router->setProjectName("Backend Version v1");
 
-$router->setGlobalMiddleware(["/login", "/api"], function () {
+$router->addGlobalMiddleware(["/login", "/api"], function () {
     echo "<h1>GLOBAL ist gesetzt!!!!!!!!</h1>";
 });
 
