@@ -10,6 +10,12 @@ class Router extends HTMLBuilder{
      * Stores routes
      */
     protected array $routes = [];
+    protected string $currentRoute = '';
+
+    /**
+     * Stores aliases
+     */
+    protected array $aliases = [];
 
     /**
      * Store the name of the project
@@ -85,11 +91,39 @@ class Router extends HTMLBuilder{
      *
      */
     public function addRoute(string $method, string $url, \Closure $target, int $statusCode = 0) {
-        return $this->routes[$method][$url] = [
+        $this->currentRoute = $url; // Store the current route URL
+        $this->routes[$method][$url] = [
             'target' => $target,
             'statusCode' => $statusCode
         ];
+
+        return $this;
     }
+
+    /**
+     * Add an alias for the current route.
+     *
+     * @param string $alias The alias URL
+     * @return Router This router instance
+     */
+    public function setAlias(string $alias) {
+        if (!empty($this->currentRoute)) {
+            $this->aliases[$alias] = $this->currentRoute;
+        }
+        
+        return $this;
+    }
+
+    /**
+     * Find the original URL for a given alias.
+     *
+     * @param string $alias The alias URL
+     * @return string|null The original URL if found, null otherwise
+     */
+    protected function findOriginalUrlForAlias(string $alias) {
+        return $this->aliases[$alias] ?? null;
+    }
+
 
     /**
      *
@@ -121,6 +155,11 @@ class Router extends HTMLBuilder{
         if ($url == "/index.php") { $url = "/";} // check if url is index.php if so send to the / route
 
         $method = $_SERVER['REQUEST_METHOD']; // indicates the client's action (GET, POST, etc.)
+
+        $alias = $this->findOriginalUrlForAlias($url);
+        if ($alias !== null) {
+            $url = $alias; // Use the original URL
+        }
 
         // Process given action on GET, POST etc.
         if (isset($this->routes[$method])) {            
