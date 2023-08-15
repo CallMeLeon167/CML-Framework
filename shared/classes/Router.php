@@ -95,6 +95,7 @@ class Router extends HTMLBuilder{
      * Set a tht isApi to true
      */
     public function isApi(){
+        header('Content-Type: application/json');
         return $this->isApi = true;
     }
 
