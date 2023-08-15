@@ -2,3 +2,4 @@
 /shared/node_modules/*
 /shared/node_modules/
 /shared/vendor/*
+/shared/vendor
