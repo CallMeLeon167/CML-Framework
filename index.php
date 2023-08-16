@@ -1,7 +1,9 @@
 <?php 
 require_once 'shared/vendor/autoload.php'; 
-use Classes\Router;
-use Classes\DB;
+use Classes\{
+    Router,
+    DB
+};
 
 $db = new DB();
 $router = new Router(basename(__DIR__));
