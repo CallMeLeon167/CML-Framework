@@ -13,6 +13,11 @@ class Router extends HTMLBuilder{
     protected string $currentRoute = '';
 
     /**
+     * Stores the current Method
+     */
+    protected string $currentMethod = '';
+
+    /**
      * Stores middlewares
      */
     protected array $middlewares = [];
@@ -112,10 +117,25 @@ class Router extends HTMLBuilder{
      */
     public function addRoute(string $method, string $url, \Closure $target, int $statusCode = 0) {
         $this->currentRoute = $url; // Store the current route URL
+        $this->currentMethod = $method; // Set the current method
         $this->routes[$method][$url] = [
             'target' => $target,
-            'statusCode' => $statusCode
+            'statusCode' => $statusCode,
+            'ajaxOnly' => false // Default to allowing both AJAX and non-AJAX requests
         ];
+
+        return $this;
+    }
+
+    /**
+     * Set the route to be accessible only via AJAX requests.
+     *
+     * @return $this
+     */
+    public function onlyAjax() {
+        if (!empty($this->currentRoute)) {
+            $this->routes[$this->currentMethod][$this->currentRoute]['ajaxOnly'] = true;
+        }
 
         return $this;
     }
@@ -237,6 +257,11 @@ class Router extends HTMLBuilder{
     protected function processRoutes(string $url, array $routes) {
         foreach ($routes as $routeUrl => $routeData) {
 
+            // Check if the current route is restricted to AJAX requests
+            if ($routeData['ajaxOnly'] && !$this->isAjaxRequest()) {
+                continue; // Skip this route if not an AJAX request
+            }
+
             // Convert route URL to a regular expression pattern for the ':' parameter
             $pattern = preg_replace('/\/:([^\/]+)/', '/(?P<$1>[^/]+)', $routeUrl);
 
@@ -264,9 +289,9 @@ class Router extends HTMLBuilder{
                 
                 // Call the target function with the extracted parameter values
                 call_user_func_array($routeData['target'], $this->sanitizeStringsArray($params));
-                
+
                 //Close the application
-                ($this->isApi == false) ? Router::APP_CLOSE() : exit;
+                ($this->isApi == false && $routeData['ajaxOnly'] == false) ? Router::APP_CLOSE() : exit;
             }
 
         }
@@ -320,6 +345,15 @@ class Router extends HTMLBuilder{
         }
 
         return $sanitizedArray;
+    }
+
+    /**
+     * Check if the current request is an AJAX request.
+     *
+     * @return bool
+     */
+    protected function isAjaxRequest(): bool {
+        return !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
     }
 }
 ?>

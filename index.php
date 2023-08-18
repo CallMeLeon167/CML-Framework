@@ -33,9 +33,9 @@ $router->addRoute('*', '/api', function () use ($router) {
     echo json_encode(["penis" => "penis"]);
 });
 
-$router->addRoute('*', '/login', function () use ($router) {
-    echo "login ";
-});
+$router->addRoute('POST', '/user/data', function () {
+    //Get user data only via Ajax
+})->onlyAjax();
 
 $router->addRoute('GET', '/test', function () use ($router) {
     $router->build();
