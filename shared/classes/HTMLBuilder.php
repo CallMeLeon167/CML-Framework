@@ -28,6 +28,8 @@ class HTMLBuilder {
         $html .= '<html>' . PHP_EOL;
         $html .= $this->init_comment($this->projectName, "CallMeLeon") . PHP_EOL;
         $html .= '<head>' . PHP_EOL;
+        $html .= '<meta charset="UTF-8">' . PHP_EOL;
+        $html .= '<meta name="viewport" content="width=device-width, initial-scale=1.0">' . PHP_EOL;
         $html .= '<title>' . $this->title . '</title>' . PHP_EOL;
         
         foreach ($this->styles as $style) {
