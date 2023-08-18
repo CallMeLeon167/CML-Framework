@@ -6,6 +6,7 @@ class HTMLBuilder {
     private $styles = [];
     private $scripts = [];
     private $metas = [];
+    private $baseUrl = "";
 
     public function setProjectName($projectName) {
         $this->projectName = $projectName;
@@ -29,10 +30,11 @@ class HTMLBuilder {
     }
 
     function assetUrl($path) {
-        return '/' . ltrim($path, '/');
+        return ($this->baseUrl == "/") ? "/" . ltrim($path, '/') : $this->baseUrl . "/" . ltrim($path, '/');
     }
 
     public function build() {
+        $this->baseUrl = dirname($_SERVER['SCRIPT_NAME']);
         $html = '<!DOCTYPE html>' . PHP_EOL;
         $html .= '<html>' . PHP_EOL;
         $html .= $this->init_comment($this->projectName, "CallMeLeon") . PHP_EOL;
