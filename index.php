@@ -8,7 +8,7 @@ use Classes\{
 $db = new DB();
 $router = new Router(basename(__DIR__));
 
-$router->setErrorRedirect("/");
+// $router->setErrorRedirect("/");
 $router->setProjectName("Backend Version v1");
 
 $router->addGlobalMiddleware(["/login", "/api"], function () {
@@ -31,7 +31,7 @@ $router->addRoute('*', '/', function () use ($router, $db) {
 $router->addRoute('*', '/api', function () use ($router) {
     $router->isApi();
     echo json_encode(["penis" => "penis"]);
-});
+    });
 
 $router->addRoute('POST', '/user/data', function () {
     //Get user data only via Ajax

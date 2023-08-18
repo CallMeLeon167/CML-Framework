@@ -213,7 +213,7 @@ class Router extends HTMLBuilder{
 
         # URL Validation
         $url = $_SERVER['REQUEST_URI']; // get the URL from the curet page
-        if ($url != "/") {rtrim($_SERVER['REQUEST_URI'], '/');} // Remove slash from the end 
+        if ($url != "/") {$url = rtrim($_SERVER['REQUEST_URI'], '/');} // Remove slash from the end 
         $url = strtok($url, '?'); // Remove query parameters from the URL
         $url = str_replace("/$this->projectName", "", $url); // add basename of the application folder
         if ($url == "/index.php") { $url = "/";} // check if url is index.php if so send to the / route
