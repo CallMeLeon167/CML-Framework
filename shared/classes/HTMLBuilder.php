@@ -6,12 +6,6 @@ class HTMLBuilder {
     private $styles = [];
     private $scripts = [];
     private $metas = [];
-    private $rootPath = "";
-
-    public function setPath() {
-        $this->rootPath = dirname($_SERVER['SCRIPT_NAME'])."/";
-        return $this->rootPath;
-    }
 
     public function setProjectName($projectName) {
         $this->projectName = $projectName;
@@ -34,9 +28,11 @@ class HTMLBuilder {
         $this->metas[] = $attrs;
     }
 
+    function assetUrl($path) {
+        return '/' . ltrim($path, '/');
+    }
+
     public function build() {
-        $this->setPath();
-        define("HOST", $this->rootPath);
         $html = '<!DOCTYPE html>' . PHP_EOL;
         $html .= '<html>' . PHP_EOL;
         $html .= $this->init_comment($this->projectName, "CallMeLeon") . PHP_EOL;
@@ -49,11 +45,11 @@ class HTMLBuilder {
         $html .= '<title>' . $this->title . '</title>' . PHP_EOL;
         
         foreach ($this->styles as $style) {
-            $html .= '<link rel="stylesheet" type="text/css" href="' . HOST . $style . '">' . PHP_EOL;
+            $html .= '<link rel="stylesheet" type="text/css" href="' . $this->assetUrl($style) . '">' . PHP_EOL;
         }
         
         foreach ($this->scripts as $script) {
-            $html .= '<script src="' . HOST . $script . '"></script>' . PHP_EOL;
+            $html .= '<script src="' . $this->assetUrl($script) . '"></script>' . PHP_EOL;
         }
         
         $html .= '</head>' . PHP_EOL;
