@@ -44,6 +44,11 @@ class Router extends HTMLBuilder{
     public bool $isApi = false;
 
     /**
+     * Store the params of an route
+     */
+    protected array $currentRouteParams = [];
+
+    /**
      * Set the name of the tool
      */
     public function __construct($projectName) {
@@ -58,6 +63,10 @@ class Router extends HTMLBuilder{
         echo PHP_EOL .'</body>';
         echo PHP_EOL .'</html>';
         exit;
+    }
+
+    public function getRouteParam($paramName) {
+        return $this->currentRouteParams[$paramName] ?? null;
     }
 
     /**
@@ -121,7 +130,8 @@ class Router extends HTMLBuilder{
         $this->routes[$method][$url] = [
             'target' => $target,
             'statusCode' => $statusCode,
-            'ajaxOnly' => false // Default to allowing both AJAX and non-AJAX requests
+            'ajaxOnly' => false,
+            'params' => [],
         ];
 
         return $this;
@@ -288,12 +298,37 @@ class Router extends HTMLBuilder{
                 }
                 
                 // Call the target function with the extracted parameter values
-                call_user_func_array($routeData['target'], $this->sanitizeStringsArray($params));
+                $this->currentRouteParams = $this->sanitizeStringsArray(array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY));
+                call_user_func_array($routeData['target'], $this->currentRouteParams);
 
                 //Close the application
                 ($this->isApi == false && $routeData['ajaxOnly'] == false) ? Router::APP_CLOSE() : exit;
             }
 
+        }
+    }
+
+    /**
+     * Executes a method in the specified controller.
+     *
+     * @param string $controllerName The name of the controller in which the method should be called.
+     * @param string $methodName The name of the method to be called.
+     * @param array $params An optional array of parameters to be passed to the method.
+     */
+    public function useController($controllerName, $methodName, $params = []){
+        if(empty($params)){
+            $params = $this->currentRouteParams;
+        }
+        $controllerClassName = 'Controllers\\' . $controllerName;
+        if (class_exists($controllerClassName)) {
+            $controllerInstance = new $controllerClassName();
+            if (method_exists($controllerInstance, $methodName)) {
+                call_user_func([$controllerInstance, $methodName], $params);
+            } else {
+                echo "Method $methodName not found in controller $controllerName.";
+            }
+        } else {
+            echo "Controller $controllerName not found.";
         }
     }
 
@@ -325,7 +360,7 @@ class Router extends HTMLBuilder{
     protected function sanitizeStringsArray(array $inputArray): array {
         $sanitizedArray = [];
 
-        foreach ($inputArray as $input) {
+        foreach ($inputArray as $k => $input) {
             // Remove HTML tags
             $sanitized = strip_tags($input);
 
@@ -341,7 +376,7 @@ class Router extends HTMLBuilder{
 
             // Add more customizations or filters as needed.
 
-            $sanitizedArray[] = $sanitized;
+            $sanitizedArray[$k] = $sanitized;
         }
 
         return $sanitizedArray;
