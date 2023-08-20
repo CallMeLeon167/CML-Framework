@@ -315,7 +315,7 @@ class Router extends HTMLBuilder{
      * @param string $methodName The name of the method to be called.
      * @param array $params An optional array of parameters to be passed to the method.
      */
-    public function useController($controllerName, $methodName, $params = []){
+    public function useController(string $controllerName, string $methodName, array $params = []){
         if(empty($params)){
             $params = $this->currentRouteParams;
         }
@@ -339,7 +339,7 @@ class Router extends HTMLBuilder{
      * @param   array   $variables An associative array of variables to be made available in the loaded file.
      * 
      */
-    public function getSite($siteName, $variables = []) {
+    public function getSite(string $siteName, array $variables = []) {
         $sitePath = "../".$this->projectName."/sites/$siteName.php";
 
         if (file_exists($sitePath)) {
