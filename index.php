@@ -9,7 +9,7 @@ $db = new DB();
 $router = new Router(basename(__DIR__));
 
 // $router->setErrorRedirect("/");
-$router->setProjectName("Backend Version v1");
+$router->setProjectName("Backend Version v1.1");
 
 $router->addGlobalMiddleware(["/login", "/api"], function () {
     echo "<h1>GLOBAL ist gesetzt!!!!!!!!</h1>";
@@ -42,6 +42,13 @@ $router->addRoute('GET', '/test', function () use ($router) {
 
     $variables = ['page' => "/test", 'url' => $router->projectName];
     $router->getSite('test', $variables);
+});
+
+$router->addRoute('GET', '/test/:id', function () use ($router) {
+
+    $router->useController("TestController", "getTest");
+
+    echo "test-id: " . $router->getRouteParam('test');
 });
 
 $router->addGroup('/admin', function($router, $prefix) {
