@@ -46,7 +46,7 @@ $router->addRoute('GET', '/test', function () use ($router) {
 
 $router->addRoute('GET', '/test/:id', function () use ($router) {
 
-    $router->useController("TestController", "getTest");
+    $router->useController("TestController", "getTest", ["controllerName" => "TestController"]);
 
     echo "test-id: " . $router->getRouteParam('test');
 });

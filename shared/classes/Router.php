@@ -63,6 +63,14 @@ class Router extends HTMLBuilder{
     }
 
     /**
+     * Set a tht isApi to true
+     */
+    public function isApi(){
+        header('Content-Type: application/json');
+        return $this->isApi = true;
+    }
+
+    /**
      * This static method is called from inside of the class,
      * to close the application correctly at the end.
      */
@@ -113,11 +121,16 @@ class Router extends HTMLBuilder{
     }
 
     /**
-     * Set a tht isApi to true
+     * Add a middleware to be executed before a route callback.
+     *
+     * @param \Closure $middleware The middleware function to be added.
+     * @return $this
      */
-    public function isApi(){
-        header('Content-Type: application/json');
-        return $this->isApi = true;
+    public function addMiddleware(\Closure $middleware, array $params = []) {
+        $this->middlewares["function"][] = $middleware;
+        $this->middlewares["route"][] = $this->currentRoute;
+        $this->middlewares["params"][] = $params;
+        return $this;
     }
 
     /**
@@ -143,56 +156,6 @@ class Router extends HTMLBuilder{
 
         return $this;
     }
-
-    /**
-     * Set the route to be accessible only via AJAX requests.
-     *
-     * @return $this
-     */
-    public function onlyAjax() {
-        if (!empty($this->currentRoute)) {
-            $this->routes[$this->currentMethod][$this->currentRoute]['ajaxOnly'] = true;
-        }
-
-        return $this;
-    }
-
-    /**
-     * Add a middleware to be executed before a route callback.
-     *
-     * @param \Closure $middleware The middleware function to be added.
-     * @return $this
-     */
-    public function addMiddleware(\Closure $middleware) {
-        $this->middlewares["function"][] = $middleware;
-        $this->middlewares["route"][] = $this->currentRoute;
-        return $this;
-    }
-
-    /**
-     * Add an alias for the current route.
-     *
-     * @param string $alias The alias URL
-     * @return Router This router instance
-     */
-    public function setAlias(string $alias) {
-        if (!empty($this->currentRoute)) {
-            $this->aliases[$alias] = $this->currentRoute;
-        }
-        
-        return $this;
-    }
-
-    /**
-     * Find the original URL for a given alias.
-     *
-     * @param string $alias The alias URL
-     * @return string|null The original URL if found, null otherwise
-     */
-    protected function findOriginalUrlForAlias(string $alias) {
-        return $this->aliases[$alias] ?? null;
-    }
-
 
     /**
      *
@@ -236,7 +199,6 @@ class Router extends HTMLBuilder{
         if ($url == "/index.php") { $url = "/";} // check if url is index.php if so send to the / route
         $url = str_replace("//", "/", $url); // remove double slash from the url
 
-
         $method = $_SERVER['REQUEST_METHOD']; // indicates the client's action (GET, POST, etc.)
 
         $alias = $this->findOriginalUrlForAlias($url);
@@ -265,6 +227,7 @@ class Router extends HTMLBuilder{
         }
 
     }
+
     /**
      *
      * Loop through the routes to find a match for the given URL.
@@ -303,7 +266,7 @@ class Router extends HTMLBuilder{
                 // Execute middleware functions
                 if(!empty($this->middlewares)){
                     $mdPosition = array_search($url, $this->middlewares["route"]);
-                    if(is_int($mdPosition)) call_user_func($this->middlewares["function"][$mdPosition]);
+                    if(is_int($mdPosition)) call_user_func($this->middlewares["function"][$mdPosition], $this->middlewares["params"][$mdPosition]);
                 }
                 
                 // Call the target function with the extracted parameter values
@@ -325,9 +288,7 @@ class Router extends HTMLBuilder{
      * @param array $params An optional array of parameters to be passed to the method.
      */
     public function useController(string $controllerName, string $methodName, array $params = []){
-        if(empty($params)){
-            $params = $this->currentRouteParams;
-        }
+        $params = empty($params) ? $this->currentRouteParams : array_merge($params, $this->currentRouteParams);
         $controllerClassName = 'Controllers\\' . $controllerName;
         if (class_exists($controllerClassName)) {
             $controllerInstance = new $controllerClassName();
@@ -358,6 +319,43 @@ class Router extends HTMLBuilder{
             header("HTTP/1.1 404 Not Found");
             echo "getSite('$siteName') | Site not found => /sites/$siteName.php";
         }
+    }
+
+    /**
+     * Set the route to be accessible only via AJAX requests.
+     *
+     * @return $this
+     */
+    public function onlyAjax() {
+        if (!empty($this->currentRoute)) {
+            $this->routes[$this->currentMethod][$this->currentRoute]['ajaxOnly'] = true;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add an alias for the current route.
+     *
+     * @param string $alias The alias URL
+     * @return Router This router instance
+     */
+    public function setAlias(string $alias) {
+        if (!empty($this->currentRoute)) {
+            $this->aliases[$alias] = $this->currentRoute;
+        }
+        
+        return $this;
+    }
+
+    /**
+     * Find the original URL for a given alias.
+     *
+     * @param string $alias The alias URL
+     * @return string|null The original URL if found, null otherwise
+     */
+    protected function findOriginalUrlForAlias(string $alias) {
+        return $this->aliases[$alias] ?? null;
     }
 
     /**
