@@ -56,6 +56,13 @@ class Router extends HTMLBuilder{
     }
 
     /**
+     * Match the routes 
+     */
+    public function __destruct() {
+        $this->matchRoute();
+    }
+
+    /**
      * This static method is called from inside of the class,
      * to close the application correctly at the end.
      */

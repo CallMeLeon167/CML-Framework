@@ -31,7 +31,7 @@ $router->addRoute('*', '/', function () use ($router, $db) {
 $router->addRoute('*', '/api', function () use ($router) {
     $router->isApi();
     echo json_encode(["penis" => "penis"]);
-    });
+});
 
 $router->addRoute('POST', '/user/data', function () {
     //Get user data only via Ajax
@@ -62,5 +62,4 @@ $router->addGroup('/admin', function($router, $prefix) {
     echo "ADMIN MIDDLeWARE ";
 });
 
-$router->matchRoute();  
 ?>
