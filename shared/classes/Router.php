@@ -85,7 +85,7 @@ class Router extends HTMLBuilder{
      */
     private static function handleRouteNotFound(string $url, string $method) {
         header("HTTP/1.1 404 Not Found");
-        echo "Site not found.<br>
+        echo "Site not found => Route is Wrong.<br>
         <h3>Route not found for URL: <b>$url</b> (Method: <b>$method</b>)</h3>";
         Router::APP_CLOSE();
     }
@@ -334,10 +334,10 @@ class Router extends HTMLBuilder{
             if (method_exists($controllerInstance, $methodName)) {
                 call_user_func([$controllerInstance, $methodName], $params);
             } else {
-                echo "Method $methodName not found in controller $controllerName.";
+                echo "Method $methodName not found in controller $controllerName.<br>";
             }
         } else {
-            echo "Controller $controllerName not found.";
+            echo "Controller <b>$controllerName</b> not found. Check your controllers folder <b>/controllers/$controllerName.php</b> <br>";
         }
     }
 
@@ -356,7 +356,7 @@ class Router extends HTMLBuilder{
             include $sitePath;
         } else {
             header("HTTP/1.1 404 Not Found");
-            echo "Site not found.";
+            echo "getSite('$siteName') | Site not found => /sites/$siteName.php";
         }
     }
 

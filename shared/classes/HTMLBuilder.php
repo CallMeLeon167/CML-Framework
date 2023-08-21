@@ -145,13 +145,4 @@ class HTMLBuilder {
         }
     }
 }
-
-// Beispielverwendung
-// $htmlBuilder = new HTMLBuilder();
-// $htmlBuilder->setTitle("Meine Webseite");
-// $htmlBuilder->addStyle("styles.css");
-// $htmlBuilder->addScript("script.js");
-
-// echo $htmlBuilder->build();
-
 ?>
