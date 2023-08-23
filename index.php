@@ -10,20 +10,16 @@ $router = new Router(basename(__DIR__));
 
 // $router->setErrorRedirect("/");
 $router->setProjectName("Backend Version v1.1");
+$router->setFavicon("/favicon.ico");
+$router->disableComments();
 
-$router->addGlobalMiddleware(["/login", "/api"], function () {
-    echo "<h1>GLOBAL ist gesetzt!!!!!!!!</h1>";
-});
-
-$router->addRoute('*', '/', function () use ($router, $db) {
+$router->addRoute('*', '/', function () use ($router) {
     $router->setTitle("Home");
     $router->addStyle('/styles.css');
     $router->addScript('/scripts.js');
     $router->build();
 
     echo "<h1>Your on the index of this App</h1>";
-})->addMiddleware(function () {
-    echo "Willkommen ";
 })
 ->setAlias('/pe')
 ->setAlias('/pen');

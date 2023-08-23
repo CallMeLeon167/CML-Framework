@@ -1,12 +1,15 @@
 <?php 
 namespace Classes;
 class HTMLBuilder {
-    private $projectName = "";
-    private $title = "";
-    private $styles = [];
-    private $scripts = [];
-    private $metas = [];
-    private $baseUrl = "";
+    private string $projectName = "";
+    private string $title = "";
+    private string $favicon = "";
+    private string $author = "CallMeLeon";
+    private string $baseUrl = "";
+    private array $styles = [];
+    private array $scripts = [];
+    private array $metas = [];
+    private bool $showComments = true;
 
     public function setProjectName($projectName) {
         $this->projectName = $projectName;
@@ -15,6 +18,14 @@ class HTMLBuilder {
 
     public function setTitle($title) {
         $this->title = $title;
+    }
+    
+    public function setAuthor(...$author) {
+        $this->author = implode(", ", $author);
+    }
+
+    public function setFavicon($favicon) {
+        $this->favicon = $favicon;
     }
 
     public function addStyle($href) {
@@ -33,11 +44,15 @@ class HTMLBuilder {
         return ($this->baseUrl == "/") ? "/" . ltrim($path, '/') : $this->baseUrl . "/" . ltrim($path, '/');
     }
 
+    public function disableComments() {
+        $this->showComments = false;
+    }
+
     public function build() {
         $this->baseUrl = dirname($_SERVER['SCRIPT_NAME']);
         $html = '<!DOCTYPE html>' . PHP_EOL;
         $html .= '<html>' . PHP_EOL;
-        $html .= $this->init_comment($this->projectName, "CallMeLeon") . PHP_EOL;
+        if($this->showComments == true) $html .= $this->init_comment($this->projectName, $this->author) . PHP_EOL;
         $html .= '<head>' . PHP_EOL;
         $html .= '<meta charset="UTF-8">' . PHP_EOL;
         $html .= '<meta name="viewport" content="width=device-width, initial-scale=1.0">' . PHP_EOL;
@@ -45,6 +60,7 @@ class HTMLBuilder {
             $html .= '<meta ' . $meta . '>' . PHP_EOL;
         }
         $html .= '<title>' . $this->title . '</title>' . PHP_EOL;
+        $html .= '<link rel="icon" type="image/x-icon" href="'.$this->assetUrl($this->favicon).'">' . PHP_EOL;
         
         foreach ($this->styles as $style) {
             $html .= '<link rel="stylesheet" type="text/css" href="' . $this->assetUrl($style) . '">' . PHP_EOL;
@@ -100,9 +116,6 @@ class HTMLBuilder {
         $comment[] = "<!-- ".$this->center_comment(" ")."-->";
         $comment[] = "<!-- ".$this->center_comment("Willkommen im Quellcode von $titel")."-->";
         $comment[] = "<!-- ".$this->center_comment(" ")."-->";
-        $comment[] = "<!-- ".$this->center_comment("Drittanbieter die verwendet werden sind:")."-->";
-        $comment[] = "<!-- ".$this->center_comment("jQuery, Bootstrap, FontAwesome und Animate.css")."-->";
-        $comment[] = "<!-- ".$this->center_comment(" ")."-->";
 
         switch ($num) {
             case 1:
@@ -135,7 +148,7 @@ class HTMLBuilder {
 
         $comment[] = "<!-- ".$this->center_comment(" ")."-->";
         $comment[] = "<!-- ".$this->center_comment("Diese Webseite wurde Programmiert von $programmer")."-->";
-        $comment[] = "<!-- ".$this->center_comment("im Zeitraum von 2022-".date("Y"))."-->";
+        $comment[] = "<!-- ".$this->center_comment("im Zeitraum von ".date("Y"))."-->";
         $comment[] = "<!-- ".$this->center_comment(" ")."-->";
         $comment[] = "<!-- ".$this->center_comment("Letztes Update: $dateFile")."-->";
         $comment[] = "<!-- ".$this->center_comment(" ")."-->";
