@@ -250,9 +250,6 @@ class Router extends HTMLBuilder{
             // Check if the current URL matches the pattern
             if (preg_match('#^' . $pattern . '$#', $url, $matches)) {
 
-                // Filter and extract named parameter values from the matches
-                $params = array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY); 
-
                 // Set the HTTP status code if provided
                 if ($routeData['statusCode'] > 0) {
                     http_response_code($routeData['statusCode']);
