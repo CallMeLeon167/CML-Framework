@@ -79,6 +79,44 @@ class DB {
         return $sqlArray;
     }
 
+    public function sql2array_file(string $filename, array $params = []) {
+        $sqlArray = [];
+    
+        // Read the contents of the SQL file
+        $sqlContent = file_get_contents($filename);
+    
+        // Split SQL queries based on semicolons
+        $queries = explode(';', $sqlContent);
+    
+        foreach ($queries as $query) {
+            // Remove leading/trailing whitespace and skip empty queries
+            $query = trim($query);
+            if (!empty($query)) {
+                // Execute the query and add result to the array
+                $sqlArray = $this->sql2array($query, $params);
+            }
+        }
+    
+        return $sqlArray;
+    }
+
+
+    public function sql2db_file(string $filename, array $params = []) {
+        // Read the contents of the SQL file
+        $sqlContent = file_get_contents($filename);
+    
+        // Split SQL queries based on semicolons
+        $queries = explode(';', $sqlContent);
+    
+        foreach ($queries as $query) {
+            // Remove leading/trailing whitespace and skip empty queries
+            $query = trim($query);
+            if (!empty($query)) {
+                $this->sql2db($query, $params);
+            }
+        }
+    }
+
     // Führt SQL-Abfrage aus und gibt das Ergebnisobjekt zurück
     public function sql2db(string $query, array $params = []) {
         $stmt = $this->conn->prepare($query);

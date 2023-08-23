@@ -28,9 +28,12 @@ $router->addRoute('*', '/', function () use ($router, $db) {
 ->setAlias('/pe')
 ->setAlias('/pen');
 
-$router->addRoute('*', '/api', function () use ($router) {
+$router->addRoute('*', '/api', function () use ($router, $db) {
     $router->isApi();
-    echo json_encode(["penis" => "penis"]);
+
+    $test = $db->sql2array_file(__DIR__."/shared/sql/test.sql", [53, 55]);
+    echo json_encode($test, JSON_PRETTY_PRINT);
+
 });
 
 $router->addRoute('POST', '/user/data', function () {
