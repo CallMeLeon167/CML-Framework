@@ -15,7 +15,7 @@ class DB {
     }
 
     // Stellt Verbindung zur Datenbank her
-    private function connect() {
+    public function connect() {
         $host = $_ENV['DB_HOST'];
         $user = $_ENV['DB_USER'];
         $pass = $_ENV['DB_PASS'];
@@ -83,7 +83,7 @@ class DB {
         $sqlArray = [];
     
         // Read the contents of the SQL file
-        $sqlContent = file_get_contents($filename);
+        $sqlContent = file_get_contents(dirname(__DIR__).'/sql/'.ltrim($filename, "/"));
     
         // Split SQL queries based on semicolons
         $queries = explode(';', $sqlContent);
@@ -103,7 +103,7 @@ class DB {
 
     public function sql2db_file(string $filename, array $params = []) {
         // Read the contents of the SQL file
-        $sqlContent = file_get_contents($filename);
+        $sqlContent = file_get_contents(dirname(__DIR__).'/sql/'.ltrim($filename, "/"));
     
         // Split SQL queries based on semicolons
         $queries = explode(';', $sqlContent);
@@ -167,15 +167,4 @@ class DB {
         $this->conn->close();
     }
 }
-
-// // Beispiel 1: SELECT-Abfrage mit sql2array
-// $query = "SELECT * FROM cml_code WHERE code_type = ?";
-// $codeType = "example_type";
-// $resultArray = $db->sql2array($query, [$codeType]);
-
-// // Beispiel 2: INSERT-Abfrage mit sql2db
-// $insertQuery = "INSERT INTO cml_code (code, code_share) VALUES (?, ?)";
-// $code = "new_code";
-// $codeShare = "share_value";
-// $db->sql2db($insertQuery, [$code, $codeShare]);
 ?>
