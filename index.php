@@ -12,9 +12,9 @@ if ($_SERVER['HTTP_HOST'] != "localhost") {
 
 $db = new DB();
 $user = new Login();
-$user->register("CallMeLeon", "GermanFr3aksLP");
-// $user->login("CallMeLeon", "GermanFr3aksLP");
-exit;
+// $user->register("CallMeLeon", "GermanFr3aksLP");
+// // $user->login("CallMeLeon", "GermanFr3aksLP");
+// exit;
 
 
 $router = new Router(basename(__DIR__));

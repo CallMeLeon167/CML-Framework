@@ -307,7 +307,8 @@ class Router extends HTMLBuilder{
      * 
      */
     public function getSite(string $siteName, array $variables = []) {
-        $sitePath = "../".$this->projectName."/sites/$siteName.php";
+        $siteName = rtrim($siteName, ".php");
+        $sitePath = dirname(__DIR__)."/../sites/$siteName.php";
 
         if (file_exists($sitePath)) {
             extract($variables); // Make the variables available
