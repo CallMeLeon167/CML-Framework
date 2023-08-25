@@ -290,7 +290,7 @@ class Router extends HTMLBuilder{
         if (class_exists($controllerClassName)) {
             $controllerInstance = new $controllerClassName();
             if (method_exists($controllerInstance, $methodName)) {
-                call_user_func([$controllerInstance, $methodName], $params);
+                return call_user_func([$controllerInstance, $methodName], $params);
             } else {
                 echo "Method $methodName not found in controller $controllerName.<br>";
             }
