@@ -299,7 +299,7 @@ class Router extends HTMLBuilder{
      * 
      */
     public function getSite(string $siteName, array $variables = []) {
-        $siteName = rtrim($siteName, ".php");
+        $siteName = str_replace(".php", '', $siteName);
         $sitePath = dirname(__DIR__)."/../sites/$siteName.php";
 
         if (file_exists($sitePath)) {
