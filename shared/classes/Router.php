@@ -6,6 +6,8 @@ use Classes\HTMLBuilder;
  * @author Leon.Schmidt
  */
 class Router extends HTMLBuilder{
+    use \Classes\Traits\Traits;
+
     /**
      * Stores routes
      */
@@ -29,11 +31,6 @@ class Router extends HTMLBuilder{
     protected array $aliases = [];
 
     /**
-     * Store the name of the project
-     */
-    public string $projectName = "";
-
-    /**
      * Store the url to redirect
      */
     public string $redirectUrl = "";
@@ -47,13 +44,6 @@ class Router extends HTMLBuilder{
      * Store the params of an route
      */
     protected array $currentRouteParams = [];
-
-    /**
-     * Set the name of the tool
-     */
-    public function __construct($projectName) {
-        $this->projectName = $projectName;
-    }
 
     /**
      * Match the routes 
@@ -104,7 +94,7 @@ class Router extends HTMLBuilder{
      * @param    string     $url URL for the redirect
      */
     public function setErrorRedirect(string $url){
-        return $this->redirectUrl = $url;
+        return $this->redirectUrl = parent::assetUrl($url);
     }
 
     /**
@@ -195,7 +185,7 @@ class Router extends HTMLBuilder{
         $url = $_SERVER['REQUEST_URI']; // get the URL from the curet page
         if ($url != "/") {$url = rtrim($_SERVER['REQUEST_URI'], '/');} // Remove slash from the end 
         $url = strtok($url, '?'); // Remove query parameters from the URL
-        $url = str_replace("$this->projectName", "", $url); // add basename of the application folder
+        $url = str_replace(ltrim(rtrim(assetUrl(""), "/"), "/"), "", $url); // add basename of the application folder
         if ($url == "/index.php") { $url = "/";} // check if url is index.php if so send to the / route
         $url = str_replace("//", "/", $url); // remove double slash from the url
 
@@ -218,12 +208,14 @@ class Router extends HTMLBuilder{
 
         // call this if route not found and redirect url is set
         if(!isset($this->routes[$method][$url]) && !empty($this->redirectUrl)){
-            $redirect = "/".$this->projectName.$this->redirectUrl;
-            header("Location: ".$redirect);
+            header("Location: ".$this->redirectUrl);
+            die;
+        } else if ($this->routes[$this->currentMethod][$this->currentRoute]['ajaxOnly'] == true){
+            echo json_encode(["error" => "this is not an Ajax call"]);
             die;
         } else {
-            // call this method if route not found
             $this->handleRouteNotFound($url, $method);
+            die;
         }
 
     }
@@ -385,6 +377,46 @@ class Router extends HTMLBuilder{
         }
 
         return $sanitizedArray;
+    }
+
+    /**
+     * Retrieves and filters query parameters from the current request URI.
+     *
+     * @param string ...$desiredParams A variable number of parameter names to filter the query parameters.
+     * @return array An associative array containing the filtered query parameters.
+     */
+    public function getQueryParams(string ...$desiredParams) {
+        // Initialize an array to store query parameters.
+        $queryParams = array();
+
+        // Extract the query string from the request URI.
+        $queryString = parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY);
+
+        // Parse the query string into the $queryParams array.
+        if ($queryString) {
+            parse_str($queryString, $queryParams);
+        }
+
+        // Check if desired parameters were provided.
+        if (!empty($desiredParams)) {
+            // Initialize an array to store filtered parameters.
+            $filteredParams = array();
+
+            // Loop through each desired parameter.
+            foreach ($desiredParams as $param) {
+                // Check if the parameter exists in the query parameters.
+                if (isset($queryParams[$param])) {
+                    // Add the parameter and its value to the filteredParams array.
+                    $filteredParams[$param] = $queryParams[$param];
+                }
+            }
+
+            // Return the filtered parameters.
+            return $filteredParams;
+        }
+
+        // Return all query parameters if no desired parameters were provided.
+        return $queryParams;
     }
 
     /**
