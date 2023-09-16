@@ -185,7 +185,7 @@ class Router extends HTMLBuilder{
         $url = $_SERVER['REQUEST_URI']; // get the URL from the curet page
         if ($url != "/") {$url = rtrim($_SERVER['REQUEST_URI'], '/');} // Remove slash from the end 
         $url = strtok($url, '?'); // Remove query parameters from the URL
-        $url = str_replace(ltrim(rtrim(assetUrl(""), "/"), "/"), "", $url); // add basename of the application folder
+        $url = str_replace(ltrim(rtrim(parent::assetUrl(""), "/"), "/"), "", $url); // add basename of the application folder
         if ($url == "/index.php") { $url = "/";} // check if url is index.php if so send to the / route
         $url = str_replace("//", "/", $url); // remove double slash from the url
 
