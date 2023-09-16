@@ -1,11 +1,13 @@
 <?php 
 namespace Classes;
-class HTMLBuilder {
+class HTMLBuilder{
+    use Traits\Traits;
     private string $projectName = "";
     private string $title = "";
     private string $favicon = "";
     private string $author = "CallMeLeon";
     private string $baseUrl = "";
+    private array $header = [];
     private array $styles = [];
     private array $scripts = [];
     private array $metas = [];
@@ -28,6 +30,10 @@ class HTMLBuilder {
         $this->favicon = $favicon;
     }
 
+    public function addHeader($header) {
+        $this->header[] = $header;
+    }
+
     public function addStyle($href) {
         $this->styles[] = $href;
     }
@@ -40,16 +46,11 @@ class HTMLBuilder {
         $this->metas[] = $attrs;
     }
 
-    function assetUrl($path) {
-        return ($this->baseUrl == "/") ? "/" . ltrim($path, '/') : $this->baseUrl . "/" . ltrim($path, '/');
-    }
-
     public function disableComments() {
         $this->showComments = false;
     }
 
     public function build() {
-        $this->baseUrl = dirname($_SERVER['SCRIPT_NAME']);
         $html = '<!DOCTYPE html>' . PHP_EOL;
         $html .= '<html>' . PHP_EOL;
         if($this->showComments == true) $html .= $this->init_comment($this->projectName, $this->author) . PHP_EOL;
@@ -72,6 +73,11 @@ class HTMLBuilder {
         
         $html .= '</head>' . PHP_EOL;
         $html .= '<body>' . PHP_EOL;
+        
+        foreach ($this->header as $header) {
+            $html .= $header . PHP_EOL;
+        }
+
         // Hier könntest du weiteren Inhalt hinzufügen
         
         echo $html;
@@ -108,7 +114,7 @@ class HTMLBuilder {
      */
     public function init_comment(string $titel, string ...$programmer){
         $comment = array();
-        $num = rand(1,4);
+        $num = rand(1,7);
         $dateFile = date ("d.m.Y H:i:s", getlastmod());
         $programmer = implode(', ', $programmer);
 
@@ -119,30 +125,44 @@ class HTMLBuilder {
 
         switch ($num) {
             case 1:
-                $comment[] = "<!-- ".$this->center_comment("   ______      ______  ___     __                    ")."-->";
-                $comment[] = "<!-- ".$this->center_comment("  / ____/___ _/ / /  |/  /__  / /   ___  ____  ____  ")."-->";
-                $comment[] = "<!-- ".$this->center_comment(" / /   / __ `/ / / /|_/ / _ \/ /   / _ \/ __ \/ __ \ ")."-->";
-                $comment[] = "<!-- ".$this->center_comment("/ /___/ /_/ / / / /  / /  __/ /___/  __/ /_/ / / / / ")."-->";
-                $comment[] = "<!-- ".$this->center_comment("\____/\__,_/_/_/_/  /_/\___/_____/\___/\____/_/ /_/  ")."-->";
+                $comment[] = "<!-- ".$this->center_comment("  _____             _      _       _         ")."-->";
+                $comment[] = "<!-- ".$this->center_comment(" |  __ \           | |    (_)     | |        ")."-->";
+                $comment[] = "<!-- ".$this->center_comment(" | |  | | _____   _| |     _ _ __ | | _____  ")."-->";
+                $comment[] = "<!-- ".$this->center_comment(" | |  | |/ _ \ \ / / |    | | '_ \| |/ / __| ")."-->";
+                $comment[] = "<!-- ".$this->center_comment(" | |__| |  __/\ V /| |____| | | | |   <\__ \ ")."-->";
+                $comment[] = "<!-- ".$this->center_comment(" |_____/ \___| \_/ |______|_|_| |_|_|\_\___/ ")."-->";
                 break;
             case 2:
-                $comment[] = "<!-- ".$this->center_comment("   ___          .    .   __   __        .                         ")."-->";
-                $comment[] = "<!-- ".$this->center_comment(" .'   \   ___   |    |   |    |    ___  /       ___    __.  , __  ")."-->";
-                $comment[] = "<!-- ".$this->center_comment(" |       /   `  |    |   |\  /|  .'   ` |     .'   ` .'   \ |'  `.")."-->";
-                $comment[] = "<!-- ".$this->center_comment(" |      |    |  |    |   | \/ |  |----' |     |----' |    | |    |")."-->";
-                $comment[] = "<!-- ".$this->center_comment("  `.__, `.__/| /\__ /\__ /    /  `.___, /---/ `.___,  `._.' /    |")."-->";
+                $comment[] = "<!-- ".$this->center_comment("    ___            __ _       _         ")."-->";
+                $comment[] = "<!-- ".$this->center_comment("   /   \_____   __/ /(_)_ __ | | _____  ")."-->";
+                $comment[] = "<!-- ".$this->center_comment("  / /\ / _ \ \ / / / | | '_ \| |/ / __| ")."-->";
+                $comment[] = "<!-- ".$this->center_comment(" / /_//  __/\ V / /__| | | | |   <\__ \ ")."-->";
+                $comment[] = "<!-- ".$this->center_comment("/___,' \___| \_/\____/_|_| |_|_|\_\___/ ")."-->";
                 break;
             case 3:
-                $comment[] = "<!-- ".$this->center_comment(" __  __                 __      __          ")."-->";
-                $comment[] = "<!-- ".$this->center_comment("|<< |  | |   |   |\ /| |   |   |    >>  | | ")."-->";
-                $comment[] = "<!-- ".$this->center_comment("|   |><| |   |   | < | |<< |   |<< |  | |\| ")."-->";
-                $comment[] = "<!-- ".$this->center_comment("|__ |  | |<< |<< |   | |__ |<< |__  <<  | |")."-->";
+                $comment[] = "<!-- ".$this->center_comment(" ____          __    _     _       ")."-->";
+                $comment[] = "<!-- ".$this->center_comment("|    \ ___ _ _|  |  |_|___| |_ ___ ")."-->";
+                $comment[] = "<!-- ".$this->center_comment("|  |  | -_| | |  |__| |   | '_|_ -|")."-->";
+                $comment[] = "<!-- ".$this->center_comment("|____/|___|\_/|_____|_|_|_|_,_|___|")."-->";
                 break;
             case 4:
-                $comment[] = "<!-- ".$this->center_comment("   ___|         |  |   \  |        |                         ")."-->";
-                $comment[] = "<!-- ".$this->center_comment("  |       _` |  |  |  |\/ |   _ \  |       _ \   _ \   __ \  ")."-->";
-                $comment[] = "<!-- ".$this->center_comment("  |      (   |  |  |  |   |   __/  |       __/  (   |  |   | ")."-->";
-                $comment[] = "<!-- ".$this->center_comment(" \____| \__,_| _| _| _|  _| \___| _____| \___| \___/  _|  _| ")."-->";
+                $comment[] = "<!-- ".$this->center_comment("    ____            __    _       __       ")."-->";
+                $comment[] = "<!-- ".$this->center_comment("   / __ \___ _   __/ /   (_)___  / /_______")."-->";
+                $comment[] = "<!-- ".$this->center_comment("  / / / / _ \ | / / /   / / __ \/ //_/ ___/")."-->";
+                $comment[] = "<!-- ".$this->center_comment(" / /_/ /  __/ |/ / /___/ / / / / ,< (__  ) ")."-->";
+                $comment[] = "<!-- ".$this->center_comment("/_____/\___/|___/_____/_/_/ /_/_/|_/____/  ")."-->";
+                break;
+            case 5:
+                $comment[] = "<!-- ".$this->center_comment(" ___            _    _       _       ")."-->";
+                $comment[] = "<!-- ".$this->center_comment("| . \ ___  _ _ | |  <_>._ _ | |__ ___")."-->";
+                $comment[] = "<!-- ".$this->center_comment("| | |/ ._>| | || |_ | || ' || / /<_-<")."-->";
+                $comment[] = "<!-- ".$this->center_comment("|___/\___.|__/ |___||_||_|_||_\_\/__/")."-->";
+                break;
+            case 6:
+                $comment[] = "<!-- ".$this->center_comment(" ____ ____ ____ ____ ____ ____ ____ ____ ")."-->";
+                $comment[] = "<!-- ".$this->center_comment("||D |||e |||v |||L |||i |||n |||k |||s ||")."-->";
+                $comment[] = "<!-- ".$this->center_comment("||__|||__|||__|||__|||__|||__|||__|||__||")."-->";
+                $comment[] = "<!-- ".$this->center_comment("|/__\|/__\|/__\|/__\|/__\|/__\|/__\|/__\|")."-->";
                 break;
         }
 
