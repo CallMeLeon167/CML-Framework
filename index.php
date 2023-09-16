@@ -3,7 +3,6 @@ require_once 'shared/vendor/autoload.php';
 use Classes\{
     Router,
     DB,
-    Login,
 };
 
 if ($_SERVER['HTTP_HOST'] != "localhost") {
@@ -11,11 +10,6 @@ if ($_SERVER['HTTP_HOST'] != "localhost") {
 }
 
 $db = new DB();
-$user = new Login();
-// $user->register("CallMeLeon", "GermanFr3aksLP");
-// // $user->login("CallMeLeon", "GermanFr3aksLP");
-// exit;
-
 
 $router = new Router(basename(__DIR__));
 
