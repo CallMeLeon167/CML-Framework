@@ -5,12 +5,7 @@ use Classes\{
     DB,
 };
 
-if ($_SERVER['HTTP_HOST'] != "localhost") {
-    ini_set("session.save_path","/var/www/vhosts/hosting180901.ae8a9.netcup.net/merida.callmeleon.de/httpdocs/sessions_bjyyyyyyyd");
-}
-
 $db = new DB();
-
 $router = new Router(basename(__DIR__));
 
 // $router->setErrorRedirect("/");

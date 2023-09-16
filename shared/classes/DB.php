@@ -30,6 +30,8 @@ class DB {
         if ($this->conn->connect_error) {
             die("Connection failed!");
         }
+
+        $this->conn->set_charset("utf8mb4");
     }
 
     // Führt SQL-Abfrage aus und gibt Ergebnis als Array zurück
@@ -51,10 +53,11 @@ class DB {
                     $types .= "i";
                 } elseif (is_string($param)) {
                     $types .= "s";
+                    $param = filter_var($param, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
                 } elseif (is_double($param)) {
                     $types .= "d";
                 } else {
-                    $types .= "s";
+                    throw new \InvalidArgumentException("Ungültiger Parametertyp");
                 }
                 $values[] = $param;
             }
@@ -65,14 +68,15 @@ class DB {
         }
     
         $stmt->execute();
+        
         $result = $stmt->get_result();
-    
-        if (!$result) {
-            die("SQL Error: " . $stmt->error);
-        }
-    
-        while ($row = $result->fetch_assoc()) {
-            $sqlArray[] = $row;
+        if ($result) {
+            while ($row = $result->fetch_assoc()) {
+                $cleanedRow = array_map('htmlspecialchars', $row);
+                $sqlArray[] = $cleanedRow;
+            }
+        } else {
+            throw new \Exception("SQL Error: " . $stmt->error);
         }
     
         $stmt->close();
@@ -134,6 +138,7 @@ class DB {
                     $types .= "i";
                 } elseif (is_string($param)) {
                     $types .= "s";
+                    $param = $this->cleanInput($param);
                 } elseif (is_double($param)) {
                     $types .= "d";
                 } else {
@@ -151,6 +156,20 @@ class DB {
         $stmt->close();
     }
 
+    public function sql2json(string $query, array $params = []) {
+        if (!empty($query)) {
+            // Execute the query and add result to the array
+            return json_encode($this->sql2array($query, $params));
+        }
+
+    }
+    public function sql2json_file(string $filename, array $params = []) {
+        if (!empty($filename)) {
+            // Execute the query and add result to the array
+            return json_encode($this->sql2array_file($filename, $params));
+        }
+    }
+
     // Hilfsfunktion für bind_param
     private function refValues(array &$arr) {
         $refs = array();
@@ -160,6 +179,15 @@ class DB {
         }
 
         return $refs;
+    }
+
+    private function cleanInput($input) {
+        // Entfernen von potenziell schädlichen Zeichen
+        $input = trim($input); // Leerzeichen am Anfang und Ende entfernen
+        $input = stripslashes($input); // Backslashes entfernen
+        $input = htmlspecialchars($input, ENT_QUOTES, 'UTF-8'); // HTML-Sonderzeichen umwandeln
+
+        return $input;
     }
 
     // Schließt die Datenbankverbindung
