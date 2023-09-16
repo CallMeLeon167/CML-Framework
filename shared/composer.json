@@ -5,7 +5,8 @@
     "autoload": {
         "psr-4": {
             "Classes\\": "classes/",
-            "Controllers\\": "controllers/"
+            "Controllers\\": "controllers/",
+            "Classes\\Traits\\": "classes/traits/"
         }
     }
 }
