@@ -61,6 +61,13 @@ class Router extends HTMLBuilder{
     public string $redirectUrl = "";
 
     /**
+     * Stores the Page to show if a route is not defined.
+     *
+     * @var string
+     */
+    public string $errorPage = "";
+
+    /**
      * Indicates whether the route is an API route.
      *
      * @var bool
@@ -152,6 +159,22 @@ class Router extends HTMLBuilder{
      */
     public function setErrorRedirect(string $url){
         return $this->redirectUrl = parent::assetUrl($url);
+    }
+
+    /**
+     * Set a path to show an error page if the route is not defined.
+     *
+     * @param string $url The URL for the redirect
+     */
+    public function setErrorPage(string $path){
+        $siteName = str_replace(".php", '', $path);
+        $sitePath = dirname(__DIR__)."/../sites/$siteName.php";
+
+        if (file_exists($sitePath)) {
+            return $this->errorPage = $sitePath;
+        } else {
+            die("Could not find the file $sitePath");
+        }
     }
 
     /**
@@ -259,15 +282,20 @@ class Router extends HTMLBuilder{
         }
 
         // Redirect to the specified URL if the route is not found and a redirect URL is set
-        if (!isset($this->routes[$method][$url]) && !empty($this->redirectUrl)) {
-            header("Location: " . $this->redirectUrl);
-            die;
-        } else if ($this->routes[$this->currentMethod][$this->currentRoute]['ajaxOnly'] == true){
-            echo json_encode(["error" => "This is not an Ajax call"]);
-            die;
-        } else {
-            $this->handleRouteNotFound($url, $method);
-            die;
+        if (!isset($this->routes[$method][$url])) {
+            if (!empty($this->redirectUrl)) {
+                header("Location: " . $this->redirectUrl);
+                die;
+            } elseif (!empty($this->errorPage)) {
+                parent::build();
+                include($this->errorPage);
+                Router::APP_CLOSE();
+            } elseif ($this->routes[$this->currentMethod][$this->currentRoute]['ajaxOnly']) {
+                echo json_encode(["error" => "This is not an Ajax call"]);
+                die;
+            } else {
+                $this->handleRouteNotFound($url, $method);
+            }
         }
     }
 

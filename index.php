@@ -10,7 +10,8 @@ $db = new DB();
 $router = new Router();
 
 //Project settings
-$router->setErrorRedirect("/");
+// $router->setErrorRedirect("/");
+$router->setErrorPage("test.php");
 $router->setProjectName("MyPHPProject");
 $router->setFavicon("/favicon.ico");
 $router->addMeta('name="theme-color" content="black"');
