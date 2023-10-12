@@ -77,6 +77,7 @@ class Router extends HTMLBuilder{
      * Initializes the error reporting configuration based on the PRODUCTION environment variable.
      */
     public function __construct(){
+        $this->setCommonSecurityHeaders();
         $dotenv = \Dotenv\Dotenv::createImmutable(__DIR__ ."/../config");
         $dotenv->load();
         $errorfile = (__DIR__.'/../../errorlogfile.log');
@@ -486,4 +487,39 @@ class Router extends HTMLBuilder{
     protected function isAjaxRequest(): bool {
         return !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
     }
+
+    /**
+     * Set important security headers that should be present on most websites
+     * to enhance security.
+     *
+     * This function sets the following headers:
+     * - Content Security Policy (CSP)
+     * - X-Content-Type-Options
+     * - X-Frame-Options
+     * - X-XSS-Protection
+     * - HTTP Strict Transport Security (HSTS)
+     * - Referrer Policy
+     *
+     * @return void
+     */
+    protected function setCommonSecurityHeaders() {
+        // Content Security Policy (CSP)
+        header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval';");
+
+        // X-Content-Type-Options
+        header("X-Content-Type-Options: nosniff");
+
+        // X-Frame-Options
+        header("X-Frame-Options: SAMEORIGIN");
+
+        // X-XSS-Protection
+        header("X-XSS-Protection: 1; mode=block");
+
+        // HTTP Strict Transport Security (HSTS)
+        header("Strict-Transport-Security: max-age=31536000; includeSubDomains; preload");
+
+        // Referrer Policy
+        header("Referrer-Policy: no-referrer-when-downgrade");
+    }
+
 }
