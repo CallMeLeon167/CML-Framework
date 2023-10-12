@@ -1,12 +1,13 @@
 {
-    "require": {
-        "vlucas/phpdotenv": "^5.5"
-    },
-    "autoload": {
-        "psr-4": {
-            "Classes\\": "classes/",
-            "Controllers\\": "controllers/",
-            "Classes\\Traits\\": "classes/traits/"
-        }
+  "require": {
+    "vlucas/phpdotenv": "^5.5"
+  },
+  "autoload": {
+    "psr-4": {
+      "Classes\\": "classes/",
+      "Controllers\\": "controllers/",
+      "Classes\\Traits\\": "classes/traits/",
+      "Classes\\SessionTrait\\": "classes/traits/"
     }
+  }
 }

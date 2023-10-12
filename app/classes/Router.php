@@ -9,6 +9,7 @@ use Classes\HTMLBuilder;
  */
 class Router extends HTMLBuilder{
     use \Classes\Traits\Traits;
+    use \Classes\SessionTrait\SessionTrait;
 
     /**
      * Stores the defined routes.
@@ -522,4 +523,42 @@ class Router extends HTMLBuilder{
         header("Referrer-Policy: no-referrer-when-downgrade");
     }
 
+    /**
+     * Rate limit requests based on IP address.
+     *
+     * @param int $limit The maximum number of requests allowed within the specified interval.
+     * @param int $interval The time interval (in seconds) during which the requests are counted.
+     *
+     * @return void
+     */
+    public function rateLimit($limit, $interval) {
+        $this->startSession();
+    
+        $ip = $_SERVER['REMOTE_ADDR'];
+        $key = 'rate_limit:' . $ip;
+    
+        $data = $this->getSessionData($key);
+        $count = ($data['count']++ ?? 0);
+
+        $lastAccess = ($data['last_access'] ?? 0);
+        $currentTime = time();
+    
+        if ($currentTime - $lastAccess >= $interval) {
+            $count = 1;
+            $lastAccess = $currentTime;
+        } else {
+            $count++;
+        }
+    
+        $this->setSessionData($key,[
+            'count' => $count,
+            'last_access' => $lastAccess,
+        ]);
+
+        if ($this->getSessionData($key)['count'] > ($limit * 2)) {
+            http_response_code(429);
+            echo 'Zu viele Anfragen';
+            die;
+        }
+    }
 }
