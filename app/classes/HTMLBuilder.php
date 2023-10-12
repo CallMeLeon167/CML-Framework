@@ -141,26 +141,23 @@ class HTMLBuilder {
      * @param bool $center Indicates if the comment should be centered (default is true).
      * @return string The centered comment.
      */
-    public static function center_comment(string $comment, bool $center = true):string{
-        $centeredCommend = "";
-        $commentLen = strlen($comment);
-        $stringLen = 84;
-        $spaces = $stringLen - $commentLen;
-        $cleanSpaces = intval($spaces / 2.2);
-
-        if(!$center){
-            $centeredCommend .= " ".$comment;
-            $spaces = $spaces - 1;
+    public static function center_comment(string $comment, bool $center = true): string {
+        $stringLen = 80;
+    
+        if (!$center) {
+            $comment = ' ' . $comment;
         }
-        for ($i=0; $i < $spaces; $i++) { 
-            if ($center && $i == $cleanSpaces) {
-                $centeredCommend.= " ". $comment;
-            } else {
-                $centeredCommend .= " ";
-            }
-        }
-        return $centeredCommend;
+    
+        $spaces = max(0, $stringLen - strlen($comment));
+    
+        $leftSpaces = $center ? (int)($spaces / 2) : 0;
+        $rightSpaces = $spaces - $leftSpaces;
+    
+        $centeredComment = str_repeat(' ', $leftSpaces) . $comment . str_repeat(' ', $rightSpaces);
+    
+        return $centeredComment;
     }
+    
 
     /**
      * Initializes and displays a centered comment in the HTML document with a randomly chosen ASCII art style.
@@ -219,7 +216,13 @@ class HTMLBuilder {
 
         return $artStyles;
     }
-
+    
+    /**
+     * Generates an HTML comment with the provided content.
+     *
+     * @param string $comment The content of the comment.
+     * @return string The HTML comment.
+     */
     private function comment($comment){
         return "<!-- ".$this->center_comment($comment)." -->";
     }
