@@ -163,75 +163,65 @@ class HTMLBuilder {
     }
 
     /**
-     * Initializes and displays a centered comment in the HTML document.
+     * Initializes and displays a centered comment in the HTML document with a randomly chosen ASCII art style.
      *
      * @param string $title The application name.
      * @param string ...$programmer The programmer's names.
      */
-    public function init_comment(string $titel, string ...$programmer){
-        $comment = array();
-        $num = rand(1,7);
-        $dateFile = date ("d.m.Y H:i:s", getlastmod());
-        $programmer = implode(', ', $programmer);
+    public function init_comment(string $title, string ...$programmer) {
+        $comments = [];
 
-        $comment[] = "";
-        $comment[] = "<!-- ".$this->center_comment(" ")."-->";
-        $comment[] = "<!-- ".$this->center_comment("Willkommen im Quellcode von $titel")."-->";
-        $comment[] = "<!-- ".$this->center_comment(" ")."-->";
+        $comments[] = $this->comment(" ");
+        $comments[] = $this->comment("Welcome to the source code of $title");
+        $comments[] = $this->comment(" ");
 
-        switch ($num) {
-            case 1:
-                $comment[] = "<!-- ".$this->center_comment("  _____             _      _       _         ")."-->";
-                $comment[] = "<!-- ".$this->center_comment(" |  __ \           | |    (_)     | |        ")."-->";
-                $comment[] = "<!-- ".$this->center_comment(" | |  | | _____   _| |     _ _ __ | | _____  ")."-->";
-                $comment[] = "<!-- ".$this->center_comment(" | |  | |/ _ \ \ / / |    | | '_ \| |/ / __| ")."-->";
-                $comment[] = "<!-- ".$this->center_comment(" | |__| |  __/\ V /| |____| | | | |   <\__ \ ")."-->";
-                $comment[] = "<!-- ".$this->center_comment(" |_____/ \___| \_/ |______|_|_| |_|_|\_\___/ ")."-->";
-                break;
-            case 2:
-                $comment[] = "<!-- ".$this->center_comment("    ___            __ _       _         ")."-->";
-                $comment[] = "<!-- ".$this->center_comment("   /   \_____   __/ /(_)_ __ | | _____  ")."-->";
-                $comment[] = "<!-- ".$this->center_comment("  / /\ / _ \ \ / / / | | '_ \| |/ / __| ")."-->";
-                $comment[] = "<!-- ".$this->center_comment(" / /_//  __/\ V / /__| | | | |   <\__ \ ")."-->";
-                $comment[] = "<!-- ".$this->center_comment("/___,' \___| \_/\____/_|_| |_|_|\_\___/ ")."-->";
-                break;
-            case 3:
-                $comment[] = "<!-- ".$this->center_comment(" ____          __    _     _       ")."-->";
-                $comment[] = "<!-- ".$this->center_comment("|    \ ___ _ _|  |  |_|___| |_ ___ ")."-->";
-                $comment[] = "<!-- ".$this->center_comment("|  |  | -_| | |  |__| |   | '_|_ -|")."-->";
-                $comment[] = "<!-- ".$this->center_comment("|____/|___|\_/|_____|_|_|_|_,_|___|")."-->";
-                break;
-            case 4:
-                $comment[] = "<!-- ".$this->center_comment("    ____            __    _       __       ")."-->";
-                $comment[] = "<!-- ".$this->center_comment("   / __ \___ _   __/ /   (_)___  / /_______")."-->";
-                $comment[] = "<!-- ".$this->center_comment("  / / / / _ \ | / / /   / / __ \/ //_/ ___/")."-->";
-                $comment[] = "<!-- ".$this->center_comment(" / /_/ /  __/ |/ / /___/ / / / / ,< (__  ) ")."-->";
-                $comment[] = "<!-- ".$this->center_comment("/_____/\___/|___/_____/_/_/ /_/_/|_/____/  ")."-->";
-                break;
-            case 5:
-                $comment[] = "<!-- ".$this->center_comment(" ___            _    _       _       ")."-->";
-                $comment[] = "<!-- ".$this->center_comment("| . \ ___  _ _ | |  <_>._ _ | |__ ___")."-->";
-                $comment[] = "<!-- ".$this->center_comment("| | |/ ._>| | || |_ | || ' || / /<_-<")."-->";
-                $comment[] = "<!-- ".$this->center_comment("|___/\___.|__/ |___||_||_|_||_\_\/__/")."-->";
-                break;
-            case 6:
-                $comment[] = "<!-- ".$this->center_comment(" ____ ____ ____ ____ ____ ____ ____ ____ ")."-->";
-                $comment[] = "<!-- ".$this->center_comment("||D |||e |||v |||L |||i |||n |||k |||s ||")."-->";
-                $comment[] = "<!-- ".$this->center_comment("||__|||__|||__|||__|||__|||__|||__|||__||")."-->";
-                $comment[] = "<!-- ".$this->center_comment("|/__\|/__\|/__\|/__\|/__\|/__\|/__\|/__\|")."-->";
-                break;
+        $artStyles = $this->getComment();
+        $randomStyle = $artStyles[array_rand($artStyles)];
+
+        $dateModified = date("d.m.Y H:i:s", getlastmod());
+        $programmerNames = implode(', ', $programmer);
+
+        $comments[] = $randomStyle;
+
+        $comments[] = $this->comment(" ");
+        $comments[] = $this->comment("This website was developed by $programmerNames");
+        $comments[] = $this->comment("in the year " . date("Y"));
+        $comments[] = $this->comment(" ");
+        $comments[] = $this->comment("Last update: $dateModified");
+        $comments[] = $this->comment(" ");
+
+        foreach ($comments as $comment) {
+            echo $comment . PHP_EOL;
         }
+    }
 
-        $comment[] = "<!-- ".$this->center_comment(" ")."-->";
-        $comment[] = "<!-- ".$this->center_comment("Diese Webseite wurde Programmiert von $programmer")."-->";
-        $comment[] = "<!-- ".$this->center_comment("im Zeitraum von ".date("Y"))."-->";
-        $comment[] = "<!-- ".$this->center_comment(" ")."-->";
-        $comment[] = "<!-- ".$this->center_comment("Letztes Update: $dateFile")."-->";
-        $comment[] = "<!-- ".$this->center_comment(" ")."-->";
+    /**
+     * Returns an array of ASCII art styles.
+     *
+     * @return array The array of ASCII art styles.
+     */
+    private function getComment() {
+        $artStyles = [
+            $this->comment("  _____             _      _       _         ").
+            $this->comment(" |  __ \           | |    (_)     | |        ").
+            $this->comment(" | |  | | _____   _| |     _ _ __ | | _____  ").
+            $this->comment(" | |  | |/ _ \ \ / / |    | | '_ \| |/ / __| ").
+            $this->comment(" | |__| |  __/\ V /| |____| | | | |   <\__ \ ").
+            $this->comment(" |_____/ \___| \_/ |______|_|_| |_|_|\_\___/ "),
 
-        foreach($comment as $endcomment){
-            echo $endcomment;
-        }
+            $this->comment("    ___            __ _       _         ").
+            $this->comment("   /   \_____   __/ /(_)_ __ | | _____  ").
+            $this->comment("  / /\ / _ \ \ / / / | | '_ \| |/ / __| ").
+            $this->comment(" / /_//  __/\ V / /__| | | | |   <\__ \ ").
+            $this->comment("/___,' \___| \_/\____/_|_| |_|_|\_\___/ "),
+            
+        ];
+
+        return $artStyles;
+    }
+
+    private function comment($comment){
+        return "<!-- ".$this->center_comment($comment)." -->";
     }
 }
 ?>
