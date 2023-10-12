@@ -1,6 +1,6 @@
-/shared/config/.env
-/shared/node_modules/*
-/shared/node_modules/
-/shared/vendor/*
-/shared/vendor
+/app/config/.env
+/app/node_modules/*
+/app/node_modules/
+/app/vendor/*
+/app/vendor
 /errorlogfile.log

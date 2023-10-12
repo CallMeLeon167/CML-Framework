@@ -1,5 +1,5 @@
 #!/bin/bash
-cd ./shared
+cd ./app
 echo '======== Wechsle Verzeichnis nach ' $PWD ========;
 echo '==========================    Composer     =========================='
 composer install
