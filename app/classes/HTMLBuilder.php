@@ -224,7 +224,7 @@ class HTMLBuilder {
      * @return string The HTML comment.
      */
     private function comment($comment){
-        return "<!-- ".$this->center_comment($comment)." -->";
+        return "<!-- ".$this->center_comment($comment)." -->". PHP_EOL;
     }
 }
 ?>
