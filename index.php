@@ -21,7 +21,7 @@ $router->addStyle("shared/web/css/styles.css");
 //Scripts
 $router->addScript("shared/web/js/styles.js");
 
-$router->addRoute('*', '/', function () use ($router) {
+$router->addRoute('*', '/', function () use ($router, $db) {
     $router->build();
 });
 

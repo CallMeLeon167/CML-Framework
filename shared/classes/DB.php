@@ -1,20 +1,31 @@
 <?php 
 namespace Classes;
+
+/**
+ * The DB class establishes a connection to the database and allows for executing SQL queries.
+ */
 class DB {
     private $conn;
 
+    /**
+     * Constructor of the DB class. Calls the methods to load environment variables and establish a connection to the database.
+     */
     public function __construct() {
-        $this->loadEnv(); // Lädt Umgebungsvariablen aus .env-Datei
-        $this->connect(); // Stellt Verbindung zur Datenbank her
+        $this->loadEnv();
+        $this->connect(); 
     }
 
-    // Lädt Umgebungsvariablen aus .env-Datei
+    /**
+     * Loads environment variables from the .env file.
+     */
     private function loadEnv() {
         $dotenv = \Dotenv\Dotenv::createImmutable(__DIR__ ."/../config");
         $dotenv->load();
     }
 
-    // Stellt Verbindung zur Datenbank her
+    /**
+     * Establishes a connection to the database.
+     */
     public function connect() {
         $host = $_ENV['DB_HOST'];
         $user = $_ENV['DB_USER'];
@@ -34,8 +45,14 @@ class DB {
         $this->conn->set_charset("utf8mb4");
     }
 
-    // Führt SQL-Abfrage aus und gibt Ergebnis als Array zurück
-    public function sql2array(string $query, array $params = []) {
+    /**
+     * Executes an SQL query and returns the result as an array.
+     *
+     * @param string $query The SQL query.
+     * @param array $params Parameters for the SQL query (optional).
+     * @return array The result of the SQL query as an array.
+     */
+    public function sql2array(string $query, array $params = []):array {
         $sqlArray = array();
     
         $stmt = $this->conn->prepare($query);
@@ -83,37 +100,40 @@ class DB {
         return $sqlArray;
     }
 
-    public function sql2array_file(string $filename, array $params = []) {
+    /**
+     * Executes an SQL query from a file and returns the result as an array.
+     *
+     * @param string $filename The filename of the SQL query.
+     * @param array $params Parameters for the SQL query (optional).
+     * @return array The result of the SQL query as an array.
+     */
+    public function sql2array_file(string $filename, array $params = []):array {
         $sqlArray = [];
-    
-        // Read the contents of the SQL file
         $sqlContent = file_get_contents(dirname(__DIR__).'/sql/'.ltrim($filename, "/"));
-    
-        // Split SQL queries based on semicolons
         $queries = explode(';', $sqlContent);
     
         foreach ($queries as $query) {
-            // Remove leading/trailing whitespace and skip empty queries
             $query = trim($query);
             if (!empty($query)) {
-                // Execute the query and add result to the array
                 $sqlArray = $this->sql2array($query, $params);
             }
         }
-    
+
         return $sqlArray;
     }
 
-
+    /**
+     * Executes an SQL query from a file and performs the operations in the database.
+     *
+     * @param string $filename The filename of the SQL query.
+     * @param array $params Parameters for the SQL query (optional).
+     */
     public function sql2db_file(string $filename, array $params = []) {
-        // Read the contents of the SQL file
         $sqlContent = file_get_contents(dirname(__DIR__).'/sql/'.ltrim($filename, "/"));
     
-        // Split SQL queries based on semicolons
         $queries = explode(';', $sqlContent);
     
         foreach ($queries as $query) {
-            // Remove leading/trailing whitespace and skip empty queries
             $query = trim($query);
             if (!empty($query)) {
                 $this->sql2db($query, $params);
@@ -121,7 +141,12 @@ class DB {
         }
     }
 
-    // Führt SQL-Abfrage aus und gibt das Ergebnisobjekt zurück
+    /**
+     * Executes an SQL query and performs the operations in the database.
+     *
+     * @param string $query The SQL query.
+     * @param array $params Parameters for the SQL query (optional).
+     */
     public function sql2db(string $query, array $params = []) {
         $stmt = $this->conn->prepare($query);
     
@@ -156,21 +181,39 @@ class DB {
         $stmt->close();
     }
 
-    public function sql2json(string $query, array $params = []) {
+    /**
+     * Executes an SQL query and returns the result as JSON.
+     *
+     * @param string $query The SQL query.
+     * @param array $params Parameters for the SQL query (optional).
+     * @return string The result of the SQL query as a JSON-encoded string.
+     */
+    public function sql2json(string $query, array $params = []):string {
         if (!empty($query)) {
-            // Execute the query and add result to the array
             return json_encode($this->sql2array($query, $params));
         }
 
     }
-    public function sql2json_file(string $filename, array $params = []) {
+
+    /**
+     * Executes an SQL query from a file and returns the result as JSON.
+     *
+     * @param string $filename The filename of the SQL query.
+     * @param array $params Parameters for the SQL query (optional).
+     * @return string The result of the SQL query as a JSON-encoded string.
+     */
+    public function sql2json_file(string $filename, array $params = []):string {
         if (!empty($filename)) {
-            // Execute the query and add result to the array
             return json_encode($this->sql2array_file($filename, $params));
         }
     }
 
-    // Hilfsfunktion für bind_param
+    /**
+     * Helper function for bind_param.
+     *
+     * @param array $arr An array to be referenced.
+     * @return array An array of references.
+     */
     private function refValues(array &$arr) {
         $refs = array();
 
@@ -181,20 +224,33 @@ class DB {
         return $refs;
     }
 
-    private function cleanInput($input) {
-        // Entfernen von potenziell schädlichen Zeichen
-        $input = trim($input); // Leerzeichen am Anfang und Ende entfernen
-        $input = stripslashes($input); // Backslashes entfernen
-        $input = htmlspecialchars($input, ENT_QUOTES, 'UTF-8'); // HTML-Sonderzeichen umwandeln
+    /**
+     * Cleans input data to prevent potential security issues.
+     *
+     * @param string $input The input data to be cleaned.
+     * @return string The cleaned input data.
+     */
+    private function cleanInput(string $input):string {
+        $input = trim($input); 
+        $input = stripslashes($input); 
+        $input = htmlspecialchars($input, ENT_QUOTES, 'UTF-8'); 
 
         return $input;
     }
 
-    public function stringToHtml(string $string){
+    /**
+     * Decodes HTML entities in a string.
+     *
+     * @param string $string The input string with HTML entities.
+     * @return string The decoded HTML string.
+     */
+    public function stringToHtml(string $string):string{
         return html_entity_decode(html_entity_decode($string));
     }
 
-    // Schließt die Datenbankverbindung
+    /**
+     * Closes the database connection.
+     */
     public function close() {
         $this->conn->close();
     }
