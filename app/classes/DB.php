@@ -6,13 +6,13 @@ namespace Classes;
  */
 class DB {
     private $conn;
-
+    
     /**
      * Constructor of the DB class. Calls the methods to load environment variables and establish a connection to the database.
      */
     public function __construct() {
         $this->loadEnv();
-        $this->connect(); 
+        $this->connect($_ENV['DB_HOST'], $_ENV['DB_USER'], $_ENV['DB_PASS'], $_ENV['DB_NAME']); 
     }
 
     /**
@@ -25,24 +25,43 @@ class DB {
 
     /**
      * Establishes a connection to the database.
+     *
+     * @param string $host The database host.
+     * @param string $user The database username.
+     * @param string $pass The database password.
+     * @param string $dbname The database name.
      */
-    public function connect() {
-        $host = $_ENV['DB_HOST'];
-        $user = $_ENV['DB_USER'];
-        $pass = $_ENV['DB_PASS'];
-        $dbname = $_ENV['DB_NAME'];
-
-        if($_SERVER['HTTP_HOST'] != 'localhost') {
-            mysqli_report(MYSQLI_REPORT_OFF);
-        }
-
+    public function connect(string $host, string $user, string $pass, string $dbname) {
         $this->conn = @new \mysqli($host, $user, $pass, $dbname);
-
         if ($this->conn->connect_error) {
-            die("Connection failed!");
+            die("Connection failed! ".$this->conn->connect_error);
         }
-
         $this->conn->set_charset("utf8mb4");
+    }
+
+    /**
+     * Connects to another database and closes the current connection if it's active.
+     *
+     * @param string $host The database host.
+     * @param string $user The database username.
+     * @param string $pass The database password.
+     * @param string $dbname The database name.
+     */
+    public function connectToAnotherDB(string $host, string $user, string $pass, string $dbname) {
+        if ($this->conn->ping()) {
+            $this->close();
+        }
+        $this->connect($host, $user, $pass, $dbname);
+    }
+
+    /**
+     * Restores the default database connection and closes the current connection if it's active.
+     */
+    public function defaultConnection() {
+        if ($this->conn->ping()) {
+            $this->close();
+        }
+        $this->connect($_ENV['DB_HOST'], $_ENV['DB_USER'], $_ENV['DB_PASS'], $_ENV['DB_NAME']);
     }
 
     /**
