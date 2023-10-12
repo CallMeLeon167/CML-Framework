@@ -84,6 +84,7 @@ class Router extends HTMLBuilder{
         $errorfile = (__DIR__.'/../../errorlogfile.log');
         if ($_ENV["PRODUCTION"] === 'true') {
             // In the production environment, do not display errors
+            mysqli_report(MYSQLI_REPORT_OFF);
             error_reporting(0);
             ini_set('display_errors', 0);
         } else {
