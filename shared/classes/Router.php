@@ -46,6 +46,26 @@ class Router extends HTMLBuilder{
     protected array $currentRouteParams = [];
 
     /**
+     * Initializes the error reporting configuration based on the PRODUCTION environment variable.
+     */
+    public function __construct(){
+        $dotenv = \Dotenv\Dotenv::createImmutable(__DIR__ ."/../config");
+        $dotenv->load();
+        $errorfile = (__DIR__.'/../../errorlogfile.log');
+        if ($_ENV["PRODUCTION"] === 'true') {
+            // In production environment, do not display errors
+            error_reporting(0);
+            ini_set('display_errors', 0);
+        } else {
+            // In other environments, display all errors
+            error_reporting(E_ALL);
+            ini_set('display_errors', 1);
+        }
+        ini_set('log_errors', 1); // Write errors to a log file
+        ini_set('error_log', $errorfile); // Adjust paths and filenames
+    }
+
+    /**
      * Match the routes 
      */
     public function __destruct() {

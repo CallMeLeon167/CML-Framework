@@ -3,3 +3,4 @@
 /shared/node_modules/
 /shared/vendor/*
 /shared/vendor
+/errorlogfile.log
