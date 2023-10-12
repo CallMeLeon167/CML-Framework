@@ -190,6 +190,10 @@ class DB {
         return $input;
     }
 
+    public function stringToHtml(string $string){
+        return html_entity_decode(html_entity_decode($string));
+    }
+
     // Schließt die Datenbankverbindung
     public function close() {
         $this->conn->close();
