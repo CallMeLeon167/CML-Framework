@@ -1,4 +1,4 @@
-# CML - Framework
+# CML - Framework [PHP]
 
 > This framework is a powerful tool that seamlessly combines an efficient routing system with an HTML builder, providing you with numerous customization options for your web routes and pages. Moreover, it offers an easy and secure way to connect to databases, making data management a breeze. This framework also comes equipped with a variety of built-in functions to simplify the programming process. Additionally, comprehensive online documentation ensures that you can always refer back to it for guidance.
 
@@ -49,11 +49,11 @@
 
 **8. AJAX Routing:** Routes can be configured to be accessible only via AJAX requests.
 
-**9.Query Parameter Handling:** The class provides a method to filter and retrieve query parameters from the current request URI.
+**9. Query Parameter Handling:** The class provides a method to filter and retrieve query parameters from the current request URI.
 
-**10.Environment Handling:** It initializes error reporting configurations based on the environment (production or development) and uses .env files for configuration.
+**10. Environment Handling:** It initializes error reporting configurations based on the environment (production or development) and uses .env files for configuration.
 
-**11.API Support:** You can set a route as an API route, returning responses in JSON format.
+**11. API Support:** You can set a route as an API route, returning responses in JSON format.
 
 **12. Rate Limiting:** Rate limiting based on IP addresses is supported to prevent abuse and excessive requests.
 
