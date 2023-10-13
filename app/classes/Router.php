@@ -558,9 +558,8 @@ class Router extends HTMLBuilder{
      * @param int $limit The maximum number of requests allowed within the specified interval.
      * @param int $interval The time interval (in seconds) during which the requests are counted.
      *
-     * @return void
      */
-    public function rateLimit($limit, $interval) {
+    public function rateLimit(int $limit, int $interval) {
         $this->startSession();
     
         $ip = $_SERVER['REMOTE_ADDR'];
