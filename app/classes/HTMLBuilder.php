@@ -12,7 +12,7 @@ class HTMLBuilder {
     private string $favicon = "";
     private string $author = "";
     private string $baseUrl = "";
-    private array $header = [];
+    private string $header = "";
     private array $styles = [];
     private array $scripts = [];
     private array $metas = [];
