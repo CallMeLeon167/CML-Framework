@@ -19,8 +19,12 @@ class DB {
      * Loads environment variables from the .env file.
      */
     private function loadEnv() {
-        $dotenv = \Dotenv\Dotenv::createImmutable(__DIR__ ."/../config");
-        $dotenv->load();
+        try {
+            $dotenv = \Dotenv\Dotenv::createImmutable(__DIR__ ."/../config");
+            $dotenv->load();
+        } catch (\Throwable $e) {
+            die("Please setup an .env file in /app/config");
+        }
     }
 
     /**
