@@ -23,7 +23,7 @@ class HTMLBuilder {
      *
      * @param string $projectName The project name.
      */
-    public function setProjectName($projectName) {
+    public function setProjectName(string $projectName) {
         $this->projectName = $projectName;
         $this->setTitle($this->projectName);
     }
@@ -33,7 +33,7 @@ class HTMLBuilder {
      *
      * @param string $title The title of the HTML document.
      */
-    public function setTitle($title) {
+    public function setTitle(string $title) {
         $this->title = $title;
     }
 
@@ -42,7 +42,7 @@ class HTMLBuilder {
      *
      * @param string ...$author The author(s) of the HTML document.
      */
-    public function setAuthor(...$author) {
+    public function setAuthor(string ...$author) {
         $this->author = implode(", ", $author);
     }
 
@@ -51,7 +51,7 @@ class HTMLBuilder {
      *
      * @param string $favicon The path to the favicon.
      */
-    public function setFavicon($favicon) {
+    public function setFavicon(string $favicon) {
         $this->favicon = $favicon;
     }
 
@@ -60,7 +60,7 @@ class HTMLBuilder {
      *
      * @param string $header The header element to add.
      */
-    public function addHeader($header) {
+    public function addHeader(string $header) {
         $this->header[] = $header;
     }
 
@@ -69,7 +69,7 @@ class HTMLBuilder {
      *
      * @param string $href The path to the stylesheet.
      */
-    public function addStyle($href) {
+    public function addStyle(string $href) {
         $this->styles[] = $href;
     }
 
@@ -78,16 +78,16 @@ class HTMLBuilder {
      *
      * @param string $src The path to the script.
      */
-    public function addScript($src) {
+    public function addScript(string $src) {
         $this->scripts[] = $src;
     }
 
     /**
      * Adds a meta tag to the HTML document.
      *
-     * @param array $attrs The attributes of the meta tag.
+     * @param string $attrs The attributes of the meta tag.
      */
-    public function addMeta($attrs) {
+    public function addMeta(string $attrs) {
         $this->metas[] = $attrs;
     }
 
@@ -197,7 +197,7 @@ class HTMLBuilder {
      *
      * @return array The array of ASCII art styles.
      */
-    private function getComment() {
+    private function getComment(): array{
         $artStyles = [
             $this->comment("  _____             _      _       _         ").
             $this->comment(" |  __ \           | |    (_)     | |        ").
@@ -223,7 +223,7 @@ class HTMLBuilder {
      * @param string $comment The content of the comment.
      * @return string The HTML comment.
      */
-    private function comment($comment){
+    private function comment(string $comment): string {
         return "<!-- ".$this->center_comment($comment)." -->". PHP_EOL;
     }
 }
