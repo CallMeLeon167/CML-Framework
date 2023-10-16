@@ -61,7 +61,7 @@ class HTMLBuilder {
      * @param string $header The header element to add.
      */
     public function addHeader(string $header) {
-        $this->header[] = $header;
+        $this->header = $header;
     }
 
     /**
@@ -125,9 +125,7 @@ class HTMLBuilder {
         $html .= '</head>' . PHP_EOL;
         $html .= '<body>' . PHP_EOL;
 
-        foreach ($this->header as $header) {
-            $html .= $header . PHP_EOL;
-        }
+        $html .= $this->header . PHP_EOL;
 
         // Additional content can be added here
         
