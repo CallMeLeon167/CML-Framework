@@ -10,7 +10,7 @@ class HTMLBuilder {
     private string $projectName = "";
     private string $title = "";
     private string $favicon = "";
-    private string $author = "CallMeLeon";
+    private string $author = "";
     private string $baseUrl = "";
     private array $header = [];
     private array $styles = [];
@@ -181,7 +181,11 @@ class HTMLBuilder {
         $comments[] = $randomStyle;
 
         $comments[] = $this->comment(" ");
-        $comments[] = $this->comment("This website was developed by $programmerNames");
+        if(!empty($programmerNames)){
+            $comments[] = $this->comment("This website was developed by $programmerNames");
+        } else {
+            $comments[] = $this->comment("This website was developed");
+        }
         $comments[] = $this->comment("in the year " . date("Y"));
         $comments[] = $this->comment(" ");
         $comments[] = $this->comment("Last update: $dateModified");
