@@ -31,4 +31,3 @@ $router->addRoute('*', '/', function () use ($router, $db) {
 $router->addRoute('*', '/user/:userid', function ($userid) {
     echo $userid;
 })->where('userid', '/^\d+$/');
-?>
