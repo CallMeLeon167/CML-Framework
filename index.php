@@ -28,4 +28,7 @@ $router->addRoute('*', '/', function () use ($router, $db) {
     // $w = $db->sql2array_file("test.sql");
 });
 
+$router->addRoute('*', '/user/:userid', function ($userid) {
+    echo $userid;
+})->where('userid', '/^\d+$/');
 ?>

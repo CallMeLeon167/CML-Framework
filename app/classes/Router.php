@@ -87,6 +87,13 @@ class Router extends HTMLBuilder{
      * @var string
      */
     public string $FILEP;
+    
+    /**
+     * An array to store "where" conditions for route parameters.
+     *
+     * @var array
+     */
+    protected $whereConditions = [];
 
     /**
      * Initializes the error reporting configuration based on the PRODUCTION environment variable.
@@ -220,18 +227,35 @@ class Router extends HTMLBuilder{
      * @param int $statusCode The HTTP status code for the route
      * @return object
      */
-    public function addRoute(string $method, string $url, \Closure $target, int $statusCode = 0) {
-        $this->currentRoute = $url; // Store the current route URL
-        $this->currentMethod = $method; // Set the current method
+    public function addRoute(string $method, string $url, \Closure $target, int $statusCode = 0){
+        $this->currentRoute = $url;
+        $this->currentMethod = $method;
         $this->routes[$method][$url] = [
             'target' => $target,
             'statusCode' => $statusCode,
             'ajaxOnly' => false,
             'params' => [],
+            'where' => $this->whereConditions, // Use where conditions from the router instance
         ];
+
+        $this->whereConditions = []; // Clear where conditions
 
         return $this;
     }
+    
+    /**
+     * Add a "where" condition for a route parameter.
+     *
+     * @param string $param The name of the parameter to which the condition applies.
+     * @param string $condition The regular expression condition for the parameter.
+     *
+     * @return $this The router instance for method chaining.
+     */
+    public function where(string $param, string $condition) {
+        $this->whereConditions[$param] = $condition;
+        return $this;
+    }
+
 
     /**
      * Add a route group to the application.
@@ -314,43 +338,65 @@ class Router extends HTMLBuilder{
      */
     protected function processRoutes(string $url, array $routes) {
         foreach ($routes as $routeUrl => $routeData) {
-
             // Check if the current route is restricted to AJAX requests
             if ($routeData['ajaxOnly'] && !$this->isAjaxRequest()) {
                 continue; // Skip this route if it's not an AJAX request
             }
-
+    
             // Convert route URL to a regular expression pattern for ':' parameters
             $pattern = preg_replace('/\/:([^\/]+)/', '/(?P<$1>[^/]+)', $routeUrl);
-
+    
             // Check if the current URL matches the pattern
             if (preg_match('#^' . $pattern . '$#', $url, $matches)) {
-
-                // Set the HTTP status code if provided
-                if ($routeData['statusCode'] > 0) {
-                    http_response_code($routeData['statusCode']);
+                // Merge "where" conditions from the route with global "where" conditions
+                $whereConditions = array_merge($routeData['where'], $this->whereConditions);
+    
+                // Check "where" conditions
+                if ($this->checkWhereConditions($matches, $whereConditions)) {
+                    // Set the HTTP status code if provided
+                    if ($routeData['statusCode'] > 0) {
+                        http_response_code($routeData['statusCode']);
+                    }
+    
+                    // Execute global middleware function
+                    if (!empty($this->globalMiddleware) && !in_array($url, $this->globalMiddleware["url"])) {
+                        call_user_func($this->globalMiddleware["function"][0]);
+                    }
+    
+                    // Execute middleware functions before the target function
+                    $this->executeMiddleware('before', $url);
+    
+                    // Call the target function with the extracted parameter values
+                    $parameterValues = $this->sanitizeStringsArray(array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY));
+                    call_user_func_array($routeData['target'], $parameterValues);
+    
+                    // Execute middleware functions after the target function
+                    $this->executeMiddleware('after', $url);
+    
+                    // Close the application
+                    ($this->isApi == false && $routeData['ajaxOnly'] == false) ? Router::APP_CLOSE() : exit;
                 }
-
-                // Execute global middleware function
-                if (!empty($this->globalMiddleware) && !in_array($url, $this->globalMiddleware["url"])) {
-                    call_user_func($this->globalMiddleware["function"][0]);
-                }
-
-                // Execute middleware functions before the target function
-                $this->executeMiddleware('before', $url);
-
-                // Call the target function with the extracted parameter values
-                $this->currentRouteParams = $this->sanitizeStringsArray(array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY));
-                call_user_func_array($routeData['target'], $this->currentRouteParams);
-
-                // Execute middleware functions after the target function
-                $this->executeMiddleware('after', $url);
-
-                // Close the application
-                ($this->isApi == false && $routeData['ajaxOnly'] == false) ? Router::APP_CLOSE() : exit;
             }
         }
     }
+    
+    /**
+     * Check if parameter values meet the specified "where" conditions.
+     *
+     * @param array $parameterValues An array of parameter values to be checked.
+     * @param array $whereConditions An array of "where" conditions for parameter validation.
+     *
+     * @return bool True if all conditions are met, false otherwise.
+     */
+    protected function checkWhereConditions(array $parameterValues, array $whereConditions) {
+        foreach ($whereConditions as $paramName => $condition) {
+            if (isset($parameterValues[$paramName]) && !preg_match($condition, $parameterValues[$paramName])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 
     /**
      * Execute middleware functions based on the specified position (before or after).
