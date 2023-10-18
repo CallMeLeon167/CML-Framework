@@ -70,16 +70,30 @@ class HTMLBuilder {
      * @param string $href The path to the stylesheet.
      */
     public function addStyle(string $href) {
-        $this->styles[] = $href;
-    }
+        $SP = $_ENV['STYLE_PATH'] ?? '';
+        $path = $SP ? $SP.$href : $href;
 
+        if (!file_exists($path)) {
+            trigger_error("Could not find stylesheet file => '" . htmlentities($path) . "'", E_USER_ERROR);
+        }
+    
+        $this->styles[] = self::assetUrl($path);
+    }
+    
     /**
      * Adds a script link to the HTML document.
      *
      * @param string $src The path to the script.
      */
     public function addScript(string $src) {
-        $this->scripts[] = $src;
+        $SP = $_ENV['SCRIPT_PATH'] ?? '';
+        $path = $SP ? $SP.$src : $src;
+    
+        if (!file_exists($path)) {
+            trigger_error("Could not find script file => '" . htmlentities($path) . "'", E_USER_ERROR);
+        }
+
+        $this->scripts[] = self::assetUrl($src);
     }
 
     /**
@@ -112,14 +126,14 @@ class HTMLBuilder {
             $html .= '<meta ' . $meta . '>' . PHP_EOL;
         }
         $html .= '<title>' . $this->title . '</title>' . PHP_EOL;
-        $html .= '<link rel="icon" type="image/x-icon" href="' . $this->assetUrl($this->favicon) . '">' . PHP_EOL;
+        $html .= '<link rel="icon" type="image/x-icon" href="' . self::assetUrl($this->favicon) . '">' . PHP_EOL;
 
         foreach ($this->styles as $style) {
-            $html .= '<link rel="stylesheet" type="text/css" href="' . $this->assetUrl($style) . '">' . PHP_EOL;
+            $html .= '<link rel="stylesheet" type="text/css" href="' . $style . '">' . PHP_EOL;
         }
 
         foreach ($this->scripts as $script) {
-            $html .= '<script src="' . $this->assetUrl($script) . '"></script>' . PHP_EOL;
+            $html .= '<script src="' . $script . '"></script>' . PHP_EOL;
         }
 
         $html .= '</head>' . PHP_EOL;

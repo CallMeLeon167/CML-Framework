@@ -5,13 +5,26 @@ namespace Classes;
  * The DB class establishes a connection to the database and allows for executing SQL queries.
  */
 class DB {
+    use Traits\Traits;
+
+    /**
+     * Stores MySQL connection.
+     */
     private $conn;
+
+    /**
+     * Stores sql path.
+     *
+     * @var string
+     */
+    public string $SQLP;
     
     /**
      * Constructor of the DB class. Calls the methods to load environment variables and establish a connection to the database.
      */
     public function __construct() {
         $this->loadEnv();
+        $this->SQLP = $_ENV['SQL_PATH'] ?? '';
         $this->connect($_ENV['DB_HOST'], $_ENV['DB_USER'], $_ENV['DB_PASS'], $_ENV['DB_NAME']); 
     }
 
@@ -130,21 +143,22 @@ class DB {
      * @param array $params Parameters for the SQL query (optional).
      * @return array The result of the SQL query as an array.
      */
-    public function sql2array_file(string $filename, array $params = []):array {
-        $sqlArray = [];
-        $sqlContent = file_get_contents(dirname(__DIR__).'/sql/'.ltrim($filename, "/"));
-        $queries = explode(';', $sqlContent);
-    
-        foreach ($queries as $query) {
-            $query = trim($query);
-            if (!empty($query)) {
-                $sqlArray = $this->sql2array($query, $params);
-            }
-        }
 
+    public function sql2array_file(string $filename, array $params = []): array {
+        $filepath = dirname(__DIR__) . '/../' . $this->SQLP . $filename;
+        
+        if (!file_exists($filepath)) {
+            trigger_error("Could not find SQL file => '" . htmlentities($this->SQLP . $filename) . "'", E_USER_ERROR);
+        }
+        
+        $sqlContent = file_get_contents($filepath);
+        $queries = explode(';', $sqlContent);
+        
+        $sqlArray = array_map(fn($query) => $this->sql2array(trim($query), $params), array_filter($queries));
+        
         return $sqlArray;
     }
-
+    
     /**
      * Executes an SQL query from a file and performs the operations in the database.
      *
@@ -152,17 +166,20 @@ class DB {
      * @param array $params Parameters for the SQL query (optional).
      */
     public function sql2db_file(string $filename, array $params = []) {
-        $sqlContent = file_get_contents(dirname(__DIR__).'/sql/'.ltrim($filename, "/"));
+        $filepath = dirname(__DIR__) . '/../' . $this->SQLP . $filename;
     
-        $queries = explode(';', $sqlContent);
+        if (!file_exists($filepath)) {
+            trigger_error("Could not find SQL file => '" . htmlentities($this->SQLP . $filename) . "'", E_USER_ERROR);
+        }
+    
+        $sqlContent = file_get_contents($filepath);
+        $queries = array_filter(array_map('trim', explode(';', $sqlContent)));
     
         foreach ($queries as $query) {
-            $query = trim($query);
-            if (!empty($query)) {
-                $this->sql2db($query, $params);
-            }
+            $this->sql2db($query, $params);
         }
     }
+    
 
     /**
      * Executes an SQL query and performs the operations in the database.
@@ -215,7 +232,6 @@ class DB {
         if (!empty($query)) {
             return json_encode($this->sql2array($query, $params));
         }
-
     }
 
     /**

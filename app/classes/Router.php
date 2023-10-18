@@ -82,12 +82,20 @@ class Router extends HTMLBuilder{
     protected array $currentRouteParams = [];
 
     /**
+     * Stores sites path.
+     *
+     * @var string
+     */
+    public string $FILEP;
+
+    /**
      * Initializes the error reporting configuration based on the PRODUCTION environment variable.
      */
     public function __construct(){
         $this->setCommonSecurityHeaders();
         $dotenv = \Dotenv\Dotenv::createImmutable(__DIR__ ."/../config");
         $dotenv->load();
+        $this->FILEP = $_ENV['SITES_PATH'] ?? '';
         $errorfile = (__DIR__.'/../../errorlogfile.log');
         if ($_ENV["PRODUCTION"] === 'true') {
             // In the production environment, do not display errors
@@ -164,16 +172,15 @@ class Router extends HTMLBuilder{
     /**
      * Set a path to show an error page if the route is not defined.
      *
-     * @param string $url The URL for the redirect
+     * @param string $siteName The name of the desired file.
      */
-    public function setErrorPage(string $path){
-        $siteName = str_replace(".php", '', $path);
-        $sitePath = dirname(__DIR__)."/../sites/$siteName.php";
+    public function setErrorPage(string $siteName){
+        $sitePath = dirname(__DIR__)."/../".$this->FILEP.$siteName;
 
         if (file_exists($sitePath)) {
             return $this->errorPage = $sitePath;
         } else {
-            die("Could not find the file $sitePath");
+            trigger_error(htmlentities("Could not find the file $this->FILEP.$siteName", E_USER_ERROR));
         }
     }
 
@@ -383,21 +390,18 @@ class Router extends HTMLBuilder{
     }
 
     /**
-     * Loads and displays a PHP file from the current directory in the /sites subfolder.
+     * Loads and displays a file.
      *
-     * @param string $siteName The name of the desired file (without ".php" ending).
+     * @param string $siteName The name of the desired file.
      * @param array $variables An associative array of variables to be made available in the loaded file.
      */
     public function getSite(string $siteName, array $variables = []) {
-        $siteName = str_replace(".php", '', $siteName);
-        $sitePath = dirname(__DIR__)."/../sites/$siteName.php";
-
+        $sitePath = dirname(__DIR__)."/../".$this->FILEP.$siteName;
         if (file_exists($sitePath)) {
             extract($variables); // Make the variables available
             include $sitePath;
         } else {
-            header("HTTP/1.1 404 Not Found");
-            echo "getSite('$siteName') | Site not found => /sites/$siteName.php";
+            trigger_error(htmlentities("getSite('$siteName') | Site not found => ".$this->FILEP.$siteName), E_USER_ERROR);
         }
     }
 

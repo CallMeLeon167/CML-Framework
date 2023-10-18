@@ -17,13 +17,15 @@ $router->setFavicon("/favicon.ico");
 $router->addMeta('name="theme-color" content="black"');
 
 //Styles
-$router->addStyle("app/web/css/styles.css");
+$router->addStyle("styles.css");
 
 //Scripts
-$router->addScript("app/web/js/styles.js");
+$router->addScript("scripts.js");
 
 $router->addRoute('*', '/', function () use ($router, $db) {
     $router->build();
+    $router->getSite("test.php");
+    // $w = $db->sql2array_file("test.sql");
 });
 
 ?>
