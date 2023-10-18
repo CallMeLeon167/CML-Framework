@@ -382,10 +382,10 @@ class Router extends HTMLBuilder{
             if (method_exists($controllerInstance, $methodName)) {
                 return call_user_func([$controllerInstance, $methodName], $params);
             } else {
-                echo "Method $methodName not found in controller $controllerName.<br>";
+                trigger_error("Method $methodName not found in controller $controllerName.", E_USER_ERROR);
             }
         } else {
-            echo "Controller <b>$controllerName</b> not found. Check your controllers folder <b>/controllers/$controllerName.php</b> <br>";
+            trigger_error("Controller $controllerName not found. Check your controllers folder /controllers/$controllerName.php", E_USER_ERROR);
         }
     }
 
