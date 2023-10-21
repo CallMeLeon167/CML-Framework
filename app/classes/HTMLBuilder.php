@@ -11,7 +11,6 @@ class HTMLBuilder {
     private string $title = "";
     private string $favicon = "";
     private string $author = "";
-    private string $baseUrl = "";
     private string $header = "";
     private array $styles = [];
     private array $scripts = [];
