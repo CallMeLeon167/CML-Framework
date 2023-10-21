@@ -141,14 +141,6 @@ class HTMLBuilder {
         $html .= '<title>' . $this->title . '</title>' . PHP_EOL;
         $html .= '<link rel="icon" type="image/x-icon" href="' . self::assetUrl($this->favicon) . '">' . PHP_EOL;
 
-        foreach ($this->styles as $style) {
-            $html .= '<link rel="stylesheet" type="text/css" href="' . $style . '">' . PHP_EOL;
-        }
-
-        foreach ($this->scripts as $script) {
-            $html .= '<script src="' . $script . '" type="text/javascript"></script>' . PHP_EOL;
-        }
-
         foreach ($this->cdns as $cdns) {
             foreach ($cdns as $tag => $attributes) {
                 $html .= "<$tag $attributes>";
@@ -157,6 +149,14 @@ class HTMLBuilder {
                 }
                 $html .= PHP_EOL;
             }
+        }
+
+        foreach ($this->styles as $style) {
+            $html .= '<link rel="stylesheet" type="text/css" href="' . $style . '">' . PHP_EOL;
+        }
+
+        foreach ($this->scripts as $script) {
+            $html .= '<script src="' . $script . '" type="text/javascript"></script>' . PHP_EOL;
         }
         
         $html .= '</head>' . PHP_EOL;
