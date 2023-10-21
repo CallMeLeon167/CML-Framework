@@ -16,6 +16,7 @@ class HTMLBuilder {
     private array $styles = [];
     private array $scripts = [];
     private array $metas = [];
+    private array $cdns = [];
     private bool $showComments = true;
 
     /**
@@ -79,6 +80,18 @@ class HTMLBuilder {
     
         $this->styles[] = self::assetUrl($path);
     }
+
+    /**
+     * Add a CDN link to the stored resources.
+     *
+     * @param string $type The type of the CDN link (e.g., 'link', 'script', etc.).
+     * @param string $attr The attribute information for the CDN link.
+     */
+    public function addCDN(string $type, string $attr) {
+        $type = strtolower($type);
+        $this->cdns[] = [$type => $attr];
+    }
+
     
     /**
      * Adds a script link to the HTML document.
@@ -93,7 +106,7 @@ class HTMLBuilder {
             trigger_error("Could not find script file => '" . htmlentities($path) . "'", E_USER_ERROR);
         }
 
-        $this->scripts[] = self::assetUrl($src);
+        $this->scripts[] = self::assetUrl($path);
     }
 
     /**
@@ -133,9 +146,19 @@ class HTMLBuilder {
         }
 
         foreach ($this->scripts as $script) {
-            $html .= '<script src="' . $script . '"></script>' . PHP_EOL;
+            $html .= '<script src="' . $script . '" type="text/javascript"></script>' . PHP_EOL;
         }
 
+        foreach ($this->cdns as $cdns) {
+            foreach ($cdns as $tag => $attributes) {
+                $html .= "<$tag $attributes>";
+                if ($tag == "script") {
+                    $html .= "</$tag>";
+                }
+                $html .= PHP_EOL;
+            }
+        }
+        
         $html .= '</head>' . PHP_EOL;
         $html .= '<body>' . PHP_EOL;
 
