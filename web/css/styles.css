@@ -1,0 +1,115 @@
+html {
+  background: linear-gradient(#111111, #161616);
+  color: white;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  margin: 0;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+main h2 {
+  font-size: xxx-large;
+  text-align: center;
+  padding: 20px 20px 0 20px;
+  text-wrap: balance;
+  width: 50%;
+}
+
+main h3 {
+  font-weight: 400;
+  border-bottom: 1px solid #ccc;
+  padding: 0px 20px 20px 20px;
+}
+
+main h2,
+main h3 {
+  margin: 0;
+}
+
+#docs-button {
+  padding: 8px 20px;
+  background-color: #292929;
+  color: #fff;
+  border-radius: 5px;
+  text-align: center;
+  text-decoration: none;
+  margin: 20px;
+  border: 1px solid #393939;
+}
+
+#cml-text {
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  display: inline-block;
+  animation: changeColor 4s infinite linear;
+  background-image: linear-gradient(45deg, #3498db, #e74c3c, #27ae60);
+  background-size: 200% 200%;
+}
+
+@keyframes changeColor {
+  0% {
+    background-position: 0 100%;
+  }
+  50% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: 0 100%;
+  }
+}
+
+#info {
+  padding: 10px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 50%;
+}
+
+#thanks {
+  font-weight: 200;
+}
+
+#last-update {
+  font-weight: 100;
+}
+
+#contributors {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  margin: 5px;
+  padding: 5px 15px;
+  background: #181818;
+  border-radius: 10px;
+  border: 1px solid #676767;
+  box-shadow: 0px 0px 3px black;
+}
+
+#contributors img {
+  height: 40px;
+  width: auto;
+  border-radius: 50%;
+  box-shadow: 0px 0px 3px black;
+}
+
+#contributors a {
+  color: #ccc;
+  text-decoration: none;
+}
+
+#contributors a:hover {
+  text-decoration: underline;
+}
