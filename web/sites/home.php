@@ -1,10 +1,10 @@
 <?php 
-function formatDate($dateString) {
+function formatDate($dateString, $format = "d.m.Y") {
     $timestamp = strtotime($dateString);
-    return date("d.m.Y", $timestamp);
+    return date($format, $timestamp);
 }
 
-$createdate = formatDate($created_at);
+$createdate = formatDate($created_at, "F d, Y");
 $last_update = formatDate($pushed_at);
 
 ?>
