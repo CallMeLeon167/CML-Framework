@@ -51,7 +51,7 @@ class DB {
     public function connect(string $host, string $user, string $pass, string $dbname) {
         $this->conn = @new \mysqli($host, $user, $pass, $dbname);
         if ($this->conn->connect_error) {
-            die("Connection failed! ".$this->conn->connect_error);
+            trigger_error("Connection failed! ".$this->conn->connect_error, E_USER_ERROR);
         }
         $this->conn->set_charset("utf8mb4");
     }
@@ -94,7 +94,7 @@ class DB {
         $stmt = $this->conn->prepare($query);
     
         if (!$stmt) {
-            die("SQL Error: " . $this->conn->error);
+            trigger_error("SQL Error: " . $this->conn->error, E_USER_ERROR);
         }
     
         if (!empty($params)) {
@@ -191,7 +191,7 @@ class DB {
         $stmt = $this->conn->prepare($query);
     
         if (!$stmt) {
-            die("SQL Error: " . $this->conn->error);
+            trigger_error("SQL Error: " . $this->conn->error, E_USER_ERROR);
         }
     
         if (!empty($params)) {
