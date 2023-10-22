@@ -128,45 +128,46 @@ class HTMLBuilder {
      * Builds the HTML document with configured elements and displays it.
      */
     public function build() {
-        $html = '<!DOCTYPE html>' . PHP_EOL;
-        $html .= '<html>' . PHP_EOL;
-        if ($this->showComments == true) $html .= $this->init_comment($this->projectName, $this->author) . PHP_EOL;
-        $html .= '<head>' . PHP_EOL;
-        $html .= '<meta charset="UTF-8">' . PHP_EOL;
-        $html .= '<meta name="viewport" content="width=device-width, initial-scale=1.0">' . PHP_EOL;
-        foreach ($this->metas as $meta) {
-            $html .= '<meta ' . $meta . '>' . PHP_EOL;
-        }
-        $html .= '<title>' . $this->title . '</title>' . PHP_EOL;
-        $html .= '<link rel="icon" type="image/x-icon" href="' . self::assetUrl($this->favicon) . '">' . PHP_EOL;
-
-        foreach ($this->cdns as $cdns) {
-            foreach ($cdns as $tag => $attributes) {
-                $html .= "<$tag $attributes>";
-                if ($tag == "script") {
-                    $html .= "</$tag>";
-                }
-                $html .= PHP_EOL;
-            }
-        }
-
-        foreach ($this->styles as $style) {
-            $html .= '<link rel="stylesheet" type="text/css" href="' . $style . '">' . PHP_EOL;
-        }
-
-        foreach ($this->scripts as $script) {
-            $html .= '<script src="' . $script . '" type="text/javascript"></script>' . PHP_EOL;
-        }
-        
-        $html .= '</head>' . PHP_EOL;
-        $html .= '<body>' . PHP_EOL;
-
-        $html .= $this->header . PHP_EOL;
-
+        ob_start();
+        ?>
+        <!DOCTYPE html>
+        <html>
+        <?php if ($this->showComments == true) $this->init_comment($this->projectName, $this->author); ?>
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <?php foreach ($this->metas as $meta): ?>
+                <meta <?= $meta ?>>
+            <?php endforeach; ?>
+            <title><?= $this->title ?></title>
+            <link rel="icon" type="image/x-icon" href="<?= self::assetUrl($this->favicon) ?>">
+    
+            <?php foreach ($this->cdns as $cdns): ?>
+                <?php foreach ($cdns as $tag => $attributes): ?>
+                    <<?= $tag ?> <?= $attributes ?>>
+                    <?php if ($tag == "script"): ?>
+                        </<?= $tag ?>>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+            <?php endforeach; ?>
+    
+            <?php foreach ($this->styles as $style): ?>
+                <link rel="stylesheet" type="text/css" href="<?= $style ?>">
+            <?php endforeach; ?>
+    
+            <?php foreach ($this->scripts as $script): ?>
+                <script src="<?= $script ?>" type="text/javascript"></script>
+            <?php endforeach; ?>
+        </head>
+        <body>
+        <?php
+        echo $this->header;
+    
         // Additional content can be added here
-        
-        echo $html;
+    
+        echo ob_get_clean(); 
     }
+    
 
     /**
      * Centers a comment in the HTML document.
