@@ -135,15 +135,6 @@ class Router extends HTMLBuilder{
     }
 
     /**
-     * Close the application correctly.
-     */
-    public static function APP_CLOSE() {
-        echo PHP_EOL .'</body>';
-        echo PHP_EOL .'</html>';
-        exit;
-    }
-
-    /**
      * Get a route parameter by name.
      *
      * @param string $paramName
@@ -163,7 +154,7 @@ class Router extends HTMLBuilder{
         header("HTTP/1.1 404 Not Found");
         trigger_error("Site not found => Route is Wrong.<br>
         <h3>Route not found for URL: <b>$url</b> (Method: <b>$method</b>)</h3>", E_USER_ERROR);
-        Router::APP_CLOSE();
+        parent::build_end();
     }
 
     /**
@@ -323,7 +314,7 @@ class Router extends HTMLBuilder{
             } elseif (!empty($this->errorPage)) {
                 parent::build();
                 include($this->errorPage);
-                Router::APP_CLOSE();
+                parent::build_end();
             } else {
                 $this->handleRouteNotFound($url, $method);
             }
@@ -375,7 +366,7 @@ class Router extends HTMLBuilder{
                     $this->executeMiddleware('after', $url);
     
                     // Close the application
-                    ($this->isApi == false && $routeData['ajaxOnly'] == false) ? Router::APP_CLOSE() : exit;
+                    ($this->isApi == false && $routeData['ajaxOnly'] == false) ? parent::build_end() : exit;
                 }
             }
         }
