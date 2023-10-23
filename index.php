@@ -27,6 +27,9 @@ $router->addStyle("styles.css");
 //Global Scripts
 $router->addScript("scripts.js");
 
+//Global HTML
+$router->addFooter();
+
 $router->addRoute('GET', '/', function () use ($router) {
     $apiData = $router->useController("ApiController", "getRepoData", ['url' => 'https://docs.callmeleon.de/data']);
     $router->setTitle("Thank you! | CML - Framework");
