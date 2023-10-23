@@ -12,6 +12,7 @@ class HTMLBuilder {
     private string $favicon = "";
     private string $author = "";
     private string $header = "";
+    private string $footer = "";
     private array $styles = [];
     private array $scripts = [];
     private array $metas = [];
@@ -60,9 +61,53 @@ class HTMLBuilder {
      *
      * @param string $header The header element to add.
      */
-    public function addHeader(string $header) {
-        $this->header = $header;
+    public function addHeader(string $header = '') {
+        $headerFile = $_ENV['HEADER_FILE'] ?? '';
+    
+        if (empty($headerFile) && empty($header)) {
+            trigger_error("Could not set the Footer", E_USER_ERROR);
+            return;
+        }
+    
+        if (!empty($header)) {
+            $this->header = $header;
+        } else {
+            if (file_exists($headerFile)) {
+                ob_start();
+                include $headerFile;
+                $this->header = ob_get_clean();
+            } else {
+                trigger_error("Footer file does not exist: $headerFile", E_USER_ERROR);
+            }
+        }
     }
+
+    /**
+     * Adds a footer element to the HTML document.
+     *
+     * @param string $footer The footer element to add.
+     */
+    public function addFooter(string $footer = '') {
+        $footerFile = $_ENV['FOOTER_FILE'] ?? '';
+    
+        if (empty($footerFile) && empty($footer)) {
+            trigger_error("Could not set the Footer", E_USER_ERROR);
+            return;
+        }
+    
+        if (!empty($footer)) {
+            $this->footer = $footer;
+        } else {
+            if (file_exists($footerFile)) {
+                ob_start();
+                include $footerFile;
+                $this->footer = ob_get_clean();
+            } else {
+                trigger_error("Footer file does not exist: $footerFile", E_USER_ERROR);
+            }
+        }
+    }
+    
 
     /**
      * Adds a stylesheet link to the HTML document.
@@ -166,6 +211,16 @@ class HTMLBuilder {
         // Additional content can be added here
     
         echo ob_get_clean(); 
+    }
+
+    /**
+     * Close the application correctly.
+     */
+    public function build_end() {
+        echo $this->footer;
+        echo PHP_EOL .'</body>';
+        echo PHP_EOL .'</html>';
+        exit;
     }
     
 
