@@ -218,24 +218,28 @@ class Router extends HTMLBuilder{
     }
 
     /**
-     * Add a route to the application.
+     * Add a route to the application with multiple HTTP methods.
      *
-     * @param string $method The HTTP method (e.g., "GET" or "POST") or "*" for any method
+     * @param array|string $methods The HTTP methods (e.g., ['GET', 'POST']) or a single method as a string.
      * @param string $url The URL for the route
      * @param \Closure $target The callback function for the route
      * @param int $statusCode The HTTP status code for the route
      * @return object
      */
-    public function addRoute(string $method, string $url, \Closure $target, int $statusCode = 0){
+    public function addRoute($methods, string $url, \Closure $target, int $statusCode = 0){
+        $methods = (is_array($methods)) ? $methods : [$methods]; // Convert to an array if it's a single method
         $this->currentRoute = $url;
-        $this->currentMethod = $method;
-        $this->routes[$method][$url] = [
-            'target' => $target,
-            'statusCode' => $statusCode,
-            'ajaxOnly' => false,
-            'params' => [],
-            'where' => $this->whereConditions, // Use where conditions from the router instance
-        ];
+
+        foreach ($methods as $method) {
+            $this->currentMethod = $method;
+            $this->routes[$method][$url] = [
+                'target' => $target,
+                'statusCode' => $statusCode,
+                'ajaxOnly' => false,
+                'params' => [],
+                'where' => $this->whereConditions, // Use where conditions from the router instance
+            ];
+        }
 
         $this->whereConditions = []; // Clear where conditions
 
@@ -284,7 +288,7 @@ class Router extends HTMLBuilder{
     /**
      * Compares the requested method and URL to defined routes, processes them, and throws an exception if no match is found.
      */
-    public function matchRoute() {
+    protected function matchRoute() {
 
         # URL Validation
         $url = $_SERVER['REQUEST_URI']; // Get the URL from the current page
@@ -320,9 +324,6 @@ class Router extends HTMLBuilder{
                 parent::build();
                 include($this->errorPage);
                 Router::APP_CLOSE();
-            } elseif ($this->routes[$this->currentMethod][$this->currentRoute]['ajaxOnly']) {
-                echo json_encode(["error" => "This is not an Ajax call"]);
-                die;
             } else {
                 $this->handleRouteNotFound($url, $method);
             }
@@ -339,6 +340,7 @@ class Router extends HTMLBuilder{
         foreach ($routes as $routeUrl => $routeData) {
             // Check if the current route is restricted to AJAX requests
             if ($routeData['ajaxOnly'] && !$this->isAjaxRequest()) {
+                http_response_code(403);
                 continue; // Skip this route if it's not an AJAX request
             }
     
@@ -403,7 +405,7 @@ class Router extends HTMLBuilder{
      * @param string $position The position of the middleware (before or after)
      * @param string $url The URL for which the middleware should be executed
      */
-    private function executeMiddleware($position, $url) {
+    protected function executeMiddleware($position, $url) {
         if (!empty($this->middlewares)) {
             $mdPosition = array_search($url, $this->middlewares["route"]);
             if (is_int($mdPosition) && $this->middlewares['position'][$mdPosition] === $position) {
@@ -563,7 +565,7 @@ class Router extends HTMLBuilder{
      *
      * @return bool
      */
-    protected function isAjaxRequest(): bool {
+    public function isAjaxRequest(): bool {
         return !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
     }
 
