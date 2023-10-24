@@ -62,24 +62,7 @@ class HTMLBuilder {
      * @param string $header The header element to add.
      */
     public function addHeader(string $header = '') {
-        $headerFile = $_ENV['HEADER_FILE'] ?? '';
-    
-        if (empty($headerFile) && empty($header)) {
-            trigger_error("Could not set the Footer", E_USER_ERROR);
-            return;
-        }
-    
-        if (!empty($header)) {
-            $this->header = $header;
-        } else {
-            if (file_exists($headerFile)) {
-                ob_start();
-                include $headerFile;
-                $this->header = ob_get_clean();
-            } else {
-                trigger_error("Footer file does not exist: $headerFile", E_USER_ERROR);
-            }
-        }
+        $this->addContent('HEADER_FILE', $header, $this->header);
     }
 
     /**
@@ -88,22 +71,33 @@ class HTMLBuilder {
      * @param string $footer The footer element to add.
      */
     public function addFooter(string $footer = '') {
-        $footerFile = $_ENV['FOOTER_FILE'] ?? '';
-    
-        if (empty($footerFile) && empty($footer)) {
-            trigger_error("Could not set the Footer", E_USER_ERROR);
+        $this->addContent('FOOTER_FILE', $footer, $this->footer);
+    }
+
+    /**
+     * Generic function to add content (header or footer) to the HTML document.
+     *
+     * @param string $envKey The environment variable key for the content file.
+     * @param string $content The content to add.
+     * @param string &$property The property to store the content in.
+     */
+    protected function addContent(string $envKey, string $content, string &$property) {
+        $contentFile = $_ENV[$envKey] ?? '';
+
+        if (empty($contentFile) && empty($content)) {
+            trigger_error("Could not set the $envKey", E_USER_ERROR);
             return;
         }
-    
-        if (!empty($footer)) {
-            $this->footer = $footer;
+
+        if (!empty($content)) {
+            $property = $content;
         } else {
-            if (file_exists($footerFile)) {
+            if (file_exists($contentFile)) {
                 ob_start();
-                include $footerFile;
-                $this->footer = ob_get_clean();
+                include $contentFile;
+                $property = ob_get_clean();
             } else {
-                trigger_error("Footer file does not exist: $footerFile", E_USER_ERROR);
+                trigger_error("$envKey file does not exist: $contentFile", E_USER_ERROR);
             }
         }
     }
