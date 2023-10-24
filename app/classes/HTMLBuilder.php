@@ -13,6 +13,8 @@ class HTMLBuilder {
     private string $author = "";
     private string $header = "";
     private string $footer = "";
+    private string $bodyAttr = "";
+    private string $htmlAttr = "";
     private array $styles = [];
     private array $scripts = [];
     private array $metas = [];
@@ -72,6 +74,23 @@ class HTMLBuilder {
      */
     public function addFooter(string $footer = '') {
         $this->addContent('FOOTER_FILE', $footer, $this->footer);
+    }
+
+    /**
+     * Set HTML tag attributes for the document.
+     *
+     * @param string $attr The HTML tag attributes to be added.
+     */
+    public function addHtmlTagAttributes(string $attr = '') {
+        $this->htmlAttr = $attr;
+    }
+    /**
+     * Set body tag attributes for the document.
+     *
+     * @param string $attr The body tag attributes to be added.
+     */
+    public function addBodyTagAttributes(string $attr = '') {
+        $this->bodyAttr = $attr;
     }
 
     /**
@@ -170,7 +189,7 @@ class HTMLBuilder {
         ob_start();
         ?>
         <!DOCTYPE html>
-        <html>
+        <html <?= $this->htmlAttr?>>
         <?php if ($this->showComments == true) $this->init_comment($this->projectName, $this->author); ?>
         <head>
             <meta charset="UTF-8">
@@ -198,7 +217,7 @@ class HTMLBuilder {
                 <script src="<?= $script ?>" type="text/javascript"></script>
             <?php endforeach; ?>
         </head>
-        <body>
+        <body <?= $this->bodyAttr ?>>
         <?php
         echo $this->header;
     
