@@ -112,7 +112,7 @@ class HTMLBuilder {
         $SP = $_ENV['STYLE_PATH'] ?? '';
         $path = $SP ? $SP.$href : $href;
 
-        if (!file_exists($path)) {
+        if (!file_exists(dirname(__DIR__) . '/../' . $path)) {
             trigger_error("Could not find stylesheet file => '" . htmlentities($path) . "'", E_USER_ERROR);
         }
     
@@ -140,7 +140,7 @@ class HTMLBuilder {
         $SP = $_ENV['SCRIPT_PATH'] ?? '';
         $path = $SP ? $SP.$src : $src;
     
-        if (!file_exists($path)) {
+        if (!file_exists(dirname(__DIR__) . '/../' . $path)) {
             trigger_error("Could not find script file => '" . htmlentities($path) . "'", E_USER_ERROR);
         }
 
