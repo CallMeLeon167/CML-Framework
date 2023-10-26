@@ -19,6 +19,7 @@ class HTMLBuilder {
     private array $scripts = [];
     private array $metas = [];
     private array $cdns = [];
+    private array $hooks = [];
     private bool $showComments = true;
 
     /**
@@ -182,6 +183,47 @@ class HTMLBuilder {
         $this->showComments = false;
     }
 
+    
+    /**
+     * Register a hook to place content at a specific location in the HTML document.
+     *
+     * @param string   $hookName      The name of the hook (e.g., 'before_head', 'after_head', 'top_body', etc.).
+     * @param mixed    $contentSource The file path, a callable function, or HTML code to provide content.
+     */
+    public function registerHook(string $hookName, $contentSource) {
+        $this->hooks[$hookName] = [
+            'source' => $contentSource,
+        ];
+    }
+
+    /**
+     * Get the content for a specific hook and return it.
+     *
+     * @param string $hookName The name of the hook (e.g., 'before_head', 'after_head', 'top_body', etc.).
+     *
+     * @return string The content for the specified hook.
+     */
+    protected function getHookContent(string $hookName) {
+        if (isset($this->hooks[$hookName])) {
+            $hook = $this->hooks[$hookName];
+            $contentSource = $hook['source'];
+
+            if (is_callable($contentSource)) {
+                $content = call_user_func($contentSource);
+                return is_string($content) ? $content : '';
+            } elseif (file_exists(dirname(__DIR__) . '/../' . $contentSource)) {
+                ob_start();
+                include dirname(__DIR__) . '/../' . $contentSource;
+                return ob_get_clean();
+            } elseif (is_string($contentSource)) {
+                return $contentSource;
+            } else {
+                trigger_error("Invalid content source for the hook: $hookName", E_USER_ERROR);
+            }
+        }
+        return '';
+    }
+
     /**
      * Builds the HTML document with configured elements and displays it.
      */
@@ -191,7 +233,9 @@ class HTMLBuilder {
         <!DOCTYPE html>
         <html <?= $this->htmlAttr?>>
         <?php if ($this->showComments == true) $this->init_comment($this->projectName, $this->author); ?>
+        <?= $this->getHookContent('before_head'); ?>
         <head>
+            <?= $this->getHookContent('top_head'); ?>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <?php foreach ($this->metas as $meta): ?>
@@ -199,7 +243,7 @@ class HTMLBuilder {
             <?php endforeach; ?>
             <title><?= $this->title ?></title>
             <link rel="icon" type="image/x-icon" href="<?= self::assetUrl($this->favicon) ?>">
-    
+
             <?php foreach ($this->cdns as $cdns): ?>
                 <?php foreach ($cdns as $tag => $attributes): ?>
                     <<?= $tag ?> <?= $attributes ?>>
@@ -208,22 +252,28 @@ class HTMLBuilder {
                     <?php endif; ?>
                 <?php endforeach; ?>
             <?php endforeach; ?>
-    
+
             <?php foreach ($this->styles as $style): ?>
                 <link rel="stylesheet" type="text/css" href="<?= $style ?>">
             <?php endforeach; ?>
-    
+
             <?php foreach ($this->scripts as $script): ?>
                 <script src="<?= $script ?>" type="text/javascript"></script>
             <?php endforeach; ?>
+            <?= $this->getHookContent('bottom_head'); ?>
         </head>
+        <?= $this->getHookContent('after_head'); ?>
+
+        <?= $this->getHookContent('before_body'); ?>
         <body <?= $this->bodyAttr ?>>
+        <?= $this->getHookContent('top_body'); ?>
         <?php
         echo $this->header;
     
         // Additional content can be added here
-    
-        echo ob_get_clean(); 
+
+        echo ob_get_clean();
+        echo $this->getHookContent('bottom_body');
     }
 
     /**
@@ -232,6 +282,7 @@ class HTMLBuilder {
     public function build_end() {
         echo $this->footer;
         echo PHP_EOL .'</body>';
+        echo $this->getHookContent('after_body');
         echo PHP_EOL .'</html>';
         exit;
     }
