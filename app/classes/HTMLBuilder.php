@@ -7,6 +7,7 @@ namespace Classes;
 class HTMLBuilder {
     use Traits\Traits;
     
+    private bool $showComments = true;
     private string $projectName = "";
     private string $title = "";
     private string $favicon = "";
@@ -20,7 +21,16 @@ class HTMLBuilder {
     private array $metas = [];
     private array $cdns = [];
     private array $hooks = [];
-    private bool $showComments = true;
+    private array $regHooks = [
+        'before_head',
+        'top_head',
+        'bottom_head',
+        'after_head',
+        'before_body',
+        'top_body',
+        'bottom_body',
+        'after_body',
+    ];
 
     /**
      * Sets the project name and updates the title accordingly.
@@ -191,6 +201,9 @@ class HTMLBuilder {
      * @param mixed    $contentSource The file path, a callable function, or HTML code to provide content.
      */
     public function addHook(string $hookName, $contentSource) {
+        if(!in_array($hookName, $this->regHooks)){
+            trigger_error("Invalid hookname: $hookName", E_USER_ERROR);
+        }
         $this->hooks[$hookName] = [
             'source' => $contentSource,
         ];
