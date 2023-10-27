@@ -1,7 +1,7 @@
 <?php
 namespace Classes\Traits;
 
-trait Traits{
+trait Functions{
     /**
      * Generate an absolute URL for an asset based on the provided path.
      *

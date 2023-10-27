@@ -4,7 +4,7 @@ namespace Classes\SessionTrait;
 /**
  * A trait for managing sessions in PHP.
  */
-trait SessionTrait {
+trait Session {
     /**
      * Starts or resumes a session if not already started.
      */
