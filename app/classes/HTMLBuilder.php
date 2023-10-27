@@ -190,7 +190,7 @@ class HTMLBuilder {
      * @param string   $hookName      The name of the hook (e.g., 'before_head', 'after_head', 'top_body', etc.).
      * @param mixed    $contentSource The file path, a callable function, or HTML code to provide content.
      */
-    public function registerHook(string $hookName, $contentSource) {
+    public function addHook(string $hookName, $contentSource) {
         $this->hooks[$hookName] = [
             'source' => $contentSource,
         ];
