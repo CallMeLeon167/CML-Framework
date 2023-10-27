@@ -15,6 +15,46 @@ trait Functions{
         $baseUrl = dirname($_SERVER['SCRIPT_NAME']);
         return ($baseUrl == "/") ? "/" . ltrim($path, '/') : $baseUrl . "/" . ltrim($path, '/');
     }
+
+    /**
+     * Retrieves and filters query parameters from the current request URI.
+     *
+     * @param string ...$desiredParams A variable number of parameter names to filter the query parameters.
+     * @return array An associative array containing the filtered query parameters.
+     */
+    public function getQueryParams(string ...$desiredParams) {
+        // Initialize an array to store query parameters.
+        $queryParams = array();
+
+        // Extract the query string from the request URI.
+        $queryString = parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY);
+
+        // Parse the query string into the $queryParams array.
+        if ($queryString) {
+            parse_str($queryString, $queryParams);
+        }
+
+        // Check if desired parameters were provided.
+        if (!empty($desiredParams)) {
+            // Initialize an array to store filtered parameters.
+            $filteredParams = array();
+
+            // Loop through each desired parameter.
+            foreach ($desiredParams as $param) {
+                // Check if the parameter exists in the query parameters.
+                if (isset($queryParams[$param])) {
+                    // Add the parameter and its value to the filteredParams array.
+                    $filteredParams[$param] = $queryParams[$param];
+                }
+            }
+
+            // Return the filtered parameters.
+            return $filteredParams;
+        }
+
+        // Return all query parameters if no desired parameters were provided.
+        return $queryParams;
+    }
 }
 
 /**
