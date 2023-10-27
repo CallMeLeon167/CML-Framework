@@ -7,11 +7,9 @@ namespace CML\Classes;
 class HTMLBuilder {
     use Functions\Functions;
     
-    private bool $showComments = true;
     private string $projectName = "";
     private string $title = "";
     private string $favicon = "";
-    private string $author = "";
     private string $header = "";
     private string $footer = "";
     private string $bodyAttr = "";
@@ -49,15 +47,6 @@ class HTMLBuilder {
      */
     public function setTitle(string $title) {
         $this->title = $title;
-    }
-
-    /**
-     * Sets the author(s) of the HTML document.
-     *
-     * @param string ...$author The author(s) of the HTML document.
-     */
-    public function setAuthor(string ...$author) {
-        $this->author = implode(", ", $author);
     }
 
     /**
@@ -186,13 +175,6 @@ class HTMLBuilder {
         $this->metas[] = $attrs;
     }
 
-    /**
-     * Disables HTML comments in the document.
-     */
-    public function disableComments() {
-        $this->showComments = false;
-    }
-
     
     /**
      * Register a hook to place content at a specific location in the HTML document.
@@ -245,7 +227,6 @@ class HTMLBuilder {
         ?>
         <!DOCTYPE html>
         <html <?= $this->htmlAttr?>>
-        <?php if ($this->showComments == true) $this->init_comment($this->projectName, $this->author); ?>
         <?= $this->getHookContent('before_head'); ?>
         <head>
             <?= $this->getHookContent('top_head'); ?>
@@ -298,104 +279,6 @@ class HTMLBuilder {
         echo $this->getHookContent('after_body');
         echo PHP_EOL .'</html>';
         exit;
-    }
-    
-
-    /**
-     * Centers a comment in the HTML document.
-     *
-     * @param string $comment The comment text to be centered.
-     * @param bool $center Indicates if the comment should be centered (default is true).
-     * @return string The centered comment.
-     */
-    public static function center_comment(string $comment, bool $center = true): string {
-        $stringLen = 80;
-    
-        if (!$center) {
-            $comment = ' ' . $comment;
-        }
-    
-        $spaces = max(0, $stringLen - strlen($comment));
-    
-        $leftSpaces = $center ? (int)($spaces / 2) : 0;
-        $rightSpaces = $spaces - $leftSpaces;
-    
-        $centeredComment = str_repeat(' ', $leftSpaces) . $comment . str_repeat(' ', $rightSpaces);
-    
-        return $centeredComment;
-    }
-    
-
-    /**
-     * Initializes and displays a centered comment in the HTML document with a randomly chosen ASCII art style.
-     *
-     * @param string $title The application name.
-     * @param string ...$programmer The programmer's names.
-     */
-    public function init_comment(string $title, string ...$programmer) {
-        $comments = [];
-
-        $comments[] = $this->comment(" ");
-        $comments[] = $this->comment("Welcome to the source code of $title");
-        $comments[] = $this->comment(" ");
-
-        $artStyles = $this->getComment();
-        $randomStyle = $artStyles[array_rand($artStyles)];
-
-        $dateModified = date("d.m.Y H:i:s", getlastmod());
-        $programmerNames = implode(', ', $programmer);
-
-        $comments[] = $randomStyle;
-
-        $comments[] = $this->comment(" ");
-        if(!empty($programmerNames)){
-            $comments[] = $this->comment("This website was developed by $programmerNames");
-        } else {
-            $comments[] = $this->comment("This website was developed");
-        }
-        $comments[] = $this->comment("in the year " . date("Y"));
-        $comments[] = $this->comment(" ");
-        $comments[] = $this->comment("Last update: $dateModified");
-        $comments[] = $this->comment(" ");
-
-        foreach ($comments as $comment) {
-            echo $comment . PHP_EOL;
-        }
-    }
-
-    /**
-     * Returns an array of ASCII art styles.
-     *
-     * @return array The array of ASCII art styles.
-     */
-    private function getComment(): array{
-        $artStyles = [
-            $this->comment("  _____             _      _       _         ").
-            $this->comment(" |  __ \           | |    (_)     | |        ").
-            $this->comment(" | |  | | _____   _| |     _ _ __ | | _____  ").
-            $this->comment(" | |  | |/ _ \ \ / / |    | | '_ \| |/ / __| ").
-            $this->comment(" | |__| |  __/\ V /| |____| | | | |   <\__ \ ").
-            $this->comment(" |_____/ \___| \_/ |______|_|_| |_|_|\_\___/ "),
-
-            $this->comment("    ___            __ _       _         ").
-            $this->comment("   /   \_____   __/ /(_)_ __ | | _____  ").
-            $this->comment("  / /\ / _ \ \ / / / | | '_ \| |/ / __| ").
-            $this->comment(" / /_//  __/\ V / /__| | | | |   <\__ \ ").
-            $this->comment("/___,' \___| \_/\____/_|_| |_|_|\_\___/ "),
-            
-        ];
-
-        return $artStyles;
-    }
-    
-    /**
-     * Generates an HTML comment with the provided content.
-     *
-     * @param string $comment The content of the comment.
-     * @return string The HTML comment.
-     */
-    private function comment(string $comment): string {
-        return "<!-- ".$this->center_comment($comment)." -->". PHP_EOL;
     }
 }
 ?>
