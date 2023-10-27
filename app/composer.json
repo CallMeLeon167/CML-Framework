@@ -6,7 +6,7 @@
     "psr-4": {
       "CML\\Classes\\": "classes/",
       "CML\\Controllers\\": "controllers/",
-      "CML\\Classes\\Traits\\": "classes/traits/"
+      "CML\\Classes\\Functions\\": "classes/Functions/"
     }
   }
 }

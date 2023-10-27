@@ -5,7 +5,7 @@ namespace CML\Classes;
  * The HTMLBuilder class is used to build HTML documents with customizable elements.
  */
 class HTMLBuilder {
-    use Traits\Functions;
+    use Functions\Functions;
     
     private bool $showComments = true;
     private string $projectName = "";

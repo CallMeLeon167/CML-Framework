@@ -7,8 +7,8 @@ namespace CML\Classes;
  * @author Leon.Schmidt
  */
 class Router extends \CML\Classes\HTMLBuilder{
-    use Traits\Functions;
-    use Traits\Session;
+    use Functions\Functions;
+    use Functions\Session;
 
     /**
      * Stores the defined routes.

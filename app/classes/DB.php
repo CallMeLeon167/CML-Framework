@@ -5,7 +5,7 @@ namespace CML\Classes;
  * The DB class establishes a connection to the database and allows for executing SQL queries.
  */
 class DB {
-    use Traits\Functions;
+    use Functions\Functions;
 
     /**
      * Stores MySQL connection.
