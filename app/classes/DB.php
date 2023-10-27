@@ -5,7 +5,7 @@ namespace Classes;
  * The DB class establishes a connection to the database and allows for executing SQL queries.
  */
 class DB {
-    use Traits\Traits;
+    use Traits\Functions;
 
     /**
      * Stores MySQL connection.

@@ -5,7 +5,7 @@ namespace Classes;
  * The HTMLBuilder class is used to build HTML documents with customizable elements.
  */
 class HTMLBuilder {
-    use Traits\Traits;
+    use Traits\Functions;
     
     private bool $showComments = true;
     private string $projectName = "";
