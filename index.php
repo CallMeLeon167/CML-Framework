@@ -14,7 +14,6 @@ $router->setErrorRedirect("/");
 $router->setProjectName("CML - Framework");
 $router->setFavicon("/favicon.ico");
 $router->addMeta('name="theme-color" content="black"');
-$router->disableComments();
 
 //Global CDNs
 $router->addCDN("link", 'rel="preconnect" href="https://fonts.googleapis.com"');
