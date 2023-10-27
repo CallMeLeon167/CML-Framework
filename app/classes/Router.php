@@ -9,7 +9,7 @@ use Classes\HTMLBuilder;
  */
 class Router extends HTMLBuilder{
     use \Classes\Traits\Functions;
-    use \Classes\SessionTrait\Session;
+    use \Classes\Traits\Session;
 
     /**
      * Stores the defined routes.

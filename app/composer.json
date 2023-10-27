@@ -6,8 +6,7 @@
     "psr-4": {
       "Classes\\": "classes/",
       "Controllers\\": "controllers/",
-      "Classes\\Traits\\": "classes/traits/",
-      "Classes\\SessionTrait\\": "classes/traits/"
+      "Classes\\Traits\\": "classes/traits/"
     }
   }
 }
