@@ -1,5 +1,5 @@
 <?php
-namespace Classes\Traits;
+namespace CML\Classes\Traits;
 
 trait Functions{
     /**

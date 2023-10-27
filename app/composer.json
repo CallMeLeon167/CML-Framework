@@ -4,9 +4,9 @@
   },
   "autoload": {
     "psr-4": {
-      "Classes\\": "classes/",
-      "Controllers\\": "controllers/",
-      "Classes\\Traits\\": "classes/traits/"
+      "CML\\Classes\\": "classes/",
+      "CML\\Controllers\\": "controllers/",
+      "CML\\Classes\\Traits\\": "classes/traits/"
     }
   }
 }

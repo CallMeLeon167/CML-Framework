@@ -1,5 +1,5 @@
 <?php 
-namespace Classes;
+namespace CML\Classes;
 
 /**
  * The DB class establishes a connection to the database and allows for executing SQL queries.

@@ -1,7 +1,7 @@
 <?php 
 require_once 'app/vendor/autoload.php'; 
 
-use Classes\{
+use CML\Classes\{
     Router,
     DB,
 };

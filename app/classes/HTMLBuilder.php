@@ -1,5 +1,5 @@
 <?php 
-namespace Classes;
+namespace CML\Classes;
 
 /**
  * The HTMLBuilder class is used to build HTML documents with customizable elements.

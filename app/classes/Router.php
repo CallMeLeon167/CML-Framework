@@ -1,15 +1,14 @@
 <?php
-namespace Classes;
-use Classes\HTMLBuilder;
+namespace CML\Classes;
 
 /**
  * Class Router
  *
  * @author Leon.Schmidt
  */
-class Router extends HTMLBuilder{
-    use \Classes\Traits\Functions;
-    use \Classes\Traits\Session;
+class Router extends \CML\Classes\HTMLBuilder{
+    use Traits\Functions;
+    use Traits\Session;
 
     /**
      * Stores the defined routes.
@@ -414,7 +413,7 @@ class Router extends HTMLBuilder{
      */
     public function useController(string $controllerName, string $methodName, array $params = []) {
         $params = empty($params) ? $this->currentRouteParams : array_merge($params, $this->currentRouteParams);
-        $controllerClassName = 'Controllers\\' . $controllerName;
+        $controllerClassName = 'CML\\Controllers\\' . $controllerName;
         if (class_exists($controllerClassName)) {
             $controllerInstance = new $controllerClassName();
             if (method_exists($controllerInstance, $methodName)) {

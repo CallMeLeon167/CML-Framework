@@ -1,5 +1,5 @@
 <?php 
-namespace Controllers;
+namespace CML\Controllers;
 
 class ApiController{
     public function getRepoData($params) {
