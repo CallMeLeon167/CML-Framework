@@ -55,6 +55,15 @@ trait Functions{
         // Return all query parameters if no desired parameters were provided.
         return $queryParams;
     }
+
+    /**
+     * Check if the current request is an AJAX request.
+     *
+     * @return bool
+     */
+    public function isAjaxRequest(): bool {
+        return !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+    }
 }
 
 /**

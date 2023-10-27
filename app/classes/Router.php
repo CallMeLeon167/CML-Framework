@@ -511,15 +511,6 @@ class Router extends \CML\Classes\HTMLBuilder{
     }
 
     /**
-     * Check if the current request is an AJAX request.
-     *
-     * @return bool
-     */
-    public function isAjaxRequest(): bool {
-        return !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
-    }
-
-    /**
      * Limits the number of requests per IP address within a specified time interval.
      *
      * This method checks and restricts the number of requests that can be made from a specific IP address
