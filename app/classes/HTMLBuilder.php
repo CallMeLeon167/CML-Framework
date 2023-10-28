@@ -111,9 +111,9 @@ class HTMLBuilder {
         if (!empty($content)) {
             $property = $content;
         } else {
-            if (file_exists($contentFile)) {
+            if (file_exists(dirname(__DIR__) . '/../' . $contentFile)) {
                 ob_start();
-                include $contentFile;
+                include dirname(__DIR__) . '/../' . $contentFile;
                 $property = ob_get_clean();
             } else {
                 trigger_error("$envKey file does not exist: $contentFile", E_USER_ERROR);
