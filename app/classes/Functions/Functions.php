@@ -57,13 +57,15 @@ trait Functions{
         // Return all query parameters if no desired parameters were provided.
         return $queryParams;
     }
+
     /**
      * Returns the absolute file path to the project's root directory.
      * 
+     * @param string $path (optional) A path to append to the root directory.
      * @return string containing the path to the root directory.
      */
-    public function getRootPath(){
-        return (dirname(__DIR__, 3));
+    public function getRootPath(string $path = ''){
+        return (dirname(__DIR__, 3) . $path);
     }
 
     /**
