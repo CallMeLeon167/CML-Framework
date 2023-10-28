@@ -1,6 +1,8 @@
 <?php
 namespace CML\Classes\Functions;
 
+use FFI\CData;
+
 trait Functions{
     /**
      * Generate an absolute URL for an asset based on the provided path.
@@ -54,6 +56,14 @@ trait Functions{
 
         // Return all query parameters if no desired parameters were provided.
         return $queryParams;
+    }
+    /**
+     * Returns the absolute file path to the project's root directory.
+     * 
+     * @return string containing the path to the root directory.
+     */
+    public function getRootPath(){
+        return (dirname(__DIR__, 3));
     }
 
     /**
