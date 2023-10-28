@@ -456,6 +456,15 @@ class Router extends \CML\Classes\HTMLBuilder{
     }
 
     /**
+     * Check if the current request is an AJAX request.
+     *
+     * @return bool
+     */
+    public function isAjaxRequest(): bool {
+        return !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+    }
+
+    /**
      * Add an alias for the current route.
      *
      * @param string $alias The alias URL

@@ -71,15 +71,6 @@ trait Functions{
     public function getRootPath(string $path = ''){
         return (dirname(__DIR__, 3) . '/' . $path);
     }
-
-    /**
-     * Check if the current request is an AJAX request.
-     *
-     * @return bool
-     */
-    public function isAjaxRequest(): bool {
-        return !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
-    }
 }
 
 /**
