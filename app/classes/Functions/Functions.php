@@ -20,7 +20,7 @@ trait Functions{
      * Retrieves and filters query parameters from the current request URI.
      *
      * @param string ...$desiredParams A variable number of parameter names to filter the query parameters.
-     * @return array An associative array containing the filtered query parameters.
+     * @return mixed An array containing the filtered query parameters, or a single parameter value if only one is requested.
      */
     public function getQueryParams(string ...$desiredParams) {
         // Initialize an array to store query parameters.
@@ -36,6 +36,11 @@ trait Functions{
 
         // Check if desired parameters were provided.
         if (!empty($desiredParams)) {
+            // If only one parameter is requested, return its value directly.
+            if (count($desiredParams) === 1 && isset($queryParams[$desiredParams[0]])) {
+                return $queryParams[$desiredParams[0]];
+            }
+
             // Initialize an array to store filtered parameters.
             $filteredParams = array();
 
@@ -48,13 +53,14 @@ trait Functions{
                 }
             }
 
-            // Return the filtered parameters.
+            // Return the filtered parameters as an array.
             return $filteredParams;
         }
 
         // Return all query parameters if no desired parameters were provided.
         return $queryParams;
     }
+
 
     /**
      * Returns the absolute file path to the project's root directory.
