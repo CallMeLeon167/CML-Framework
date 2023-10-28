@@ -98,10 +98,10 @@ class Router extends \CML\Classes\HTMLBuilder{
      * Initializes the error reporting configuration based on the PRODUCTION environment variable.
      */
     public function __construct(){
-        $dotenv = \Dotenv\Dotenv::createImmutable(__DIR__ ."/../config");
+        $dotenv = \Dotenv\Dotenv::createImmutable(self::getRootPath("app/config"));
         $dotenv->load();
         $this->FILEP = $_ENV['SITES_PATH'] ?? '';
-        $errorfile = (__DIR__.'/../../errorlogfile.log');
+        $errorfile = (self::getRootPath('errorlogfile.log'));
         if ($_ENV["PRODUCTION"] === 'true') {
             // In the production environment, do not display errors
             mysqli_report(MYSQLI_REPORT_OFF);
@@ -171,7 +171,7 @@ class Router extends \CML\Classes\HTMLBuilder{
      * @param string $siteName The name of the desired file.
      */
     public function setErrorPage(string $siteName){
-        $sitePath = dirname(__DIR__)."/../".$this->FILEP.$siteName;
+        $sitePath = self::getRootPath($this->FILEP.$siteName);
 
         if (file_exists($sitePath)) {
             return $this->errorPage = $sitePath;
@@ -433,7 +433,7 @@ class Router extends \CML\Classes\HTMLBuilder{
      * @param array $variables An associative array of variables to be made available in the loaded file.
      */
     public function getSite(string $siteName, array $variables = []) {
-        $sitePath = dirname(__DIR__)."/../".$this->FILEP.$siteName;
+        $sitePath = self::getRootPath($this->FILEP.$siteName);
         if (file_exists($sitePath)) {
             extract($variables); // Make the variables available
             include $sitePath;

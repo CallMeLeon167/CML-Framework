@@ -33,7 +33,7 @@ class DB {
      */
     private function loadEnv() {
         try {
-            $dotenv = \Dotenv\Dotenv::createImmutable(__DIR__ ."/../config");
+            $dotenv = \Dotenv\Dotenv::createImmutable(self::getRootPath("app/config"));
             $dotenv->load();
         } catch (\Throwable $e) {
             die("Please setup an .env file in /app/config");
@@ -145,7 +145,7 @@ class DB {
      */
 
     public function sql2array_file(string $filename, array $params = []): array {
-        $filepath = dirname(__DIR__) . '/../' . $this->SQLP . $filename;
+        $filepath = self::getRootPath($this->SQLP . $filename);
         
         if (!file_exists($filepath)) {
             trigger_error("Could not find SQL file => '" . htmlentities($this->SQLP . $filename) . "'", E_USER_ERROR);
@@ -166,7 +166,7 @@ class DB {
      * @param array $params Parameters for the SQL query (optional).
      */
     public function sql2db_file(string $filename, array $params = []) {
-        $filepath = dirname(__DIR__) . '/../' . $this->SQLP . $filename;
+        $filepath = self::getRootPath($this->SQLP . $filename);
     
         if (!file_exists($filepath)) {
             trigger_error("Could not find SQL file => '" . htmlentities($this->SQLP . $filename) . "'", E_USER_ERROR);

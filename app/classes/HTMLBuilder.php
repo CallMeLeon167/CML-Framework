@@ -111,9 +111,9 @@ class HTMLBuilder {
         if (!empty($content)) {
             $property = $content;
         } else {
-            if (file_exists(dirname(__DIR__) . '/../' . $contentFile)) {
+            if (file_exists(self::getRootPath($contentFile))) {
                 ob_start();
-                include dirname(__DIR__) . '/../' . $contentFile;
+                include self::getRootPath($contentFile);
                 $property = ob_get_clean();
             } else {
                 trigger_error("$envKey file does not exist: $contentFile", E_USER_ERROR);
@@ -131,7 +131,7 @@ class HTMLBuilder {
         $SP = $_ENV['STYLE_PATH'] ?? '';
         $path = $SP ? $SP.$href : $href;
 
-        if (!file_exists(dirname(__DIR__) . '/../' . $path)) {
+        if (!file_exists(self::getRootPath($path))) {
             trigger_error("Could not find stylesheet file => '" . htmlentities($path) . "'", E_USER_ERROR);
         }
     
@@ -159,7 +159,7 @@ class HTMLBuilder {
         $SP = $_ENV['SCRIPT_PATH'] ?? '';
         $path = $SP ? $SP.$src : $src;
     
-        if (!file_exists(dirname(__DIR__) . '/../' . $path)) {
+        if (!file_exists(self::getRootPath($path))) {
             trigger_error("Could not find script file => '" . htmlentities($path) . "'", E_USER_ERROR);
         }
 
@@ -206,9 +206,9 @@ class HTMLBuilder {
             if (is_callable($contentSource)) {
                 $content = call_user_func($contentSource);
                 return is_string($content) ? $content : '';
-            } elseif (file_exists(dirname(__DIR__) . '/../' . $contentSource)) {
+            } elseif (file_exists(self::getRootPath($contentSource))) {
                 ob_start();
-                include dirname(__DIR__) . '/../' . $contentSource;
+                include self::getRootPath($contentSource);
                 return ob_get_clean();
             } elseif (is_string($contentSource)) {
                 return $contentSource;
