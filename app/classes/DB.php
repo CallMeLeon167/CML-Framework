@@ -29,6 +29,13 @@ class DB {
     }
 
     /**
+     * Destructor for the class. Automatically closes the database connection upon object destruction.
+     */
+    public function __destruct() {
+        $this->close();
+    }
+
+    /**
      * Loads environment variables from the .env file.
      */
     private function loadEnv() {
