@@ -21,10 +21,10 @@ $router->addCDN("link", 'rel="preconnect" href="https://fonts.gstatic.com" cross
 $router->addCDN("link", 'href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;400;600&display=swap" rel="stylesheet"');
 
 //Global Styles
-$router->addStyle("styles.css");
+$router->addStyle($router->compress("styles.css"));
 
 //Global Scripts
-$router->addScript("scripts.js");
+$router->addScript($router->compress("scripts.js"));
 
 //Global HTML
 $router->addFooter();

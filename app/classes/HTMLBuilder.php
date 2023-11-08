@@ -121,6 +121,26 @@ class HTMLBuilder {
         }
     }
     
+    /**
+     * Adds a resource link to the HTML document.
+     *
+     * @param string $path The path to the resource.
+     * @param array &$container The container (styles or scripts) to which the resource should be added.
+     */
+    private function addResource(string $path, array &$container) {
+        $envKey = $container === $this->styles ? 'STYLE_PATH' : 'SCRIPT_PATH';
+        $envPath = $_ENV[$envKey] ?? '';
+        $fullPath = $envPath ? $envPath . $path : $path;
+
+        if (!file_exists(self::getRootPath($fullPath))) {
+            $resourceType = $container === $this->styles ? 'stylesheet' : 'script';
+            trigger_error("Could not find $resourceType file => '" . htmlentities($fullPath) . "'", E_USER_ERROR);
+        }
+
+        if (filesize($fullPath) !== 0){
+            $container[] = self::assetUrl($fullPath);
+        } 
+    }
 
     /**
      * Adds a stylesheet link to the HTML document.
@@ -128,14 +148,60 @@ class HTMLBuilder {
      * @param string $href The path to the stylesheet.
      */
     public function addStyle(string $href) {
-        $SP = $_ENV['STYLE_PATH'] ?? '';
-        $path = $SP ? $SP.$href : $href;
+        if($href) $this->addResource($href, $this->styles);
+    }
 
-        if (!file_exists(self::getRootPath($path))) {
-            trigger_error("Could not find stylesheet file => '" . htmlentities($path) . "'", E_USER_ERROR);
+    /**
+     * Adds a script link to the HTML document.
+     *
+     * @param string $src The path to the script.
+     */
+    public function addScript(string $src) {
+        if($src) $this->addResource($src, $this->scripts);
+    }
+
+    /**
+     * Compresses CSS or JavaScript by removing whitespace and comments.
+     *
+     * @param string $path The path to the CSS or JavaScript file to compress.
+     * @param string $envPath The environment path for the file.
+     * @param string $fileExtension The file extension to use for the compressed file.
+     * @return string The path to the compressed file.
+     */
+    public static function compressFile(string $path, string $envPath, string $fileExtension):string {
+        $newFileName = str_replace($fileExtension, ".min{$fileExtension}", $path);
+
+        $content = file_get_contents($envPath ? $envPath . $path : $path);
+        if (empty($content)) return false;
+        $content = preg_replace('/\/\/[^\n\r]*|\/\*[\s\S]*?\*\//', '', $content);
+        $content = preg_replace('/\s*([{}:;,=()])\s*/', '$1', $content);
+        $content = preg_replace('/;\s*}/', '}', $content);
+        $content = preg_replace('/\s+/', ' ', $content);
+
+        $file = fopen($envPath . $newFileName, "w");
+        fwrite($file, $content);
+        fclose($file);
+
+        return $newFileName;
+    }
+
+    /**
+     * Compresses CSS or JavaScript by removing whitespace and comments.
+     *
+     * @param string $path The path to the CSS or JavaScript file to compress.
+     * @param string $envPath The environment path for the file.
+     * @return string The path to the compressed file.
+     */
+    public static function compress(string $path):string {
+        $fileExtension = pathinfo($path, PATHINFO_EXTENSION);
+        
+        if ($fileExtension === 'css') {
+            return self::compressFile($path, $_ENV['STYLE_PATH'] ?? '', '.css');
+        } elseif ($fileExtension === 'js') {
+            return self::compressFile($path, $_ENV['SCRIPT_PATH'] ?? '', '.js');
+        } else {
+            return $path;
         }
-    
-        $this->styles[] = self::assetUrl($path);
     }
 
     /**
@@ -147,23 +213,6 @@ class HTMLBuilder {
     public function addCDN(string $type, string $attr) {
         $type = strtolower($type);
         $this->cdns[] = [$type => $attr];
-    }
-
-    
-    /**
-     * Adds a script link to the HTML document.
-     *
-     * @param string $src The path to the script.
-     */
-    public function addScript(string $src) {
-        $SP = $_ENV['SCRIPT_PATH'] ?? '';
-        $path = $SP ? $SP.$src : $src;
-    
-        if (!file_exists(self::getRootPath($path))) {
-            trigger_error("Could not find script file => '" . htmlentities($path) . "'", E_USER_ERROR);
-        }
-
-        $this->scripts[] = self::assetUrl($path);
     }
 
     /**
