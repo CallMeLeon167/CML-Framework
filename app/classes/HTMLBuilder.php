@@ -94,140 +94,6 @@ class HTMLBuilder {
     }
 
     /**
-     * Generic function to add content (header or footer) to the HTML document.
-     *
-     * @param string $envKey The environment variable key for the content file.
-     * @param string $content The content to add.
-     * @param string &$property The property to store the content in.
-     */
-    protected function addContent(string $envKey, string $content, string &$property) {
-        $contentFile = $_ENV[$envKey] ?? '';
-
-        if (empty($contentFile) && empty($content)) {
-            trigger_error("Could not set the $envKey", E_USER_ERROR);
-            return;
-        }
-
-        if (!empty($content)) {
-            $property = $content;
-        } else {
-            if (file_exists(self::getRootPath($contentFile))) {
-                ob_start();
-                include self::getRootPath($contentFile);
-                $property = ob_get_clean();
-            } else {
-                trigger_error("$envKey file does not exist: $contentFile", E_USER_ERROR);
-            }
-        }
-    }
-
-    /**
-     * Converts an associative array to HTML attribute string.
-     *
-     * @param array $attributes
-     * @return string
-     */
-    private function arrayToAttributes(array $attributes): string {
-        $htmlAttributes = '';
-        foreach ($attributes as $key => $value) {
-            $htmlAttributes .= " $key=\"$value\"";
-        }
-        return $htmlAttributes;
-    }
-    
-    /**
-     * Adds a resource link to the HTML document.
-     *
-     * @param string $path The path to the resource.
-     * @param array &$container The container (styles or scripts) to which the resource should be added.
-     * @param string|array $attributes Additional attributes for the HTML element (e.g., 'media="screen"', 'async', 'defer', etc.).
-     */
-    private function addResource(string $path, array &$container, $attributes = "") {
-        $envKey = $container === $this->styles ? 'STYLE_PATH' : 'SCRIPT_PATH';
-        $envPath = $_ENV[$envKey] ?? '';
-        $fullPath = $envPath ? $envPath . $path : $path;
-
-        if (!file_exists(self::getRootPath($fullPath))) {
-            $resourceType = $container === $this->styles ? 'stylesheet' : 'script';
-            return trigger_error("Could not find $resourceType file => '" . htmlentities($fullPath) . "'", E_USER_ERROR);
-        }
-
-        if (!is_array($attributes)) {
-            $attributes = !empty($attributes) ? " $attributes" : "";
-        } else {
-            $attributes = $this->arrayToAttributes($attributes);
-        }
-
-        if (filesize($fullPath) !== 0) {
-            $container[] = '"' . self::assetUrl($fullPath) . '"' . $attributes;
-        }
-    }
-
-    /**
-     * Adds a stylesheet link to the HTML document.
-     *
-     * @param string $href The path to the stylesheet.
-     * @param string|array $attributes Additional attributes for the link element (optional).
-     */
-    public function addStyle(string $href, $attributes = "") {
-        if ($href) $this->addResource($href, $this->styles, $attributes);
-    }
-
-    /**
-     * Adds a script link to the HTML document.
-     *
-     * @param string $src The path to the script.
-     * @param string|array $attributes Additional attributes for the script element (optional).
-     */
-    public function addScript(string $src, $attributes = "") {
-        if ($src) $this->addResource($src, $this->scripts, $attributes);
-    }
-
-    /**
-     * Compresses CSS or JavaScript by removing whitespace and comments.
-     *
-     * @param string $path The path to the CSS or JavaScript file to compress.
-     * @param string $envPath The environment path for the file.
-     * @param string $fileExtension The file extension to use for the compressed file.
-     * @return string The path to the compressed file.
-     */
-    public static function compressFile(string $path, string $envPath, string $fileExtension):string {
-        $newFileName = str_replace($fileExtension, ".min{$fileExtension}", $path);
-
-        $content = file_get_contents($envPath ? $envPath . $path : $path);
-        if (empty($content)) return false;
-        $content = preg_replace('/\/\/[^\n\r]*|\/\*[\s\S]*?\*\//', '', $content);
-        $content = preg_replace('/\s*([{}:;,=()])\s*/', '$1', $content);
-        $content = preg_replace('/;\s*}/', '}', $content);
-        $content = preg_replace('/\s+/', ' ', $content);
-
-        $file = fopen($envPath . $newFileName, "w");
-        fwrite($file, $content);
-        fclose($file);
-
-        return $newFileName;
-    }
-
-    /**
-     * Compresses CSS or JavaScript by removing whitespace and comments.
-     *
-     * @param string $path The path to the CSS or JavaScript file to compress.
-     * @param string $envPath The environment path for the file.
-     * @return string The path to the compressed file.
-     */
-    public static function compress(string $path):string {
-        $fileExtension = pathinfo($path, PATHINFO_EXTENSION);
-        
-        if ($fileExtension === 'css') {
-            return self::compressFile($path, $_ENV['STYLE_PATH'] ?? '', '.css');
-        } elseif ($fileExtension === 'js') {
-            return self::compressFile($path, $_ENV['SCRIPT_PATH'] ?? '', '.js');
-        } else {
-            return $path;
-        }
-    }
-
-    /**
      * Add a CDN link to the stored resources.
      *
      * @param string $type The type of the CDN link (e.g., 'link', 'script', etc.).
@@ -261,6 +127,140 @@ class HTMLBuilder {
         $this->hooks[$hookName] = [
             'source' => $contentSource,
         ];
+    }
+
+    /**
+     * Adds a stylesheet link to the HTML document.
+     *
+     * @param string $href The path to the stylesheet.
+     * @param string|array $attributes Additional attributes for the link element (optional).
+     */
+    public function addStyle(string $href, $attributes = "") {
+        if ($href) $this->addResource($href, $this->styles, $attributes);
+    }
+
+    /**
+     * Adds a script link to the HTML document.
+     *
+     * @param string $src The path to the script.
+     * @param string|array $attributes Additional attributes for the script element (optional).
+     */
+    public function addScript(string $src, $attributes = "") {
+        if ($src) $this->addResource($src, $this->scripts, $attributes);
+    }
+
+    /**
+     * Generic function to add content (header or footer) to the HTML document.
+     *
+     * @param string $envKey The environment variable key for the content file.
+     * @param string $content The content to add.
+     * @param string &$property The property to store the content in.
+     */
+    protected function addContent(string $envKey, string $content, string &$property) {
+        $contentFile = $_ENV[$envKey] ?? '';
+
+        if (empty($contentFile) && empty($content)) {
+            trigger_error("Could not set the $envKey", E_USER_ERROR);
+            return;
+        }
+
+        if (!empty($content)) {
+            $property = $content;
+        } else {
+            if (file_exists(self::getRootPath($contentFile))) {
+                ob_start();
+                include self::getRootPath($contentFile);
+                $property = ob_get_clean();
+            } else {
+                trigger_error("$envKey file does not exist: $contentFile", E_USER_ERROR);
+            }
+        }
+    }
+
+    /**
+     * Converts an associative array to HTML attribute string.
+     *
+     * @param array $attributes
+     * @return string
+     */
+    protected function arrayToAttributes(array $attributes): string {
+        $htmlAttributes = '';
+        foreach ($attributes as $key => $value) {
+            $htmlAttributes .= " $key=\"$value\"";
+        }
+        return $htmlAttributes;
+    }
+    
+    /**
+     * Adds a resource link to the HTML document.
+     *
+     * @param string $path The path to the resource.
+     * @param array &$container The container (styles or scripts) to which the resource should be added.
+     * @param string|array $attributes Additional attributes for the HTML element (e.g., 'media="screen"', 'async', 'defer', etc.).
+     */
+    protected function addResource(string $path, array &$container, $attributes = "") {
+        $envKey = $container === $this->styles ? 'STYLE_PATH' : 'SCRIPT_PATH';
+        $envPath = $_ENV[$envKey] ?? '';
+        $fullPath = $envPath ? $envPath . $path : $path;
+
+        if (!file_exists(self::getRootPath($fullPath))) {
+            $resourceType = $container === $this->styles ? 'stylesheet' : 'script';
+            return trigger_error("Could not find $resourceType file => '" . htmlentities($fullPath) . "'", E_USER_ERROR);
+        }
+
+        if (!is_array($attributes)) {
+            $attributes = !empty($attributes) ? " $attributes" : "";
+        } else {
+            $attributes = $this->arrayToAttributes($attributes);
+        }
+
+        if (filesize($fullPath) !== 0) {
+            $container[] = '"' . self::assetUrl($fullPath) . '"' . $attributes;
+        }
+    }
+
+    /**
+     * Compresses CSS or JavaScript by removing whitespace and comments.
+     *
+     * @param string $path The path to the CSS or JavaScript file to compress.
+     * @param string $envPath The environment path for the file.
+     * @param string $fileExtension The file extension to use for the compressed file.
+     * @return string The path to the compressed file.
+     */
+    protected static function compressFile(string $path, string $envPath, string $fileExtension):string {
+        $newFileName = str_replace($fileExtension, ".min{$fileExtension}", $path);
+
+        $content = file_get_contents($envPath ? $envPath . $path : $path);
+        if (empty($content)) return false;
+        $content = preg_replace('/\/\/[^\n\r]*|\/\*[\s\S]*?\*\//', '', $content);
+        $content = preg_replace('/\s*([{}:;,=()])\s*/', '$1', $content);
+        $content = preg_replace('/;\s*}/', '}', $content);
+        $content = preg_replace('/\s+/', ' ', $content);
+
+        $file = fopen($envPath . $newFileName, "w");
+        fwrite($file, $content);
+        fclose($file);
+
+        return $newFileName;
+    }
+
+    /**
+     * Compresses CSS or JavaScript by removing whitespace and comments.
+     *
+     * @param string $path The path to the CSS or JavaScript file to compress.
+     * @param string $envPath The environment path for the file.
+     * @return string The path to the compressed file.
+     */
+    public static function compress(string $path):string {
+        $fileExtension = pathinfo($path, PATHINFO_EXTENSION);
+        
+        if ($fileExtension === 'css') {
+            return self::compressFile($path, $_ENV['STYLE_PATH'] ?? '', '.css');
+        } elseif ($fileExtension === 'js') {
+            return self::compressFile($path, $_ENV['SCRIPT_PATH'] ?? '', '.js');
+        } else {
+            return $path;
+        }
     }
 
     /**
