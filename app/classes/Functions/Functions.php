@@ -69,7 +69,7 @@ trait Functions{
      * @return string containing the path to the root directory.
      */
     public static function getRootPath(string $path = ''){
-        return (dirname(__DIR__, 3) . '/' . $path);
+        return (dirname(__DIR__, 3) . '/' . ltrim($path, "/"));
     }
 }
 
