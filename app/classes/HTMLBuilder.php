@@ -126,8 +126,9 @@ class HTMLBuilder {
      *
      * @param string $path The path to the resource.
      * @param array &$container The container (styles or scripts) to which the resource should be added.
+     * @param string $attributes Additional attributes for the HTML element (e.g., 'media="screen"', 'async', 'defer', etc.).
      */
-    private function addResource(string $path, array &$container) {
+    private function addResource(string $path, array &$container, string $attributes = "") {
         $envKey = $container === $this->styles ? 'STYLE_PATH' : 'SCRIPT_PATH';
         $envPath = $_ENV[$envKey] ?? '';
         $fullPath = $envPath ? $envPath . $path : $path;
@@ -137,27 +138,31 @@ class HTMLBuilder {
             return trigger_error("Could not find $resourceType file => '" . htmlentities($fullPath) . "'", E_USER_ERROR);
         }
 
-        if (filesize($fullPath) !== 0){
-            $container[] = self::assetUrl($fullPath);
-        } 
+        $attributes = !empty($attributes) ? " $attributes" : "";
+
+        if (filesize($fullPath) !== 0) {
+            $container[] = '"' . self::assetUrl($fullPath) . '"' . $attributes;
+        }
     }
 
     /**
      * Adds a stylesheet link to the HTML document.
      *
      * @param string $href The path to the stylesheet.
+     * @param string $attributes Additional attributes for the link element (optional).
      */
-    public function addStyle(string $href) {
-        if($href) $this->addResource($href, $this->styles);
+    public function addStyle(string $href, string $attributes = "") {
+        if ($href) $this->addResource($href, $this->styles, $attributes);
     }
 
     /**
      * Adds a script link to the HTML document.
      *
      * @param string $src The path to the script.
+     * @param string $attributes Additional attributes for the script element (optional).
      */
-    public function addScript(string $src) {
-        if($src) $this->addResource($src, $this->scripts);
+    public function addScript(string $src, string $attributes = "") {
+        if ($src) $this->addResource($src, $this->scripts, $attributes);
     }
 
     /**
@@ -297,11 +302,10 @@ class HTMLBuilder {
             <?php endforeach; ?>
 
             <?php foreach ($this->styles as $style): ?>
-                <link rel="stylesheet" type="text/css" href="<?= $style ?>">
+                <link rel="stylesheet" href=<?= $style ?>>
             <?php endforeach; ?>
-
             <?php foreach ($this->scripts as $script): ?>
-                <script src="<?= $script ?>" type="text/javascript"></script>
+                <script src=<?= $script ?>></script>
             <?php endforeach; ?>
             <?= $this->getHookContent('bottom_head'); ?>
         </head>
