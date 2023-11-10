@@ -134,7 +134,7 @@ class HTMLBuilder {
 
         if (!file_exists(self::getRootPath($fullPath))) {
             $resourceType = $container === $this->styles ? 'stylesheet' : 'script';
-            trigger_error("Could not find $resourceType file => '" . htmlentities($fullPath) . "'", E_USER_ERROR);
+            return trigger_error("Could not find $resourceType file => '" . htmlentities($fullPath) . "'", E_USER_ERROR);
         }
 
         if (filesize($fullPath) !== 0){

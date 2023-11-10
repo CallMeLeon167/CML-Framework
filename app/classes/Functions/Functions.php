@@ -68,7 +68,7 @@ trait Functions{
      * @param string $path (optional) A path to append to the root directory.
      * @return string containing the path to the root directory.
      */
-    public function getRootPath(string $path = ''){
+    public static function getRootPath(string $path = ''){
         return (dirname(__DIR__, 3) . '/' . $path);
     }
 }
