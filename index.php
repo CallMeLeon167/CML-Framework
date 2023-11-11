@@ -14,6 +14,7 @@ $router->setErrorRedirect("/");
 $router->setProjectName("CML - Framework");
 $router->setFavicon("/favicon.ico");
 $router->addMeta('name="theme-color" content="black"');
+$router->activateSinglePageApp();
 
 //Global CDNs
 $router->addCDN("link", 'rel="preconnect" href="https://fonts.googleapis.com"');
@@ -29,9 +30,16 @@ $router->addScript($router->compress("scripts.js"));
 //Global HTML
 $router->addFooter();
 
+echo '<a href="'.$router->assetUrl("/").'">root</a>
+<a href="'.$router->assetUrl("/test").'">test</a>';
+
 $router->addRoute('GET', '/', function () use ($router) {
     $apiData = $router->useController("ApiController", "getRepoData", ['url' => 'https://docs.callmeleon.de/data']);
     $router->setTitle("Thank you! | CML - Framework");
     $router->build();
     $router->getSite("home.php", $apiData);
+});
+
+$router->addRoute('GET', '/test', function () use ($router) {
+    echo "das ist ein test";
 });
