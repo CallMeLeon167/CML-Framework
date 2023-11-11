@@ -14,6 +14,7 @@ class HTMLBuilder {
     private string $footer = "";
     private string $bodyAttr = "";
     private string $htmlAttr = "";
+    private string $lang = "en";
     private array $styles = [];
     private array $scripts = [];
     private array $metas = [];
@@ -91,6 +92,24 @@ class HTMLBuilder {
      */
     public function addBodyTagAttributes(string $attr = '') {
         $this->bodyAttr = $attr;
+    }
+
+    /**
+     * Set the lang attribute for html tag.
+     * 
+     * @param string $lang The lang attribute of the document.
+     */
+    public function setLang(string $lang) {
+        $this->lang = $lang;
+    }
+
+    /**
+     * Get the lang attribute for html tag.
+     * 
+     * @return string The lang attribute of the document.
+     */
+    public function getLang() {
+        return $this->lang;
     }
 
     /**
@@ -296,7 +315,7 @@ class HTMLBuilder {
         ob_start();
         ?>
         <!DOCTYPE html>
-        <html <?= $this->htmlAttr?>>
+        <html lang="<?= $this->lang ?>" <?= $this->htmlAttr?>>
         <?= $this->getHookContent('before_head'); ?>
         <head>
             <?= $this->getHookContent('top_head'); ?>
