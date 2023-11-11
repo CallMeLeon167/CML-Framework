@@ -7,7 +7,6 @@ namespace CML\Classes;
 class HTMLBuilder {
     use Functions\Functions;
     
-    private string $spaCode = "";
     private string $projectName = "";
     private string $title = "";
     private string $favicon = "";
