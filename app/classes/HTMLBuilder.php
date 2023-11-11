@@ -248,7 +248,6 @@ class HTMLBuilder {
      * Compresses CSS or JavaScript by removing whitespace and comments.
      *
      * @param string $path The path to the CSS or JavaScript file to compress.
-     * @param string $envPath The environment path for the file.
      * @return string The path to the compressed file.
      */
     public static function compress(string $path):string {
@@ -267,7 +266,6 @@ class HTMLBuilder {
      * Get the content for a specific hook and return it.
      *
      * @param string $hookName The name of the hook (e.g., 'before_head', 'after_head', 'top_body', etc.).
-     *
      * @return string The content for the specified hook.
      */
     protected function getHookContent(string $hookName) {
