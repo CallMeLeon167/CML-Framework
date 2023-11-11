@@ -7,6 +7,7 @@ namespace CML\Classes;
 class HTMLBuilder {
     use Functions\Functions;
     
+    private string $spaCode = "";
     private string $projectName = "";
     private string $title = "";
     private string $favicon = "";
@@ -287,6 +288,62 @@ class HTMLBuilder {
             }
         }
         return '';
+    }
+
+    /**
+     * Activate Single Page Application (SPA) functionality for links within your own website.
+     */
+    public function activateSinglePageApp() {
+        ob_start();
+        ?>
+        <script>
+            // Attach event listeners to all links
+            document.addEventListener('DOMContentLoaded', function() {
+                let allLinks = document.querySelectorAll('a');
+                allLinks.forEach(link => {
+                    link.addEventListener('click', function(event) {
+                        let url = this.getAttribute('href');
+                        // Check if the link is within the same domain
+                        if (isSameDomain(url)) {
+                            event.preventDefault();
+                            navigateTo(url);
+                            history.pushState(null, null, url);
+                        }
+                    });
+                });
+            });
+
+            // Function to check if the link is within the same domain
+            function isSameDomain(url) {
+                let link = document.createElement('a');
+                link.href = url;
+                return link.origin === window.location.origin;
+            }
+
+            // Function to handle navigation in the SPA
+            function navigateTo(url) {
+                fetch(url)
+                    .then(response => response.text())
+                    .then(html => {
+                        document.open();
+                        document.write(html);
+                        document.close();
+                        // Additional logic if needed after changing the content
+                    })
+                    .catch(error => console.error('Error fetching content:', error));
+            }
+
+            // Handle back/forward browser navigation
+            window.addEventListener('popstate', function(event) {
+                let url = location.pathname;
+                // Check if the link is within the same domain
+                if (isSameDomain(url)) {
+                    navigateTo(url);
+                }
+            });
+        </script>
+        <?php
+        echo preg_replace(['/\/\/[^\n\r]*|\/\*[\s\S]*?\*\//', '/\s*([{}:;,=()])\s*/', '/;\s*}/', '/\s+/'], ['', '$1', '}', ' '], ob_get_clean());
     }
 
     /**
