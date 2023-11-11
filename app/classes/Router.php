@@ -101,6 +101,25 @@ class Router extends \CML\Classes\HTMLBuilder{
         $dotenv = \Dotenv\Dotenv::createImmutable(self::getRootPath("app/config"));
         $dotenv->load();
         $this->FILEP = $_ENV['SITES_PATH'] ?? '';
+        $this->errorHandler();
+    }
+
+    /**
+     * Match the defined routes.
+     */
+    public function __destruct() {
+        $this->matchRoute();
+    }
+
+    /**
+     * Handles error configuration based on the environment.
+     *
+     * This function adjusts error reporting settings based on the environment,
+     * controlling the display of errors and logging them to a specified file.
+     * In the production environment, errors are suppressed for security and user experience reasons.
+     * In other environments, all errors are displayed, aiding in development and debugging.
+     */
+    protected function errorHandler(){
         $errorfile = (self::getRootPath('errorlogfile.log'));
         if ($_ENV["PRODUCTION"] === 'true') {
             // In the production environment, do not display errors
@@ -114,13 +133,6 @@ class Router extends \CML\Classes\HTMLBuilder{
         }
         ini_set('log_errors', 1); // Write errors to a log file
         ini_set('error_log', $errorfile); // Adjust paths and filenames
-    }
-
-    /**
-     * Match the defined routes.
-     */
-    public function __destruct() {
-        $this->matchRoute();
     }
 
     /**
