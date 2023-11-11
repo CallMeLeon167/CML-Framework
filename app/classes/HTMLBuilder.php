@@ -297,13 +297,10 @@ class HTMLBuilder {
         ob_start();
         ?>
         <script>
-            // Attach event listeners to all links
-            document.addEventListener('DOMContentLoaded', function() {
-                let allLinks = document.querySelectorAll('a');
-                allLinks.forEach(link => {
-                    link.addEventListener('click', function(event) {
-                        let url = this.getAttribute('href');
-                        // Check if the link is within the same domain
+            document.addEventListener('DOMContentLoaded', () => {
+                document.querySelectorAll('a').forEach(link => {
+                    link.addEventListener('click', event => {
+                        const url = link.getAttribute('href');
                         if (isSameDomain(url)) {
                             event.preventDefault();
                             navigateTo(url);
@@ -311,34 +308,25 @@ class HTMLBuilder {
                         }
                     });
                 });
-            });
-
-            // Function to check if the link is within the same domain
-            function isSameDomain(url) {
-                let link = document.createElement('a');
-                link.href = url;
-                return link.origin === window.location.origin;
-            }
-
-            // Function to handle navigation in the SPA
-            function navigateTo(url) {
-                fetch(url)
-                    .then(response => response.text())
-                    .then(html => {
-                        document.open();
-                        document.write(html);
-                        document.close();
-                        // Additional logic if needed after changing the content
-                    })
+    
+                window.addEventListener('popstate', () => {
+                    const url = location.pathname;
+                    if (isSameDomain(url)) navigateTo(url);
+                });
+    
+                function isSameDomain(url) {
+                    return (new URL(url, location.href)).origin === location.origin;
+                }
+    
+                function navigateTo(url) {
+                    fetch(url)
+                        .then(response => response.text())
+                        .then(html => {
+                            document.open();
+                            document.write(html);
+                            document.close();
+                        })
                     .catch(error => console.error('Error fetching content:', error));
-            }
-
-            // Handle back/forward browser navigation
-            window.addEventListener('popstate', function(event) {
-                let url = location.pathname;
-                // Check if the link is within the same domain
-                if (isSameDomain(url)) {
-                    navigateTo(url);
                 }
             });
         </script>
