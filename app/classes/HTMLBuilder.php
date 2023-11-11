@@ -15,6 +15,7 @@ class HTMLBuilder {
     private string $bodyAttr = "";
     private string $htmlAttr = "";
     private string $lang = "en";
+    private string $charset = "UTF-8";
     private array $styles = [];
     private array $scripts = [];
     private array $metas = [];
@@ -95,7 +96,7 @@ class HTMLBuilder {
     }
 
     /**
-     * Set the lang attribute for html tag.
+     * Set the lang attribute for the document.
      * 
      * @param string $lang The lang attribute of the document.
      */
@@ -104,12 +105,21 @@ class HTMLBuilder {
     }
 
     /**
-     * Get the lang attribute for html tag.
+     * Get the lang attribute of the document.
      * 
      * @return string The lang attribute of the document.
      */
     public function getLang() {
         return $this->lang;
+    }
+
+    /**
+     * Set the charset for the document.
+     * 
+     * @param string $charset The charset attribute of the document.
+     */
+    public function setCharset(string $charset) {
+        $this->charset = $charset;
     }
 
     /**
@@ -319,7 +329,7 @@ class HTMLBuilder {
         <?= $this->getHookContent('before_head'); ?>
         <head>
             <?= $this->getHookContent('top_head'); ?>
-            <meta charset="UTF-8">
+            <meta charset="<?= $this->charset ?>">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <?php foreach ($this->metas as $meta): ?>
                 <meta <?= $meta ?>>
