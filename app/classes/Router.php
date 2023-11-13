@@ -447,7 +447,9 @@ class Router extends \CML\Classes\HTMLBuilder{
         $sitePath = self::getRootPath($this->FILEP.$siteName);
         if (file_exists($sitePath)) {
             extract($variables); // Make the variables available
+            ob_start();
             include $sitePath;
+            echo $this->minifyHTML(ob_get_clean());
         } else {
             trigger_error(htmlentities("getSite('$siteName') | Site not found => ".$this->FILEP.$siteName), E_USER_ERROR);
         }

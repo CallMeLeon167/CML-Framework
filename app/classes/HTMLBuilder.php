@@ -7,6 +7,7 @@ namespace CML\Classes;
 class HTMLBuilder {
     use Functions\Functions;
     
+    private bool $minifyHTML = false;
     private string $projectName = "";
     private string $title = "";
     private string $favicon = "";
@@ -31,6 +32,13 @@ class HTMLBuilder {
         'bottom_body',
         'after_body',
     ];
+
+    /**
+     * Activates HTML minification.
+     */
+    public function activateMinifyHTML() {
+        $this->minifyHTML = true;
+    }
 
     /**
      * Sets the project name and updates the title accordingly.
@@ -319,13 +327,38 @@ class HTMLBuilder {
     }
 
     /**
+     * Minifies HTML content by removing unnecessary spaces, line breaks, tabs, and HTML comments.
+     *
+     * This function takes an HTML string as input, applies various regular expressions
+     * to remove extra whitespace, HTML comments, and spaces around HTML tags, and returns
+     * the minified HTML content.
+     *
+     * @param string $html The HTML content to be minified.
+     *
+     * @return string The minified HTML content without unnecessary spaces and comments.
+     */
+    public function minifyHTML(string $html) {
+        if ($this->minifyHTML === true) {
+            // Remove spaces, line breaks, and tabs
+            $minified = preg_replace('/\s+/', ' ', $html);
+            // Remove HTML comments
+            $minified = preg_replace('/<!--(.|\s)*?-->/', '', $minified);
+            // Remove unnecessary spaces around tags
+            $minified = preg_replace('/>\s+</', '><', $minified);
+            return $minified;
+        } else {
+            return $html;
+        }
+    }
+
+    /**
      * Builds the HTML document with configured elements and displays it.
      */
     public function build() {
         ob_start();
         ?>
         <!DOCTYPE html>
-        <html lang="<?= $this->lang ?>" <?= $this->htmlAttr?>>
+        <html lang="<?= $this->lang ?>"<?= $this->htmlAttr?>>
         <?= $this->getHookContent('before_head'); ?>
         <head>
             <?= $this->getHookContent('top_head'); ?>
@@ -364,18 +397,20 @@ class HTMLBuilder {
     
         // Additional content can be added here
 
-        echo ob_get_clean();
-        echo $this->getHookContent('bottom_body');
+        echo $this->minifyHTML(ob_get_clean());
+        echo $this->minifyHTML($this->getHookContent('bottom_body'));
     }
 
     /**
      * Close the application correctly.
      */
     public function build_end() {
+        ob_start();
         echo $this->footer;
-        echo PHP_EOL .'</body>';
+        echo '</body>';
         echo $this->getHookContent('after_body');
-        echo PHP_EOL .'</html>';
+        echo '</html>';
+        echo $this->minifyHTML(ob_get_clean());
         exit;
     }
 }

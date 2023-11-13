@@ -10,6 +10,7 @@ $db = new DB();
 $router = new Router();
 
 //Project settings
+$router->activateMinifyHTML();
 $router->setErrorRedirect("/");
 $router->setProjectName("CML - Framework");
 $router->setFavicon("/favicon.ico");
