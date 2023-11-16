@@ -2,7 +2,10 @@
 namespace CML\Classes;
 
 /**
- * The DB class establishes a connection to the database and allows for executing SQL queries.
+ * Class DB
+ *
+ * @author CallMeLeon <kontakt@callmeleon.de>
+ * @see https://docs.callmeleon.de/cml#db
  */
 class DB {
     use Functions\Functions;

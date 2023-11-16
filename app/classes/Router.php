@@ -4,7 +4,9 @@ namespace CML\Classes;
 /**
  * Class Router
  *
- * @author Leon.Schmidt
+ * @version v2.1
+ * @author CallMeLeon <kontakt@callmeleon.de>
+ * @see https://docs.callmeleon.de/cml#router
  */
 class Router extends \CML\Classes\HTMLBuilder{
     use Functions\Functions;

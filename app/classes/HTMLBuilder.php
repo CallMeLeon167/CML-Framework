@@ -2,7 +2,10 @@
 namespace CML\Classes;
 
 /**
- * The HTMLBuilder class is used to build HTML documents with customizable elements.
+ * Class HTMLBuilder
+ *
+ * @author CallMeLeon <kontakt@callmeleon.de>
+ * @see https://docs.callmeleon.de/cml#html-builder
  */
 class HTMLBuilder {
     use Functions\Functions;
