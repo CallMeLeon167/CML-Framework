@@ -6,7 +6,7 @@ function formatDate($dateString, $format = "d.m.Y") {
 
 $createdate = formatDate($created_at, "F d, Y");
 $last_update = formatDate($pushed_at);
-
+var_dump($this->hasHandlers("user_logged_in"));
 ?>
 
 <main>
