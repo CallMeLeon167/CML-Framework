@@ -4,12 +4,10 @@ require_once 'app/vendor/autoload.php';
 use CML\Classes\{
     Router,
     DB,
-    Events
 };
 
 $db = new DB();
 $router = new Router();
-$event = new Events();
 
 //Project settings
 $router->activateMinifyHTML();
@@ -38,11 +36,9 @@ $router->addRoute('GET', '/', function () use ($router) {
     $router->build();
     $router->getSite("home.php", $apiData);
 });
-
 // Registriere einen Handler für das Ereignis "user_logged_in"
-$event->on('user_logged_in', function ($userData) {
+$router->on('user_logged_in', function ($userData) {
     return "Benutzer eingeloggt: " . $userData['username'];
 });
 
-// Trigger das Ereignis "user_logged_in"
-echo $event->trigger('user_logged_in', ['username' => 'JohnDoe']);
+echo $router->trigger('user_logged_in', ['username' => 'JohnDoe']);
