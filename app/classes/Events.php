@@ -2,9 +2,9 @@
 namespace CML\Classes;
 
 /**
- * A simple class for managing events and event handlers.
+ * A simple trait for managing events and event handlers.
  */
-class Events {
+trait Events {
 
     /**
      * @var array $eventHandlers Associative array to store event handlers.
