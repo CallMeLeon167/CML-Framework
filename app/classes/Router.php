@@ -6,93 +6,70 @@ namespace CML\Classes;
  *
  * @author Leon.Schmidt
  */
-class Router extends \CML\Classes\HTMLBuilder{
+class Router extends HTMLBuilder{
     use Functions\Functions;
     use Functions\Session;
+    use Events;
 
     /**
      * Stores the defined routes.
-     *
-     * @var array
      */
     protected array $routes = [];
 
     /**
      * Stores the currently requested route.
-     *
-     * @var string
      */
     protected string $currentRoute = '';
 
     /**
      * Stores the current HTTP request method.
-     *
-     * @var string
      */
     protected string $currentMethod = '';
 
     /**
      * Stores route-specific middleware functions.
-     *
-     * @var array
      */
     protected array $middlewares = [];
 
     /**
      * Stores global middleware functions.
-     *
-     * @var array
      */
     protected array $globalMiddleware = [];
 
     /**
      * Stores route aliases.
-     *
-     * @var array
      */
     protected array $aliases = [];
 
     /**
      * Stores the URL to redirect to if a route is not defined.
-     *
-     * @var string
      */
     public string $redirectUrl = "";
 
     /**
      * Stores the Page to show if a route is not defined.
-     *
-     * @var string
      */
     public string $errorPage = "";
 
     /**
      * Indicates whether the route is an API route.
-     *
-     * @var bool
      */
     public bool $isApi = false;
 
     /**
      * Stores the parameters of the current route.
-     *
-     * @var array
      */
     protected array $currentRouteParams = [];
 
     /**
      * Stores sites path.
-     *
-     * @var string
      */
-    public string $FILEP;
+    public string $sitesPath;
     
     /**
      * An array to store "where" conditions for route parameters.
-     *
-     * @var array
      */
-    protected $whereConditions = [];
+    protected array $whereConditions = [];
 
     /**
      * Initializes the error reporting configuration based on the PRODUCTION environment variable.
@@ -100,7 +77,7 @@ class Router extends \CML\Classes\HTMLBuilder{
     public function __construct(){
         $dotenv = \Dotenv\Dotenv::createImmutable(self::getRootPath("app/config"));
         $dotenv->load();
-        $this->FILEP = $_ENV['SITES_PATH'] ?? '';
+        $this->sitesPath = $_ENV['SITES_PATH'] ?? '';
         $this->errorHandler();
     }
 
@@ -182,12 +159,12 @@ class Router extends \CML\Classes\HTMLBuilder{
      * @param string $siteName The name of the desired file.
      */
     public function setErrorPage(string $siteName){
-        $sitePath = self::getRootPath($this->FILEP.$siteName);
+        $sitePath = self::getRootPath($this->sitesPath.$siteName);
 
         if (file_exists($sitePath)) {
             return $this->errorPage = $sitePath;
         } else {
-            trigger_error(htmlentities("Could not find the file $this->FILEP.$siteName", E_USER_ERROR));
+            trigger_error(htmlentities("Could not find the file $this->sitesPath.$siteName", E_USER_ERROR));
         }
     }
 
@@ -444,14 +421,14 @@ class Router extends \CML\Classes\HTMLBuilder{
      * @param array $variables An associative array of variables to be made available in the loaded file.
      */
     public function getSite(string $siteName, array $variables = []) {
-        $sitePath = self::getRootPath($this->FILEP.$siteName);
+        $sitePath = self::getRootPath($this->sitesPath.$siteName);
         if (file_exists($sitePath)) {
             extract($variables); // Make the variables available
             ob_start();
             include $sitePath;
             echo $this->minifyHTML(ob_get_clean());
         } else {
-            trigger_error(htmlentities("getSite('$siteName') | Site not found => ".$this->FILEP.$siteName), E_USER_ERROR);
+            trigger_error(htmlentities("getSite('$siteName') | Site not found => ".$this->sitesPath.$siteName), E_USER_ERROR);
         }
     }
 
