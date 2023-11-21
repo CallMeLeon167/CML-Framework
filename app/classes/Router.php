@@ -87,7 +87,7 @@ class Router extends \CML\Classes\HTMLBuilder{
      *
      * @var string
      */
-    public string $FILEP;
+    public string $sitesPath;
     
     /**
      * An array to store "where" conditions for route parameters.
@@ -100,9 +100,7 @@ class Router extends \CML\Classes\HTMLBuilder{
      * Initializes the error reporting configuration based on the PRODUCTION environment variable.
      */
     public function __construct(){
-        $dotenv = \Dotenv\Dotenv::createImmutable(self::getRootPath("app/config"));
-        $dotenv->load();
-        $this->FILEP = $_ENV['SITES_PATH'] ?? '';
+        $this->sitesPath = $_ENV['SITES_PATH'] ?? '';
         $this->errorHandler();
     }
 
@@ -184,12 +182,12 @@ class Router extends \CML\Classes\HTMLBuilder{
      * @param string $siteName The name of the desired file.
      */
     public function setErrorPage(string $siteName){
-        $sitePath = self::getRootPath($this->FILEP.$siteName);
+        $sitePath = self::getRootPath($this->sitesPath.$siteName);
 
         if (file_exists($sitePath)) {
             return $this->errorPage = $sitePath;
         } else {
-            trigger_error(htmlentities("Could not find the file $this->FILEP.$siteName", E_USER_ERROR));
+            trigger_error(htmlentities("Could not find the file $this->sitesPath.$siteName", E_USER_ERROR));
         }
     }
 
@@ -446,14 +444,14 @@ class Router extends \CML\Classes\HTMLBuilder{
      * @param array $variables An associative array of variables to be made available in the loaded file.
      */
     public function getSite(string $siteName, array $variables = []) {
-        $sitePath = self::getRootPath($this->FILEP.$siteName);
+        $sitePath = self::getRootPath($this->sitesPath.$siteName);
         if (file_exists($sitePath)) {
             extract($variables); // Make the variables available
             ob_start();
             include $sitePath;
             echo $this->minifyHTML(ob_get_clean());
         } else {
-            trigger_error(htmlentities("getSite('$siteName') | Site not found => ".$this->FILEP.$siteName), E_USER_ERROR);
+            trigger_error(htmlentities("getSite('$siteName') | Site not found => ".$this->sitesPath.$siteName), E_USER_ERROR);
         }
     }
 

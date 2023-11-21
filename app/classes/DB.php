@@ -20,14 +20,13 @@ class DB {
      *
      * @var string
      */
-    public string $SQLP;
+    public string $sqlPath;
     
     /**
      * Constructor of the DB class. Calls the methods to load environment variables and establish a connection to the database.
      */
     public function __construct() {
-        $this->loadEnv();
-        $this->SQLP = $_ENV['SQL_PATH'] ?? '';
+        $this->sqlPath = $_ENV['SQL_PATH'] ?? '';
         $this->connect($_ENV['DB_HOST'], $_ENV['DB_USER'], $_ENV['DB_PASS'], $_ENV['DB_NAME']); 
     }
 
@@ -36,18 +35,6 @@ class DB {
      */
     public function __destruct() {
         $this->close();
-    }
-
-    /**
-     * Loads environment variables from the .env file.
-     */
-    private function loadEnv() {
-        try {
-            $dotenv = \Dotenv\Dotenv::createImmutable(self::getRootPath("app/config"));
-            $dotenv->load();
-        } catch (\Throwable $e) {
-            die("Please setup an .env file in /app/config");
-        }
     }
 
     /**
@@ -155,10 +142,10 @@ class DB {
      */
 
     public function sql2array_file(string $filename, array $params = []): array {
-        $filepath = self::getRootPath($this->SQLP . $filename);
+        $filepath = self::getRootPath($this->sqlPath . $filename);
         
         if (!file_exists($filepath)) {
-            trigger_error("Could not find SQL file => '" . htmlentities($this->SQLP . $filename) . "'", E_USER_ERROR);
+            trigger_error("Could not find SQL file => '" . htmlentities($this->sqlPath . $filename) . "'", E_USER_ERROR);
         }
         
         $sqlContent = file_get_contents($filepath);
@@ -176,10 +163,10 @@ class DB {
      * @param array $params Parameters for the SQL query (optional).
      */
     public function sql2db_file(string $filename, array $params = []) {
-        $filepath = self::getRootPath($this->SQLP . $filename);
+        $filepath = self::getRootPath($this->sqlPath . $filename);
     
         if (!file_exists($filepath)) {
-            trigger_error("Could not find SQL file => '" . htmlentities($this->SQLP . $filename) . "'", E_USER_ERROR);
+            trigger_error("Could not find SQL file => '" . htmlentities($this->sqlPath . $filename) . "'", E_USER_ERROR);
         }
     
         $sqlContent = file_get_contents($filepath);
