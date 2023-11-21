@@ -28,7 +28,7 @@ switch ($command) {
 
 // CLI command: php cli.php create:controller TestController --db
 function createController($controllerName, $useDatabase) {
-    $controllerFilePath = __DIR__ . "/app/controllers/{$controllerName}.php";
+    $controllerFilePath = __DIR__ . "/controllers/{$controllerName}.php";
 
     // Check if the file already exists
     if (file_exists($controllerFilePath)) {
