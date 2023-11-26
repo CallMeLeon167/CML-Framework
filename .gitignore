@@ -1,8 +1,4 @@
-/app/config/.env
-/app/node_modules/*
-/app/node_modules/
-/app/vendor/*
-/app/vendor
-/errorlogfile.log
 /.idea
-/.idea/*
+/vendor
+errorlogfile.log
+cml-config.php
