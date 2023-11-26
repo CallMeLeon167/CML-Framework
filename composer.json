@@ -1,4 +1,16 @@
 {
+  "name": "CallMeLeon167/CML-Framework",
+  "description": "A PHP Framework that saves you time and scales with your development process. Provides everything you need to build a Web app. All in one place, designed to work together perfectly.",
+  "type": "library",
+  "require": {
+    "php": ">=7.4.0"
+  },
+  "authors": [
+    {
+      "name": "Leon Schmidt",
+      "email": "kontakt@callmeleon.de"
+    }
+  ],
   "autoload": {
     "psr-4": {
       "CML\\Classes\\": "app/classes/",
