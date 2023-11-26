@@ -4,3 +4,7 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d 
 
 RewriteRule ^(.*)$ index.php?/$1 [L]
+RewriteRule ^app/classes(/.*)$ index.php?/$1 [L]
+RewriteRule ^app/config(/.*)$ index.php?/$1 [L]
+RewriteRule ^controllers(/.*)$ index.php?/$1 [L]
+RewriteRule ^sql(/.*)$ index.php?/$1 [L]
