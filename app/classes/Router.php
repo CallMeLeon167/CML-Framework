@@ -100,8 +100,7 @@ class Router extends \CML\Classes\HTMLBuilder{
      * Initializes the error reporting configuration based on the PRODUCTION environment variable.
      */
     public function __construct(){
-        $this->sitesPath = $_ENV['SITES_PATH'] ?? '';
-        $this->errorHandler();
+        $this->sitesPath = SITES_PATH ?? '';
     }
 
     /**
@@ -109,30 +108,6 @@ class Router extends \CML\Classes\HTMLBuilder{
      */
     public function __destruct() {
         $this->matchRoute();
-    }
-
-    /**
-     * Handles error configuration based on the environment.
-     *
-     * This function adjusts error reporting settings based on the environment,
-     * controlling the display of errors and logging them to a specified file.
-     * In the production environment, errors are suppressed for security and user experience reasons.
-     * In other environments, all errors are displayed, aiding in development and debugging.
-     */
-    protected function errorHandler(){
-        $errorfile = (self::getRootPath('errorlogfile.log'));
-        if ($_ENV["PRODUCTION"] === 'true') {
-            // In the production environment, do not display errors
-            mysqli_report(MYSQLI_REPORT_OFF);
-            error_reporting(0);
-            ini_set('display_errors', 0);
-        } else {
-            // In other environments, display all errors
-            error_reporting(E_ALL);
-            ini_set('display_errors', 1);
-        }
-        ini_set('log_errors', 1); // Write errors to a log file
-        ini_set('error_log', $errorfile); // Adjust paths and filenames
     }
 
     /**

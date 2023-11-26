@@ -26,8 +26,8 @@ class DB {
      * Constructor of the DB class. Calls the methods to load environment variables and establish a connection to the database.
      */
     public function __construct() {
-        $this->sqlPath = $_ENV['SQL_PATH'] ?? '';
-        $this->connect($_ENV['DB_HOST'], $_ENV['DB_USER'], $_ENV['DB_PASS'], $_ENV['DB_NAME']); 
+        $this->sqlPath = SQL_PATH ?? '';
+        $this->connect(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME); 
     }
 
     /**
@@ -50,7 +50,7 @@ class DB {
         if ($this->conn->connect_error) {
             trigger_error("Connection failed! ".$this->conn->connect_error, E_USER_ERROR);
         }
-        $this->conn->set_charset("utf8mb4");
+        $this->conn->set_charset(DB_CHARSET);
     }
 
     /**
@@ -75,7 +75,7 @@ class DB {
         if ($this->conn->ping()) {
             $this->close();
         }
-        $this->connect($_ENV['DB_HOST'], $_ENV['DB_USER'], $_ENV['DB_PASS'], $_ENV['DB_NAME']);
+        $this->connect(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
     }
 
     /**

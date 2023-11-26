@@ -11,6 +11,7 @@ class HTMLBuilder {
     use Functions\Functions;
     
     private bool $minifyHTML = false;
+    private string $ajaxUrl = "";
     private string $projectName = "";
     private string $title = "";
     private string $favicon = "";
@@ -77,7 +78,7 @@ class HTMLBuilder {
      * @param string $header The header element to add.
      */
     public function addHeader(string $header = '') {
-        $this->addContent('HEADER_FILE', $header, $this->header);
+        $this->addContent(HEADER_FILE, $header, $this->header);
     }
 
     /**
@@ -86,7 +87,7 @@ class HTMLBuilder {
      * @param string $footer The footer element to add.
      */
     public function addFooter(string $footer = '') {
-        $this->addContent('FOOTER_FILE', $footer, $this->footer);
+        $this->addContent(FOOTER_FILE, $footer, $this->footer);
     }
 
     /**
@@ -153,6 +154,21 @@ class HTMLBuilder {
         $this->metas[] = $attrs;
     }
 
+    /**
+     * Sets the Ajax URL for internal use and makes it available in JavaScript.
+     *
+     * Constructs the Ajax URL to be used internally, and the resulting URL is made
+     * accessible in JavaScript.
+     */
+    public function setAjaxUrl(){
+        $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
+        $servername = $_SERVER['SERVER_NAME'];
+        $currentPath = dirname($_SERVER['PHP_SELF']);
+        $fullUrl = $protocol . '://' . $servername . ($currentPath !== '/' ? $currentPath : '');
+        $ajaxUrl = $fullUrl."/app/admin/cml-ajax.php";
+        $this->ajaxUrl = $ajaxUrl;
+    }
+
     
     /**
      * Register a hook to place content at a specific location in the HTML document.
@@ -192,15 +208,14 @@ class HTMLBuilder {
     /**
      * Generic function to add content (header or footer) to the HTML document.
      *
-     * @param string $envKey The environment variable key for the content file.
+     * @param string $const
      * @param string $content The content to add.
      * @param string &$property The property to store the content in.
      */
-    protected function addContent(string $envKey, string $content, string &$property) {
-        $contentFile = $_ENV[$envKey] ?? '';
-
+    protected function addContent(string $const, string $content, string &$property) {
+        $contentFile = $const ?? '';
         if (empty($contentFile) && empty($content)) {
-            trigger_error("Could not set the $envKey", E_USER_ERROR);
+            trigger_error("Could not set the $const", E_USER_ERROR);
             return;
         }
 
@@ -212,7 +227,7 @@ class HTMLBuilder {
                 include self::getRootPath($contentFile);
                 $property = ob_get_clean();
             } else {
-                trigger_error("$envKey file does not exist: $contentFile", E_USER_ERROR);
+                trigger_error("$const file does not exist: $contentFile", E_USER_ERROR);
             }
         }
     }
@@ -239,8 +254,8 @@ class HTMLBuilder {
      * @param string|array $attributes Additional attributes for the HTML element (e.g., 'media="screen"', 'async', 'defer', etc.).
      */
     protected function addResource(string $path, array &$container, $attributes = "") {
-        $envKey = $container === $this->styles ? 'STYLE_PATH' : 'SCRIPT_PATH';
-        $envPath = $_ENV[$envKey] ?? '';
+        $const = $container === $this->styles ? 'STYLE_PATH' : 'SCRIPT_PATH';
+        $envPath = constant($const) ?? '';
         $fullPath = $envPath ? $envPath . $path : $path;
 
         if (!file_exists(self::getRootPath($fullPath))) {
@@ -294,9 +309,9 @@ class HTMLBuilder {
         $fileExtension = pathinfo($path, PATHINFO_EXTENSION);
         
         if ($fileExtension === 'css') {
-            return self::compressFile($path, $_ENV['STYLE_PATH'] ?? '', '.css');
+            return self::compressFile($path, STYLE_PATH ?? '', '.css');
         } elseif ($fileExtension === 'js') {
-            return self::compressFile($path, $_ENV['SCRIPT_PATH'] ?? '', '.js');
+            return self::compressFile($path, SCRIPT_PATH ?? '', '.js');
         } else {
             return $path;
         }
@@ -370,9 +385,9 @@ class HTMLBuilder {
             <?php foreach ($this->metas as $meta): ?>
                 <meta <?= $meta ?>>
             <?php endforeach; ?>
-            <title><?= $this->title ?></title>
+            <title><?= empty($this->title) ? APP_NAME : $this->title?></title>
+            <?= !empty($this->ajaxUrl) ? "<script>let ajax_url = '{$this->ajaxUrl}'</script>" : ''?>
             <link rel="icon" type="image/x-icon" href="<?= self::assetUrl($this->favicon) ?>">
-
             <?php foreach ($this->cdns as $cdns): ?>
                 <?php foreach ($cdns as $tag => $attributes): ?>
                     <<?= $tag ?> <?= $attributes ?>>
