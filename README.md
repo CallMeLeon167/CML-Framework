@@ -15,7 +15,7 @@
 
 
 ## Documentation
-[https://docs.callmeleon.de/backend](https://docs.callmeleon.de/)
+[https://docs.callmeleon.de/](https://docs.callmeleon.de/)
 
 ## Getting Started
 
