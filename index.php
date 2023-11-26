@@ -1,10 +1,8 @@
 <?php 
-require_once 'app/vendor/autoload.php'; 
+require_once 'app/admin/cml-load.php'; 
 
-use CML\Classes\{
-    Router,
-    DB,
-};
+use CML\Classes\Router;
+use CML\Classes\DB;
 
 $db = new DB();
 $router = new Router();
@@ -12,8 +10,7 @@ $router = new Router();
 //Project settings
 $router->activateMinifyHTML();
 $router->setErrorRedirect("/");
-$router->setProjectName("CML - Framework");
-$router->setFavicon("/favicon.ico");
+$router->setFavicon("/web/favicon.ico");
 $router->addMeta('name="theme-color" content="black"');
 
 //Global CDNs
