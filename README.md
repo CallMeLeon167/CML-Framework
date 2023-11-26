@@ -15,16 +15,20 @@
 
 
 ## Documentation
-[https://docs.callmeleon.de/backend](https://docs.callmeleon.de/backend)
+[https://docs.callmeleon.de/](https://docs.callmeleon.de/)
 
 ## Getting Started
 
 ### Installation
 
+```composer create-project callmeleon167/cml-framework my-app```
+
+or
+
 - Clone the repo
 - Have composer installed
-- Run the build.sh or just run ```composer install``` in the ```/app``` folder
-- Duplicate the .env.template file in the app/config directory, and then remove the .template extension from the file name to obtain an .env file
+- Run the build.sh
+- Duplicate the cml-config.template.php file in the app/config directory, and then remove the .template extension from the file name to obtain an cml-config.php file
 - Configure your settings, and you're good to go!
 
 ## Features
@@ -115,4 +119,3 @@ The DB class simplifies database interactions, supports parameterized queries fo
 
 
 This class is useful for quickly creating well-structured HTML documents, including setting titles, adding styles and scripts, and enhancing readability with attractive comments. It provides an elegant and informative start to your HTML source code. When used in conjunction with the `Router` class, you can easily build dynamic web applications and websites.
-
