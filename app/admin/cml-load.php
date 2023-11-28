@@ -54,8 +54,16 @@ require_once dirname(__DIR__, 2).'/vendor/autoload.php';
         ini_set('error_log', $errorfile);
     }
 
-    // Custom error function
     function customError($errno, $errstr, $errfile, $errline) {
+
+        $errorTypes = [
+            E_ERROR => 'Error',
+            E_WARNING => 'Warning',
+            E_NOTICE => 'Notice',
+        ];
+    
+        $errorTypeString = $errorTypes[$errno] ?? 'Unknown Error Type';
+        
         echo "
         <div style='
             background-color: #e74c3c;
@@ -64,18 +72,23 @@ require_once dirname(__DIR__, 2).'/vendor/autoload.php';
             color: #fff;
             padding: 30px;
             margin: 30px;
-            font-family: 'Roboto', sans-serif;
+            font-family: Roboto, sans-serif;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-            max-width: 600px;
-            margin: auto;
             text-align: left;
             '>
-            <h2 style='color: #fff; font-size: 28px; margin-bottom: 15px;'>Error Details</h2>
+            <div style='    
+            display: flex;
+            justify-content: space-between;'>
+            <h2 style='color: #fff; font-size: 28px; margin: 15px 0px;'>Error Details: $errorTypeString</h2>
+            <div style='text-align: end;'>
+            <span style='color: #ffffff70;font-size: 12px;'>Date/Time: " . date('Y-m-d H:i:s') . "</span><br>
+            <span style='color: #ffffff70;font-size: 12px;'>PHP ".phpversion()."</span>
+            </div>
+            </div>
             <p><strong>Error:</strong> [$errno] ". htmlspecialchars($errstr) ."</p>
             <p><strong>File:</strong> $errfile</p>
             <p><strong>Line:</strong> $errline</p>
             <hr style='border-color: #c0392b; margin: 20px 0;'>
-    
             <pre style='
                 white-space: pre-wrap;
                 background-color: #fff;
@@ -85,7 +98,6 @@ require_once dirname(__DIR__, 2).'/vendor/autoload.php';
                 overflow-x: auto;
                 '>";
     
-        // Display code snippet
         $lines = file($errfile);
         $start = max(0, $errline - 5);
         $end = min(count($lines), $errline + 5);
@@ -108,13 +120,9 @@ require_once dirname(__DIR__, 2).'/vendor/autoload.php';
         }
 
         echo "</div>";
-    
-        // Pass error handling to PHP's default behavior
         return false;
     }
     
     // Trigger an error for testing
     echo $test;  // $test is not defined and will trigger an error
-        ?>
-
-    
+?>
