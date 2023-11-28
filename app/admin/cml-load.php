@@ -30,13 +30,23 @@ require_once dirname(__DIR__, 2).'/vendor/autoload.php';
      */
     $errorfile = dirname(__DIR__, 2).ERRORLOG_FILE;
 
+    // If the application is running in the production environment
     if (PRODUCTION === true) {
+        // Turn off error reporting
         mysqli_report(MYSQLI_REPORT_OFF);
         error_reporting(0);
         ini_set('display_errors', 0);
     } else {
+        // Enable error reporting in development or testing environment
         error_reporting(E_ALL);
         ini_set('display_errors', 1);
+
+        // If debug mode is enabled
+        if (CML_DEBUG === true) {
+            // Turn off error display and set a custom error handler
+            ini_set('display_errors', 0);
+            set_error_handler("customError");
+        }
     }
 
     if (file_exists($errorfile)){
@@ -44,9 +54,6 @@ require_once dirname(__DIR__, 2).'/vendor/autoload.php';
         ini_set('error_log', $errorfile);
     }
 
-    // Enable error handling
-    set_error_handler("customError");
-    
     // Custom error function
     function customError($errno, $errstr, $errfile, $errline) {
         echo "
@@ -64,7 +71,7 @@ require_once dirname(__DIR__, 2).'/vendor/autoload.php';
             text-align: left;
             '>
             <h2 style='color: #fff; font-size: 28px; margin-bottom: 15px;'>Error Details</h2>
-            <p><strong>Error:</strong> [$errno] $errstr</p>
+            <p><strong>Error:</strong> [$errno] ". htmlspecialchars($errstr) ."</p>
             <p><strong>File:</strong> $errfile</p>
             <p><strong>Line:</strong> $errline</p>
             <hr style='border-color: #c0392b; margin: 20px 0;'>
@@ -90,8 +97,17 @@ require_once dirname(__DIR__, 2).'/vendor/autoload.php';
                 . "</span>";
         }
     
-        echo "</pre>
-        </div>";
+        echo "</pre>";
+
+        $trace = debug_backtrace();
+        echo "<h3 style='color: #fff; font-size: 24px; margin-bottom: 15px;'>Stack Trace</h3>";
+        foreach ($trace as $item) {
+            echo "<p><strong>File:</strong> {$item['file']}</p>";
+            echo "<p><strong>Line:</strong> {$item['line']}</p>";
+            echo "<hr style='border-color: #c0392b; margin: 10px 0;'>";
+        }
+
+        echo "</div>";
     
         // Pass error handling to PHP's default behavior
         return false;
@@ -99,6 +115,6 @@ require_once dirname(__DIR__, 2).'/vendor/autoload.php';
     
     // Trigger an error for testing
     echo $test;  // $test is not defined and will trigger an error
-    
-    ?>
+        ?>
+
     
