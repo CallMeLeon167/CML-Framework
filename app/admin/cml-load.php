@@ -58,6 +58,7 @@ require_once dirname(__DIR__, 2).'/vendor/autoload.php';
 
         $errorTypes = [
             E_ERROR => 'Error',
+            E_USER_ERROR  => 'Error',
             E_WARNING => 'Warning',
             E_NOTICE => 'Notice',
         ];
@@ -73,7 +74,7 @@ require_once dirname(__DIR__, 2).'/vendor/autoload.php';
             padding: 30px;
             margin: 30px;
             font-family: Roboto, sans-serif;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 8px 16px rgb(0 0 0 / 42%);
             text-align: left;
             '>
             <div style='    
