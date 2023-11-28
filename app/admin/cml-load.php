@@ -111,12 +111,21 @@ require_once dirname(__DIR__, 2).'/vendor/autoload.php';
     
         echo "</pre>";
 
-        $trace = debug_backtrace();
+        $trace = debug_backtrace(2);
         echo "<h3 style='color: #fff; font-size: 24px; margin-bottom: 15px;'>Stack Trace</h3>";
         foreach ($trace as $item) {
-            echo "<p><strong>File:</strong> {$item['file']}</p>";
-            echo "<p><strong>Line:</strong> {$item['line']}</p>";
-            echo "<hr style='border-color: #c0392b; margin: 10px 0;'>";
+            if(isset($item['file']) && isset($item['line'])){
+                echo "<p><strong>File:</strong> {$item['file']}</p>";
+                echo "<p><strong>Line:</strong> {$item['line']}</p>";
+                echo "<p><strong>Function:</strong> {$item['function']} ";
+                if(isset($item['args'])){
+                    foreach ($item['args'] as $args) {
+                        echo basename($args);
+                    }
+                }
+                echo "</p>";
+                echo "<hr style='border-color: #c0392b; margin: 10px 0;'>";
+            }
         }
 
         echo "</div>";
@@ -124,5 +133,5 @@ require_once dirname(__DIR__, 2).'/vendor/autoload.php';
     }
     
     // Trigger an error for testing
-    echo $test;  // $test is not defined and will trigger an error
+    echo $test;
 ?>
