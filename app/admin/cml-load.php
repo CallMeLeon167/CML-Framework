@@ -30,23 +30,16 @@ require_once dirname(__DIR__, 2).'/vendor/autoload.php';
      */
     $errorfile = dirname(__DIR__, 2).ERRORLOG_FILE;
 
-    // If the application is running in the production environment
-    if (PRODUCTION === true) {
-        // Turn off error reporting
-        mysqli_report(MYSQLI_REPORT_OFF);
-        error_reporting(0);
-        ini_set('display_errors', 0);
-    } else {
-        // Enable error reporting in development or testing environment
-        error_reporting(E_ALL);
-        ini_set('display_errors', 1);
+    // Turn off error reporting in production environment, enable otherwise
+    error_reporting(PRODUCTION ? 0 : E_ALL);
+    ini_set('display_errors', PRODUCTION || (CML_DEBUG && !PRODUCTION) ? 0 : 1);
 
-        // If debug mode is enabled
-        if (CML_DEBUG === true) {
-            // Turn off error display and set a custom error handler
-            ini_set('display_errors', 0);
-            set_error_handler("customError");
-        }
+    // If debug mode is enabled, set a custom error handler
+    if (CML_DEBUG && !PRODUCTION) {
+        set_error_handler("customError");
+    } else {
+        // Turn off error reporting when not in debug mode
+        mysqli_report(PRODUCTION ? MYSQLI_REPORT_OFF : MYSQLI_REPORT_ERROR);
     }
 
     if (file_exists($errorfile)){
