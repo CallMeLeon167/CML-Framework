@@ -83,6 +83,7 @@ require_once dirname(__DIR__, 2).'/vendor/autoload.php';
             <h2 style='color: #fff; font-size: 28px; margin: 15px 0px;'>Error Details: $errorTypeString</h2>
             <div style='text-align: end;'>
             <span style='color: #ffffff70;font-size: 12px;'>Date/Time: " . date('Y-m-d H:i:s') . "</span><br>
+            <span style='color: #ffffff70;font-size: 12px;'>CML Version: v".(new class { use CML\Classes\Functions\Functions; })::getFrameworkVersion()."</span> <br>
             <span style='color: #ffffff70;font-size: 12px;'>PHP ".phpversion()."</span>
             </div>
             </div>
