@@ -4,7 +4,6 @@ namespace CML\Classes;
 /**
  * Class Router
  *
- * @version v2.1
  * @author CallMeLeon <kontakt@callmeleon.de>
  * @see https://docs.callmeleon.de/cml#router
  */

@@ -71,6 +71,16 @@ trait Functions{
     public static function getRootPath(string $path = ''){
         return (dirname(__DIR__, 3) . '/' . ltrim($path, "/"));
     }
+
+    /**
+     * Retrieves the current version of the framework.
+     * This function returns the current version of the framework as a string.
+     *
+     * @return string The current version of the framework.
+     */
+    public static function getFrameworkVersion(){
+        return "2.2";
+    } 
 }
 
 /**
