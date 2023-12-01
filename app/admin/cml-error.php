@@ -27,6 +27,14 @@
         ini_set('error_log', $errorfile);
     }
 
+    /**
+     * Custom error handler function.
+     *
+     * @param int    $errno   The level of the error raised.
+     * @param string $errstr  The error message.
+     * @param string $errfile The filename that the error was raised in.
+     * @param int    $errline The line number the error was raised at.
+     */
     function customError($errno, $errstr, $errfile, $errline) {
 
         $errorTypes = [
@@ -108,6 +116,7 @@
                 <div class='stack-trace'>
                     <h3>Stack Trace</h3>";
 
+                    // Loop through the stack trace and display relevant information
                     $firstIteration = true;
                     foreach ($trace as $item) {
                         if (isset($item['file']) && isset($item['line'])) {
@@ -140,6 +149,7 @@
                     <div class='file-content'>
                     <pre><code class='language-php'>";
                     
+                    // Display code snippet around the error line
                     $lines = file($errfile);
                     $start = max(0, $errline - 10);
                     $end = min(count($lines), $errline + 10);
@@ -155,7 +165,8 @@
                     </div>
                     <div class='all-infos'>
                     <hr>";
-                    
+
+                    // Display various tables with data (GET, POST, FILES, SESSION, ENV, COOKIE, etc.)
                     generateTable($_GET, "Get Data");
                     generateTable($_POST, "Post Data");
                     generateTable($_FILES, "File Upload Data");
@@ -176,13 +187,25 @@
     </div>";
     }
 
+    /**
+     * Get relative file path from the document root.
+     *
+     * @param string $dir The absolute file path.
+     * @return string The relative file path.
+     */
     function getFilePath(string $dir) {
         $documentRoot = str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']);
         $relativePath = str_replace($documentRoot, '', str_replace('\\', '/', $dir));
         return $relativePath;
     }
 
-    function generateTable($data, $title) {
+    /**
+     * Generate a table for displaying key-value pairs.
+     *
+     * @param array  $data  The data to be displayed in the table.
+     * @param string $title The title of the table.
+     */
+    function generateTable(array $data, string $title) {
         echo "<div class='table-container'>
                 <div class='info-data'>
                 <h4>$title</h4>";
