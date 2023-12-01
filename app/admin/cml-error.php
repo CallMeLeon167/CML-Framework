@@ -108,11 +108,13 @@
                 <div class='stack-trace'>
                     <h3>Stack Trace</h3>";
 
-                    foreach ($trace as $key => $item) {
+                    $firstIteration = true;
+                    foreach ($trace as $item) {
                         if (isset($item['file']) && isset($item['line'])) {
-                            echo "<div class='stack-trace-data'" . ($key === 0 ? ' style="background-color:#fd3a3a;color:white;"' : '') . ">";
+                            echo "<div class='stack-trace-data'" . ($firstIteration ? ' style="background-color:#fd3a3a;color:white;"' : '') . ">";
                             echo "<span><strong>File:</strong>" . getFilePath($item['file']) . "</span>";
                             echo "<span><strong>Line:</strong> {$item['line']}</span>";
+
                             if (isset($item['args'])) {
                                 foreach ($item['args'] as $args) {
                                     echo "<span><strong>{$item['function']}:</strong>" . basename($args);
@@ -120,8 +122,11 @@
                             } else {
                                 echo "<span><strong>Function:</strong> {$item['function']} ";
                             }
+
                             echo "</div>";
                             echo "<hr>";
+
+                            $firstIteration = false;
                         }
                     }
 
