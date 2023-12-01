@@ -37,76 +37,171 @@
         ];
     
         $errorTypeString = $errorTypes[$errno] ?? 'Unknown Error Type';
-        
-        echo "
-        <div style='
-            background-color: #e74c3c;
-            border: 1px solid #c0392b;
-            border-radius: 10px;
-            color: #fff;
-            padding: 30px;
-            margin: 30px;
-            font-family: Roboto, sans-serif;
-            box-shadow: 0 8px 16px rgb(0 0 0 / 42%);
-            text-align: left;
-            '>
-            <div style='    
-            display: flex;
-            justify-content: space-between;'>
-            <h2 style='color: #fff; font-size: 28px; margin: 15px 0px;'>Error Details: $errorTypeString</h2>
-            <div style='text-align: end;'>
-            <span style='color: #ffffff70;font-size: 12px;'>Date/Time: " . date('Y-m-d H:i:s') . "</span><br>
-            <span style='color: #ffffff70;font-size: 12px;'>CML Version: v".(new class { use CML\Classes\Functions\Functions; })::getFrameworkVersion()."</span> <br>
-            <span style='color: #ffffff70;font-size: 12px;'>PHP ".phpversion()."</span>
-            </div>
-            </div>
-            <p><strong>Error:</strong> [$errno] ". htmlspecialchars($errstr) ."</p>
-            <p><strong>File:</strong> $errfile</p>
-            <p><strong>Line:</strong> $errline</p>
-            <hr style='border-color: #c0392b; margin: 20px 0;'>
-            <pre style='
-                white-space: pre-wrap;
-                background-color: #fff;
-                color: #333;
-                padding: 15px;
-                border-radius: 10px;
-                overflow-x: auto;
-                '>";
-    
-        $lines = file($errfile);
-        $start = max(0, $errline - 5);
-        $end = min(count($lines), $errline + 5);
-    
-        for ($i = $start; $i < $end; $i++) {
-            echo "<span style='color: " . ($i == $errline - 1 ? '#e74c3c' : '#333') . ";'>"
-                . "Line " . ($i + 1) . ": "
-                . htmlspecialchars($lines[$i])
-                . "</span>";
-        }
-    
-        echo "</pre>";
-
+        $id = substr(str_shuffle('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 8);
         $trace = debug_backtrace(2);
-        echo "<h3 style='color: #fff; font-size: 24px; margin-bottom: 15px;'>Stack Trace</h3>";
-        foreach ($trace as $item) {
-            if(isset($item['file']) && isset($item['line'])){
-                echo "<p><strong>File:</strong> {$item['file']}</p>";
-                echo "<p><strong>Line:</strong> {$item['line']}</p>";
-                echo "<p><strong>Function:</strong> {$item['function']} ";
-                if(isset($item['args'])){
-                    foreach ($item['args'] as $args) {
-                        echo basename($args);
-                    }
-                }
-                echo "</p>";
-                echo "<hr style='border-color: #c0392b; margin: 10px 0;'>";
-            }
-        }
 
+        echo "
+        <script>
+            function closeOverlayById(id) {
+                const overlay = document.querySelector('.' + id);
+                if (overlay) {
+                    overlay.style.display = 'none'
+                }
+            }
+        
+            document.addEventListener('click', function (event) {
+                const closeOverlayBtn = event.target;
+                const closeOverlayId = closeOverlayBtn.getAttribute('data-id');
+        
+                if (closeOverlayId && closeOverlayBtn.getAttribute('data-close-overlay') !== null) {
+                    closeOverlayById(closeOverlayId);
+                }
+            });
+        </script>
+
+        <style>
+        body, html{margin:0;padding:0;height: 100%;overflow-x:hidden;}
+        .container{background-color:#E5E7EB;width: 100vw;font-family: Roboto, sans-serif;display: flex;flex-direction: column; color:black;max-height: 100vh;overflow: auto;}
+        .error{background-color:#fff;margin:80px 80px 50px 80px;padding:30px;box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);display:flex;justify-content: space-between;border-radius: 6px;border: 1px solid #c7c7c7;}
+        .error-versions{display: flex;flex-direction: column;align-items: flex-end;font-size:13px;color: #33333370;}
+        .error-msg{margin:15px 0 0 0;}
+        .stack-trace{width: 25%;}
+        .error-file{color: #575757;font-size: small;}
+        .file-header{text-align: end}
+        .stack-trace h3{margin:10px}
+        .stack-trace-data{display: flex;flex-direction: column;gap: 5px;font-size: 14px;padding: 10px;border-radius: 5px;}
+        .error-type{padding: 5px;margin: 10px;background-color: #ededed;border-radius:5px}
+        .error-content{background-color:#fff;margin:0 80px 80px 80px;padding:20px;box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);display: flex;border-radius: 6px;border: 1px solid #c7c7c7;}
+        .file{width: 100%;padding:20px;}
+        .table-container {max-width: 100%;overflow-x: auto;margin-top: 10px;}
+        .info-table {width: 100%;border-collapse: collapse;}
+        .info-table th, .info-table td {border: 1px solid #ddd;padding: 8px;text-align: left;word-wrap: break-word;color: black;}
+        .info-table td.value{word-break: break-word;}
+        .empty-data {color: #888;font-style: italic;}
+        .info-data{display: flex;align-items: center;gap: 10px;}
+        .info-data h4{margin:10px 0;}
+        .all-infos h3{margin: 0}
+        .overlay {position: fixed;top: 0;left: 0;width: 100vw;height: 100vh;background: rgba(0, 0, 0, 0.5);display: flex;justify-content: center;align-items: center;z-index: 9999;overflow: auto;}
+        .close-button {position: fixed;top: 10px;right: 30px;background-color: transparent;border: none;padding: 10px;cursor: pointer;font-size: 42px;color: #333;}
+        .close-button:hover {color: #555;}
+        hr{border-color: #ffffff; margin: 10px 0;}
+        pre{white-space: pre-wrap;background-color: #f3f3f3;padding: 15px;overflow-x: auto;}
+        pre span{display: inline-block; width: 100%; color: #444;}
+        </style>
+
+    <div class='overlay {$id}'>
+    <button class='close-button' data-close-overlay data-id='{$id}'>×</button>
+        <div class='container'>
+            <div class='error'>
+                <div class='error-info'>
+                    <span class='error-type'>{$errorTypeString}</span>
+                    <h2 class='error-msg'>". htmlspecialchars($errstr) ."</h2>
+                </div>
+                <div class='error-versions'>
+                    <span>Date/Time: " . date('Y-m-d H:i:s') . "</span>
+                    <span>CML Version: v".(new class { use CML\Classes\Functions\Functions; })::getFrameworkVersion()."</span>
+                    <span>PHP ".phpversion()."</span>
+                </div>
+            </div>
+
+            <div class='error-content'>
+                <div class='stack-trace'>
+                    <h3>Stack Trace</h3>";
+
+                    foreach ($trace as $key => $item) {
+                        if (isset($item['file']) && isset($item['line'])) {
+                            echo "<div class='stack-trace-data'" . ($key === 0 ? ' style="background-color:#fd3a3a;color:white;"' : '') . ">";
+                            echo "<span><strong>File:</strong>" . getFilePath($item['file']) . "</span>";
+                            echo "<span><strong>Line:</strong> {$item['line']}</span>";
+                            if (isset($item['args'])) {
+                                foreach ($item['args'] as $args) {
+                                    echo "<span><strong>{$item['function']}:</strong>" . basename($args);
+                                }
+                            } else {
+                                echo "<span><strong>Function:</strong> {$item['function']} ";
+                            }
+                            echo "</div>";
+                            echo "<hr>";
+                        }
+                    }
+
+                echo "
+                </div>
+
+                <div class='file'>
+                    <div class='file-header'>
+                        <span class='error-file'>" . getFilePath($errfile) . ":{$errline}</span>
+                    </div>
+                    <div class='file-content'>
+                    <pre><code class='language-php'>";
+                    
+                    $lines = file($errfile);
+                    $start = max(0, $errline - 10);
+                    $end = min(count($lines), $errline + 10);
+    
+                    for ($i = $start; $i < $end; $i++) {
+                        echo "<span style='background-color: " . ($i == $errline - 1 ? '#FEDBDA' : '') . ";'>"
+                            . ($i + 1) . ": "
+                            . htmlspecialchars($lines[$i])
+                            . "</span>";
+                    }
+
+                    echo "</code></pre>
+                    </div>
+                    <div class='all-infos'>
+                    <hr>";
+                        generateTable($_GET, "Get Data");
+                        generateTable($_POST, "Post Data");
+                        generateTable($_COOKIE, "Cookie Data");
+
+                        session_start();
+                        generateTable($_SESSION, "Session Data");
+
+                        generateTable($_SERVER, "Server Data");
+                        generateTable(getallheaders(), "Header Information");
+
+                    echo "
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>";
+    }
+
+    function getFilePath(string $dir) {
+        $documentRoot = str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']);
+        $relativePath = str_replace($documentRoot, '', str_replace('\\', '/', $dir));
+        return $relativePath;
+    }
+
+    function generateTable($data, $title) {
+        echo "<div class='table-container'>
+                <div class='info-data'>
+                <h4>$title</h4>";
+        
+        if (empty($data)) {
+            echo "<span class='empty-data'>empty</span>
+            </div>";
+        } else {
+            echo "
+            </div>
+            <table class='info-table'>
+                    <tr>
+                        <th>Key</th>
+                        <th>Value</th>
+                    </tr>";
+    
+            foreach ($data as $key => $value) {
+                echo "<tr>
+                        <td>$key</td>
+                        <td class='value'>$value</td>
+                    </tr>";
+            }
+            echo "</table>";
+        }
+    
         echo "</div>";
-        return false;
     }
     
-    // Trigger an error for testing
     echo $test;
 ?>
