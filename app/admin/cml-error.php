@@ -155,15 +155,18 @@
                     </div>
                     <div class='all-infos'>
                     <hr>";
-                        generateTable($_GET, "Get Data");
-                        generateTable($_POST, "Post Data");
-                        generateTable($_COOKIE, "Cookie Data");
-
-                        session_start();
-                        generateTable($_SESSION, "Session Data");
-
-                        generateTable($_SERVER, "Server Data");
-                        generateTable(getallheaders(), "Header Information");
+                    
+                    generateTable($_GET, "Get Data");
+                    generateTable($_POST, "Post Data");
+                    generateTable($_FILES, "File Upload Data");
+                    session_start();
+                    generateTable($_SESSION, "Session Data");
+                    generateTable($_ENV, "Environment Variables");
+                    generateTable($_COOKIE, "Cookie Data");
+                    
+                    generateTable(['HTTP Status' => http_response_code()], "HTTP Response");
+                    generateTable($_SERVER, "Server Data");
+                    generateTable(getallheaders(), "Header Information");
 
                     echo "
                     </div>
