@@ -99,6 +99,11 @@ define('SQL_PATH', 'sql/');
 define('SITES_PATH', 'web/sites/');
 
 /** 
+ * Specify the folder path to the components.
+ */
+define('COMPONENTS_PATH', 'web/components/');
+
+/** 
  * File path to the footer.
  * Specify the file path to the footer component.
  */
