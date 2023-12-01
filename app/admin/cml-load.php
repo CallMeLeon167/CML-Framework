@@ -1,6 +1,13 @@
 <?php 
 
-require_once dirname(__DIR__, 2).'/vendor/autoload.php'; 
+    /**
+     * Loads the Composer autoloader.
+     */
+    if (file_exists($autoloadPath = dirname(__DIR__, 2) . '/vendor/autoload.php')) {
+        require_once $autoloadPath;
+    } else {
+        die('Composer vendor is not installed.');
+    }
 
     /**
      * Loads configuration variables from the cml-config file.
