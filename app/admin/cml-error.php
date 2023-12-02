@@ -78,7 +78,7 @@
         .file-header{text-align: end}
         .stack-trace h3{margin:10px}
         .stack-trace-data{display: flex;flex-direction: column;gap: 5px;font-size: 14px;padding: 10px;border-radius: 5px;}
-        .error-type{padding: 5px;margin: 10px;background-color: #ededed;border-radius:5px}
+        .error-type{padding: 5px 10px;margin: 10px;background-color: #ededed;border-radius:5px}
         .error-content{background-color:#fff;margin:0 80px 80px 80px;padding:20px;box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);display: flex;border-radius: 6px;border: 1px solid #c7c7c7;}
         .file{width: 100%;padding:20px;}
         .table-container {max-width: 100%;overflow-x: auto;margin-top: 10px;}
@@ -170,7 +170,7 @@
                     generateTable($_GET, "Get Data");
                     generateTable($_POST, "Post Data");
                     generateTable($_FILES, "File Upload Data");
-                    session_start();
+                    (new class { use CML\Classes\Functions\Session; })->startSession();
                     generateTable($_SESSION, "Session Data");
                     generateTable($_ENV, "Environment Variables");
                     generateTable($_COOKIE, "Cookie Data");
