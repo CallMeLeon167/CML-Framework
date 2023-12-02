@@ -1,4 +1,4 @@
-<?php 
+<?php
 
     /**
      * Handles error configuration based on the environment.
@@ -47,7 +47,7 @@
         $errorTypeString = $errorTypes[$errno] ?? 'Unknown Error Type';
         $id = substr(str_shuffle('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 8);
         $trace = debug_backtrace(2);
-
+        ob_start();
         echo "
         <script>
             function closeOverlayById(id) {
@@ -185,6 +185,7 @@
             </div>
         </div>
     </div>";
+    echo ob_get_clean();
     }
 
     /**
