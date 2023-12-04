@@ -126,7 +126,7 @@
 
                             if (isset($item['args'])) {
                                 foreach ($item['args'] as $args) {
-                                    echo "<span><strong>{$item['function']}:</strong>" . basename($args);
+                                    echo "<span><strong>{$item['function']}: </strong>" . basename($args);
                                 }
                             } else {
                                 echo "<span><strong>Function:</strong> {$item['function']} ";
