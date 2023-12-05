@@ -234,6 +234,4 @@
     
         echo "</div>";
     }
-    
-    echo $test;
 ?>
