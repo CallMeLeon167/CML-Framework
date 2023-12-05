@@ -1,6 +1,13 @@
 <?php 
 
-require_once dirname(__DIR__, 2).'/vendor/autoload.php'; 
+    /**
+     * Loads the Composer autoloader.
+     */
+    if (file_exists($autoloadPath = dirname(__DIR__, 2) . '/vendor/autoload.php')) {
+        require_once $autoloadPath;
+    } else {
+        die('Composer vendor is not installed.');
+    }
 
     /**
      * Loads configuration variables from the cml-config file.
@@ -21,27 +28,10 @@ require_once dirname(__DIR__, 2).'/vendor/autoload.php';
     }
 
     /**
-     * Handles error configuration based on the environment.
-     *
-     * This function adjusts error reporting settings based on the environment,
-     * controlling the display of errors and logging them to a specified file.
-     * In the production environment, errors are suppressed for security and user experience reasons.
-     * In other environments, all errors are displayed, aiding in development and debugging.
+     * Loads error handler from cml-error.php
      */
-    $errorfile = dirname(__DIR__, 2).ERRORLOG_FILE;
-
-    if (PRODUCTION === true) {
-        mysqli_report(MYSQLI_REPORT_OFF);
-        error_reporting(0);
-        ini_set('display_errors', 0);
-    } else {
-        error_reporting(E_ALL);
-        ini_set('display_errors', 1);
-    }
-
-    if (file_exists($errorfile)){
-        ini_set('log_errors', 1);
-        ini_set('error_log', $errorfile);
+    if (file_exists($handler = __DIR__.'/cml-error.php')){
+        require_once $handler;
     }
 
 ?>

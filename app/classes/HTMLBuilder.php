@@ -205,6 +205,27 @@ class HTMLBuilder {
         if ($src) $this->addResource($src, $this->scripts, $attributes);
     }
 
+
+    /**
+     * Renders a specified component with optional variables and includes it in the output.
+     *
+     * @param string $component The name of the component to be rendered.
+     * @param array $variables An associative array of variables to be extracted and made available within the component.
+     */
+    public function component(string $component, array $variables = []) {
+        $component = str_replace(".php", '', $component).".php";
+        $path = self::getRootPath(COMPONENTS_PATH.$component);
+        
+        if (file_exists($path)) {
+            extract($variables);
+            ob_start();
+            include $path;
+            echo $this->minifyHTML(ob_get_clean());
+        } else {
+            trigger_error(htmlentities("Component $component | not found in ".$path), E_USER_ERROR);
+        }
+    }
+
     /**
      * Generic function to add content (header or footer) to the HTML document.
      *

@@ -53,6 +53,12 @@ define('DB_CHARSET', 'utf8mb4');
 define('PRODUCTION', false);
 
 /** 
+ * Enable enhanced error display for better debugging.
+ * Set to true to activate improved error messages.
+ */
+define('CML_DEBUG', true);
+
+/** 
  * Define the path to the log file.
  * 
  * Set the value of 'LOG_FILE' to the absolute path of the log file you want to use.
@@ -91,6 +97,11 @@ define('SQL_PATH', 'sql/');
  * Specify the directory path where site-specific files are located.
  */
 define('SITES_PATH', 'web/sites/');
+
+/** 
+ * Specify the folder path to the components.
+ */
+define('COMPONENTS_PATH', 'web/components/');
 
 /** 
  * File path to the footer.
