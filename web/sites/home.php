@@ -5,7 +5,7 @@
 
 <main>
     <span id="last-update">Last update: <?=$last_update?></span>
-    <h2>Thank you for Downloading the <a id="cml-text" href="https://github.com/CallMeLeon167/CML-Framework" target="_blank">CML-Framework</a> <?=$version?></h2>
+    <h2>Thank you for Downloading the <a id="cml-text" href="https://github.com/CallMeLeon167/CML-Framework" target="_blank">CML-Framework</a> v<?=$this->getFrameworkVersion()?></h2>
     <h3>A small project that started on <?=$createdate?></h3>
     <a id="docs-button" href="https://docs.callmeleon.de" target="_blank">Documentation</a>
     <span id="thanks">A special thanks to all contributors:</span>
