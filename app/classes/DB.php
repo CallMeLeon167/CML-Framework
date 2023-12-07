@@ -150,10 +150,8 @@ class DB {
         
         $sqlContent = file_get_contents($filepath);
         $queries = explode(';', $sqlContent);
-        
-        $sqlArray = array_map(fn($query) => $this->sql2array(trim($query), $params), array_filter($queries));
-        
-        return $sqlArray;
+
+        return array_map(fn($query) => $this->sql2array(trim($query), $params), array_filter($queries));
     }
     
     /**

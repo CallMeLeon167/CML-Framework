@@ -16,7 +16,7 @@ trait Functions{
      *
      * @return string The current version of the framework.
      */
-    public static function getFrameworkVersion(){
+    public static function getFrameworkVersion():string{
         return self::$cml_version;
     } 
 
@@ -86,7 +86,7 @@ trait Functions{
      * @param string $path (optional) A path to append to the root directory.
      * @return string containing the path to the root directory.
      */
-    public static function getRootPath(string $path = ''){
+    public static function getRootPath(string $path = ''):string{
         return (dirname(__DIR__, 3) . '/' . ltrim($path, "/"));
     }
 }
@@ -124,11 +124,7 @@ trait Session {
      */
     public function getSessionData(string $key) {
         $this->startSession();
-        if (isset($_SESSION[$key])) {
-            return $_SESSION[$key];
-        } else {
-            return null;
-        }
+        return $_SESSION[$key] ?? null;
     }
 
     /**

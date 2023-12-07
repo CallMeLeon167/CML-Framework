@@ -194,10 +194,9 @@
      * @param string $dir The absolute file path.
      * @return string The relative file path.
      */
-    function getFilePath(string $dir) {
+    function getFilePath(string $dir):string {
         $documentRoot = str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']);
-        $relativePath = str_replace($documentRoot, '', str_replace('\\', '/', $dir));
-        return $relativePath;
+        return str_replace($documentRoot, '', str_replace('\\', '/', $dir));
     }
 
     /**

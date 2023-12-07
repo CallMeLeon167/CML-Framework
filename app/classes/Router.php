@@ -114,7 +114,7 @@ class Router extends \CML\Classes\HTMLBuilder{
      *
      * @return bool
      */
-    public function isApi(){
+    public function isApi():bool{
         header('Content-Type: application/json');
         return $this->isApi = true;
     }
@@ -123,9 +123,9 @@ class Router extends \CML\Classes\HTMLBuilder{
      * Get a route parameter by name.
      *
      * @param string $paramName
-     * @return mixed|null
+     * @return string|null
      */
-    public function getRouteParam($paramName) {
+    public function getRouteParam(string $paramName) {
         return $this->currentRouteParams[$paramName] ?? null;
     }
 
@@ -147,7 +147,7 @@ class Router extends \CML\Classes\HTMLBuilder{
      * @param string $url The URL for the redirect
      */
     public function setErrorRedirect(string $url){
-        return $this->redirectUrl = parent::assetUrl($url);
+        $this->redirectUrl = parent::assetUrl($url);
     }
 
     /**
@@ -161,7 +161,7 @@ class Router extends \CML\Classes\HTMLBuilder{
         if (file_exists($sitePath)) {
             return $this->errorPage = $sitePath;
         } else {
-            trigger_error(htmlentities("Could not find the file $this->sitesPath.$siteName", E_USER_ERROR));
+            return trigger_error(htmlentities("Could not find the file $this->sitesPath.$siteName", E_USER_ERROR));
         }
     }
 
@@ -169,7 +169,7 @@ class Router extends \CML\Classes\HTMLBuilder{
      * Add a global middleware for routes not in the specified array of URLs.
      *
      * @param array $urls An array of URLs for the redirect
-     * @param \Closure $gloMiddleware
+     * @param Closure $gloMiddleware
      */
     public function addGlobalMiddleware(array $urls, \Closure $gloMiddleware){
         $this->globalMiddleware['function'][] = $gloMiddleware;
@@ -181,7 +181,7 @@ class Router extends \CML\Classes\HTMLBuilder{
     /**
      * Add a middleware to be executed before or after a route callback.
      *
-     * @param \Closure $middleware The middleware function to be added.
+     * @param Closure $middleware The middleware function to be added.
      * @param string $position The position (before or after)
      * @return $this
      */
@@ -197,7 +197,7 @@ class Router extends \CML\Classes\HTMLBuilder{
      *
      * @param array|string $methods The HTTP methods (e.g., ['GET', 'POST']) or a single method as a string.
      * @param string $url The URL for the route
-     * @param \Closure $target The callback function for the route
+     * @param Closure $target The callback function for the route
      * @param int $statusCode The HTTP status code for the route
      * @return object
      */
@@ -241,7 +241,7 @@ class Router extends \CML\Classes\HTMLBuilder{
      * The addGroup feature allows bundling of related routes under a common URL prefix for better structure and organization in routing.
      *
      * @param string $prefix The common initial part of the URLs for the bundled routes (e.g., "/admin").
-     * @param \Closure $callback A function that defines the specific routes for this group and adds them to the router.
+     * @param Closure $callback A function that defines the specific routes for this group and adds them to the router.
      * @return object
      */
     public function addGroup(string $prefix, \Closure $callback) {
@@ -350,7 +350,7 @@ class Router extends \CML\Classes\HTMLBuilder{
                     $this->executeMiddleware('after', $url);
     
                     // Close the application
-                    ($this->isApi == false && $routeData['ajaxOnly'] == false) ? parent::build_end() : exit;
+                    (!$this->isApi && !$routeData['ajaxOnly']) ? parent::build_end() : exit;
                 }
             }
         }
@@ -364,7 +364,7 @@ class Router extends \CML\Classes\HTMLBuilder{
      *
      * @return bool True if all conditions are met, false otherwise.
      */
-    protected function checkWhereConditions(array $parameterValues, array $whereConditions) {
+    protected function checkWhereConditions(array $parameterValues, array $whereConditions):bool {
         foreach ($whereConditions as $paramName => $condition) {
             if (isset($parameterValues[$paramName]) && !preg_match($condition, $parameterValues[$paramName])) {
                 return false;
@@ -380,7 +380,7 @@ class Router extends \CML\Classes\HTMLBuilder{
      * @param string $position The position of the middleware (before or after)
      * @param string $url The URL for which the middleware should be executed
      */
-    protected function executeMiddleware($position, $url) {
+    protected function executeMiddleware(string $position, string $url) {
         if (!empty($this->middlewares)) {
             $mdPosition = array_search($url, $this->middlewares["route"]);
             if (is_int($mdPosition) && $this->middlewares['position'][$mdPosition] === $position) {

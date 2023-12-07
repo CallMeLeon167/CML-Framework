@@ -98,6 +98,7 @@ class HTMLBuilder {
     public function addHtmlTagAttributes(string $attr = '') {
         $this->htmlAttr = $attr;
     }
+
     /**
      * Set body tag attributes for the document.
      *
@@ -121,7 +122,7 @@ class HTMLBuilder {
      * 
      * @return string The lang attribute of the document.
      */
-    public function getLang() {
+    public function getLang():string {
         return $this->lang;
     }
 
@@ -178,7 +179,7 @@ class HTMLBuilder {
      */
     public function addHook(string $hookName, $contentSource) {
         if(!in_array($hookName, $this->regHooks)){
-            trigger_error("Invalid hookname: $hookName", E_USER_ERROR);
+            trigger_error("Invalid hook name: $hookName", E_USER_ERROR);
         }
         $this->hooks[$hookName] = [
             'source' => $contentSource,
@@ -236,8 +237,7 @@ class HTMLBuilder {
     protected function addContent(string $const, string $content, string &$property) {
         $contentFile = $const ?? '';
         if (empty($contentFile) && empty($content)) {
-            trigger_error("Could not set the $const", E_USER_ERROR);
-            return;
+            return trigger_error("Could not set the $const", E_USER_ERROR);
         }
 
         if (!empty($content)) {
@@ -376,15 +376,14 @@ class HTMLBuilder {
      *
      * @return string The minified HTML content without unnecessary spaces and comments.
      */
-    public function minifyHTML(string $html) {
+    public function minifyHTML(string $html):string {
         if ($this->minifyHTML === true) {
             // Remove spaces, line breaks, and tabs
             $minified = preg_replace('/\s+/', ' ', $html);
             // Remove HTML comments
             $minified = preg_replace('/<!--(.|\s)*?-->/', '', $minified);
             // Remove unnecessary spaces around tags
-            $minified = preg_replace('/>\s+</', '><', $minified);
-            return $minified;
+            return preg_replace('/>\s+</', '><', $minified);
         } else {
             return $html;
         }
