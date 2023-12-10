@@ -120,13 +120,22 @@ class Router extends \CML\Classes\HTMLBuilder{
     }
 
     /**
-     * Get a route parameter by name.
+     * Get the value of a route parameter.
      *
-     * @param string $paramName
-     * @return string|null
+     * If $paramName is empty, returns an array of all current route parameters.
+     * If $paramName is specified, returns the value of the corresponding route parameter.
+     *
+     * @param mixed $paramName The name of the route parameter to retrieve. (optional)
+     * @return mixed|array|null The value of the specified route parameter, an array of all route parameters, or null if the parameter is not found.
      */
-    public function getRouteParam(string $paramName) {
-        return $this->currentRouteParams[$paramName] ?? null;
+    public function getRouteParam($paramName = null) {
+        if (empty($paramName)) {
+            // Return all current route parameters
+            return $this->currentRouteParams; 
+        } else {
+            // Return the value of the specified route parameter or null if not found
+            return $this->currentRouteParams[$paramName] ?? null;
+        }
     }
 
     /**
@@ -344,6 +353,7 @@ class Router extends \CML\Classes\HTMLBuilder{
     
                     // Call the target function with the extracted parameter values
                     $parameterValues = $this->sanitizeStringsArray(array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY));
+                    $this->currentRouteParams = $parameterValues;
                     call_user_func_array($routeData['target'], $parameterValues);
     
                     // Execute middleware functions after the target function
