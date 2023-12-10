@@ -36,6 +36,7 @@
      * @param int    $errline The line number the error was raised at.
      */
     function customError($errno, $errstr, $errfile, $errline) {
+        global $errorfile;
 
         $errorTypes = [
             E_ERROR => 'Error',
@@ -45,8 +46,12 @@
         ];
     
         $errorTypeString = $errorTypes[$errno] ?? 'Unknown Error Type';
-        $id = substr(str_shuffle('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 8);
+        $id = substr(str_shuffle('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 20);
         $trace = debug_backtrace(2);
+        if (file_exists($errorfile)){
+            error_log("[ID: {$id}] ", 3, $errorfile);
+        }
+        
         ob_start();
         echo "
         <script>
@@ -74,8 +79,8 @@
         .error-versions{display: flex;flex-direction: column;align-items: flex-end;font-size:13px;color: #33333370;}
         .error-msg{margin:15px 0 0 0;}
         .stack-trace{width: 25%;}
-        .error-file{color: #575757;font-size: small;}
-        .file-header{text-align: end}
+        .error-file, .error-id{color: #575757;font-size: small;}
+        .file-header{display: flex;flex-direction: column;align-items: flex-end;}
         .stack-trace h3{margin:10px}
         .stack-trace-data{display: flex;flex-direction: column;gap: 5px;font-size: 14px;padding: 10px;border-radius: 5px;}
         .error-type{padding: 5px 10px;margin: 10px;background-color: #ededed;border-radius:5px}
@@ -104,6 +109,7 @@
                 <div class='error-info'>
                     <span class='error-type'>{$errorTypeString}</span>
                     <h2 class='error-msg'>". htmlspecialchars($errstr) ."</h2>
+                    <span class='error-id'>Error-ID: {$id}</span> 
                 </div>
                 <div class='error-versions'>
                     <span>Date/Time: " . date('Y-m-d H:i:s') . "</span>
@@ -144,7 +150,7 @@
 
                 <div class='file'>
                     <div class='file-header'>
-                        <span class='error-file'>" . getFilePath($errfile) . ":{$errline}</span>
+                    <span class='error-file'>" . getFilePath($errfile) . ":{$errline}</span>
                     </div>
                     <div class='file-content'>
                     <pre><code class='language-php'>";
@@ -186,6 +192,7 @@
         </div>
     </div>";
     echo ob_get_clean();
+    return false;
     }
 
     /**
