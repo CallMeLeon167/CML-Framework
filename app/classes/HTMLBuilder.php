@@ -221,7 +221,7 @@ class HTMLBuilder {
             extract($variables);
             ob_start();
             include $path;
-            echo $this->minifyHTML(ob_get_clean());
+            return $this->minifyHTML(ob_get_clean());
         } else {
             trigger_error(htmlentities("Component $component | not found in ".$path), E_USER_ERROR);
         }
@@ -436,7 +436,6 @@ class HTMLBuilder {
         // Additional content can be added here
 
         echo $this->minifyHTML(ob_get_clean());
-        echo $this->minifyHTML($this->getHookContent('bottom_body'));
     }
 
     /**
@@ -444,6 +443,7 @@ class HTMLBuilder {
      */
     public function build_end() {
         ob_start();
+        echo $this->minifyHTML($this->getHookContent('bottom_body'));
         echo $this->footer;
         echo '</body>';
         echo $this->getHookContent('after_body');
