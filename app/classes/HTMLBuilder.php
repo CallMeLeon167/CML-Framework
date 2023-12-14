@@ -290,7 +290,7 @@ class HTMLBuilder {
             $attributes = $this->arrayToAttributes($attributes);
         }
 
-        if (filesize($fullPath) !== 0) {
+        if (filesize(self::getRootPath($fullPath)) !== 0) {
             $container[] = '"' . self::assetUrl($fullPath) . '"' . $attributes;
         }
     }
