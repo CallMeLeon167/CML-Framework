@@ -1,7 +1,7 @@
 {
   "name": "callmeleon167/cml-framework",
   "description": "A PHP Framework that saves you time and scales with your development process. Provides everything you need to build a Web app. All in one place, designed to work together perfectly.",
-  "type": "library",
+  "type": "project",
   "license": "MIT",
   "require": {
     "php": ">=7.4.0",
@@ -19,5 +19,12 @@
       "CML\\Controllers\\": "controllers/",
       "CML\\Classes\\Functions\\": "app/classes/Functions/"
     }
-  }
+  },
+  "config": {
+    "optimize-autoloader": true,
+    "preferred-install": "dist",
+    "sort-packages": true
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true
 }
