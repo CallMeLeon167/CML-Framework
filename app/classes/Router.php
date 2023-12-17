@@ -120,6 +120,26 @@ class Router extends \CML\Classes\HTMLBuilder{
     }
 
     /**
+     * Get all defined routes.
+     *
+     * @return array An array containing all defined routes.
+     */
+    public function getAllRoutes(): array {
+        $allRoutes = [];
+
+        foreach ($this->routes as $method => $routes) {
+            foreach ($routes as $url => $routeData) {
+                $allRoutes[] = [
+                    'method' => $method,
+                    'url' => $url,
+                ];
+            }
+        }
+
+        return $allRoutes;
+    }
+
+    /**
      * Get the value of a route parameter.
      *
      * If $paramName is empty, returns an array of all current route parameters.
