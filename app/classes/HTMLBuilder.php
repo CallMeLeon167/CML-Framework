@@ -191,9 +191,10 @@ class HTMLBuilder {
      *
      * @param string $href The path to the stylesheet.
      * @param string|array $attributes Additional attributes for the link element (optional).
+     * @param bool $fromRoot Whether the path is relative to the document root.
      */
-    public function addStyle(string $href, $attributes = "") {
-        if ($href) $this->addResource($href, $this->styles, $attributes);
+    public function addStyle(string $href, $attributes = "", bool $fromRoot = false) {
+        if ($href) $this->addResource($href, $this->styles, $attributes, $fromRoot);
     }
 
     /**
@@ -201,9 +202,10 @@ class HTMLBuilder {
      *
      * @param string $src The path to the script.
      * @param string|array $attributes Additional attributes for the script element (optional).
+     * @param bool $fromRoot Whether the path is relative to the document root.
      */
-    public function addScript(string $src, $attributes = "") {
-        if ($src) $this->addResource($src, $this->scripts, $attributes);
+    public function addScript(string $src, $attributes = "", bool $fromRoot = false) {
+        if ($src) $this->addResource($src, $this->scripts, $attributes, $fromRoot);
     }
 
 
@@ -273,11 +275,12 @@ class HTMLBuilder {
      * @param string $path The path to the resource.
      * @param array &$container The container (styles or scripts) to which the resource should be added.
      * @param string|array $attributes Additional attributes for the HTML element (e.g., 'media="screen"', 'async', 'defer', etc.).
+     * @param bool $fromRoot Whether the path is relative to the document root.
      */
-    protected function addResource(string $path, array &$container, $attributes = "") {
+    protected function addResource(string $path, array &$container, $attributes = "", bool $fromRoot = false) {
         $const = $container === $this->styles ? 'STYLE_PATH' : 'SCRIPT_PATH';
-        $envPath = constant($const) ?? '';
-        $fullPath = $envPath ? $envPath . $path : $path;
+        
+        $fullPath = $fromRoot ? "/$path" : (constant($const) ?? '') . $path;
 
         if (!file_exists(self::getRootPath($fullPath))) {
             $resourceType = $container === $this->styles ? 'stylesheet' : 'script';
