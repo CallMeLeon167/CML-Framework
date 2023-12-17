@@ -166,8 +166,7 @@ class Router extends \CML\Classes\HTMLBuilder{
      */
     private function handleRouteNotFound(string $url, string $method) {
         header("HTTP/1.1 404 Not Found");
-        trigger_error("Site not found => Route is Wrong.<br>
-        <h3>Route not found for URL: <b>$url</b> (Method: <b>$method</b>)</h3>", E_USER_ERROR);
+        trigger_error("Route not found for URL: '$url' (Method: $method)", E_USER_ERROR);
     }
 
     /**
