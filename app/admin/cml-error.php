@@ -22,10 +22,8 @@
         mysqli_report(PRODUCTION ? MYSQLI_REPORT_OFF : MYSQLI_REPORT_ERROR);
     }
 
-    if (file_exists($errorfile)){
-        ini_set('log_errors', 1);
-        ini_set('error_log', $errorfile);
-    }
+    ini_set('log_errors', 1);
+    ini_set('error_log', $errorfile);
 
     /**
      * Custom error handler function.
