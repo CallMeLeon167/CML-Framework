@@ -176,13 +176,15 @@ class HTMLBuilder {
      *
      * @param string   $hookName      The name of the hook (e.g., 'before_head', 'after_head', 'top_body', etc.).
      * @param mixed    $contentSource The file path, a callable function, or HTML code to provide content.
+     * @param int      $level         The priority level for rendering the content (higher levels are rendered first).
      */
-    public function addHook(string $hookName, $contentSource) {
+    public function addHook(string $hookName, $contentSource, int $level = 0) {
         if(!in_array($hookName, $this->regHooks)){
             trigger_error("Invalid hook name: $hookName", E_USER_ERROR);
         }
-        $this->hooks[$hookName] = [
+        $this->hooks[$hookName][] = [
             'source' => $contentSource,
+            'level' => $level,
         ];
     }
 
@@ -349,23 +351,39 @@ class HTMLBuilder {
      */
     protected function getHookContent(string $hookName) {
         if (isset($this->hooks[$hookName])) {
-            $hook = $this->hooks[$hookName];
-            $contentSource = $hook['source'];
+            $hooks = $this->hooks[$hookName];
+            $this->sortByKey($hooks, "level");
 
-            if (is_callable($contentSource)) {
-                $content = call_user_func($contentSource);
-                return is_string($content) ? $content : '';
-            } elseif (file_exists(self::getRootPath($contentSource))) {
-                ob_start();
-                include self::getRootPath($contentSource);
-                return ob_get_clean();
-            } elseif (is_string($contentSource)) {
-                return $contentSource;
-            } else {
-                trigger_error("Invalid content source for the hook: $hookName", E_USER_ERROR);
+            foreach ($hooks as $hook) {
+                $contentSource = $hook['source'];
+                
+                if (is_callable($contentSource)) {
+                    $content = call_user_func($contentSource);
+                    echo is_string($content) ? $content : '';
+                } elseif (file_exists(self::getRootPath($contentSource))) {
+                    ob_start();
+                    include self::getRootPath($contentSource);
+                    echo ob_get_clean();
+                } elseif (is_string($contentSource)) {
+                    echo $contentSource;
+                } else {
+                    trigger_error("Invalid content source for the hook: $hookName", E_USER_ERROR);
+                }
             }
         }
         return '';
+    }
+
+    /**
+     * Sorts an array of associative arrays based on a specified key.
+     *
+     * @param array $array The array to be sorted (passed by reference).
+     * @param string $key The key by which the array should be sorted.
+     */
+    protected function sortByKey(array &$array, $key) {
+        usort($array, function($a, $b) use ($key) {
+            return $b[$key] - $a[$key];
+        });
     }
 
     /**
