@@ -76,18 +76,20 @@ class HTMLBuilder {
      * Adds a header element to the HTML document.
      *
      * @param string $header The header element to add.
+     * @param array $variables Associative array of variables to be extracted and made available in the included file.
      */
-    public function addHeader(string $header = '') {
-        $this->addContent(HEADER_FILE, $header, $this->header);
+    public function addHeader(string $header = '', array $variables = []) {
+        $this->addContent(HEADER_FILE, $header, $this->header, $variables);
     }
 
     /**
      * Adds a footer element to the HTML document.
      *
      * @param string $footer The footer element to add.
+     * @param array $variables Associative array of variables to be extracted and made available in the included file.
      */
-    public function addFooter(string $footer = '') {
-        $this->addContent(FOOTER_FILE, $footer, $this->footer);
+    public function addFooter(string $footer = '', array $variables = []) {
+        $this->addContent(FOOTER_FILE, $footer, $this->footer, $variables);
     }
 
     /**
@@ -237,8 +239,9 @@ class HTMLBuilder {
      * @param string $const
      * @param string $content The content to add.
      * @param string &$property The property to store the content in.
+     * @param array $variables Associative array of variables to be extracted and made available in the included file.
      */
-    protected function addContent(string $const, string $content, string &$property) {
+    protected function addContent(string $const, string $content, string &$property, array $variables = []) {
         $contentFile = $const ?? '';
         if (empty($contentFile) && empty($content)) {
             return trigger_error("Could not set the $const", E_USER_ERROR);
@@ -248,6 +251,7 @@ class HTMLBuilder {
             $property = $content;
         } else {
             if (file_exists(self::getRootPath($contentFile))) {
+                extract($variables);
                 ob_start();
                 include self::getRootPath($contentFile);
                 $property = ob_get_clean();
