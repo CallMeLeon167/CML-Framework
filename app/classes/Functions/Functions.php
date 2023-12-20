@@ -31,7 +31,7 @@ trait Functions{
      */
     public function assetUrl(string $path): string {
         $baseUrl = dirname($_SERVER['SCRIPT_NAME']);
-        return ($baseUrl == "/") ? "/" . ltrim($path, '/') : $baseUrl . "/" . ltrim($path, '/');
+        return rtrim($baseUrl, '/') . '/' . ltrim($path, '/');
     }
 
     /**
