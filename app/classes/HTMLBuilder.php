@@ -7,7 +7,7 @@ namespace CML\Classes;
  * @author CallMeLeon <kontakt@callmeleon.de>
  * @see https://docs.callmeleon.de/cml#html-builder
  */
-class HTMLBuilder {
+abstract class HTMLBuilder {
     use Functions\Functions;
     
     private bool $minifyHTML = false;
