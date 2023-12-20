@@ -312,20 +312,29 @@ abstract class HTMLBuilder {
      * @param string $fileExtension The file extension to use for the compressed file.
      * @return string The path to the compressed file.
      */
-    protected static function compressFile(string $path, string $configPath, string $fileExtension):string {
+    protected static function compressFile(string $path, string $configPath, string $fileExtension): string {
         $newFileName = str_replace($fileExtension, ".min{$fileExtension}", $path);
-
-        $content = file_get_contents(self::getRootPath($configPath ? $configPath . $path : $path));
-        if (empty($content)) return false;
-        $content = preg_replace('/\/\/[^\n\r]*|\/\*[\s\S]*?\*\//', '', $content);
-        $content = preg_replace('/\s*([{}:;,=()])\s*/', '$1', $content);
-        $content = preg_replace('/;\s*}/', '}', $content);
-        $content = preg_replace('/\s+/', ' ', $content);
-
-        $file = fopen(self::getRootPath($configPath) . $newFileName, "w");
-        fwrite($file, $content);
-        fclose($file);
-
+        $filePath = self::getRootPath($configPath ? $configPath . $path : $path);
+    
+        if (!is_readable($filePath)) {
+            return trigger_error(htmlentities($filePath) . " - File does not exists or is not readable", E_USER_ERROR);
+        }
+    
+        $fileContent = file_get_contents($filePath);
+    
+        if ($fileContent === false || $fileContent === '') {
+            return '';
+        }
+    
+        $fileContent = preg_replace(
+            ['/\/\/[^\n\r]*/', '/\/\*[\s\S]*?\*\//', '/\s*([{}:;,=()])\s*/', '/;\s*}/', '/\s+/'],
+            ['', '', '$1', '}', ' '],
+            $fileContent
+        );
+    
+        $filePath = self::getRootPath($configPath) . $newFileName;
+        file_put_contents($filePath, $fileContent);
+    
         return $newFileName;
     }
 
