@@ -8,7 +8,7 @@ trait Functions{
      *
      * @var string
      */
-    private static string $cml_version = "2.3.3";
+    private static string $cml_version = "2.3.4";
 
     /**
      * Retrieves the current version of the framework.
