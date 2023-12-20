@@ -142,12 +142,12 @@ class Router extends \CML\Classes\HTMLBuilder{
      * @return mixed|array|null The value of the specified route parameter, an array of all route parameters, or null if the parameter is not found.
      */
     public function getRouteParam($paramName = null) {
-        if (empty($paramName)) {
+        if (is_null($paramName)) {
             // Return all current route parameters
             return $this->currentRouteParams; 
         } else {
             // Return the value of the specified route parameter or null if not found
-            return $this->currentRouteParams[$paramName] ?? null;
+            return isset($this->currentRouteParams[$paramName]) ? $this->currentRouteParams[$paramName] : null;
         }
     }
 
