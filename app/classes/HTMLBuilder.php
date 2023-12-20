@@ -434,52 +434,100 @@ abstract class HTMLBuilder {
     }
 
     /**
-     * Builds the HTML document with configured elements and displays it.
+     * Builds the complete HTML structure.
      */
     public function build() {
         ob_start();
+        $this->buildHtmlStart();
+        $this->buildHead();
+        $this->buildBody();
+        echo $this->minifyHTML(ob_get_clean());
+    }
+    
+    /**
+     * Builds the opening HTML tags and outputs any content hooks before the head.
+     */
+    protected function buildHtmlStart() {
         ?>
         <!DOCTYPE html>
         <html lang="<?= $this->lang ?>"<?= $this->htmlAttr?>>
         <?= $this->getHookContent(self::BEFORE_HEAD); ?>
+        <?php
+    }
+    
+    /**
+     * Builds the head section of the HTML document with meta tags, title, scripts, and styles.
+     */
+    protected function buildHead() {
+        ?>
         <head>
             <?= $this->getHookContent(self::TOP_HEAD); ?>
             <meta charset="<?= $this->charset ?>">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <?php foreach ($this->metas as $meta): ?>
-                <meta <?= $meta ?>>
-            <?php endforeach; ?>
+            <?php $this->buildMetas(); ?>
             <title><?= empty($this->title) ? APP_NAME : $this->title?></title>
             <?= !empty($this->ajaxUrl) ? "<script>let ajax_url = '{$this->ajaxUrl}'</script>" : ''?>
             <link rel="icon" type="image/x-icon" href="<?= self::assetUrl($this->favicon) ?>">
-            <?php foreach ($this->cdns as $cdns): ?>
-                <?php foreach ($cdns as $tag => $attributes): ?>
-                    <<?= $tag ?> <?= $attributes ?>>
-                    <?php if ($tag == "script"): ?>
-                        </<?= $tag ?>>
-                    <?php endif; ?>
-                <?php endforeach; ?>
-            <?php endforeach; ?>
-
-            <?php foreach ($this->styles as $style): ?>
-                <link rel="stylesheet" href=<?= $style ?>>
-            <?php endforeach; ?>
-            <?php foreach ($this->scripts as $script): ?>
-                <script src=<?= $script ?>></script>
-            <?php endforeach; ?>
+            <?php $this->buildCdns(); ?>
+            <?php $this->buildStyles(); ?>
+            <?php $this->buildScripts(); ?>
             <?= $this->getHookContent(self::BOTTOM_HEAD); ?>
         </head>
         <?= $this->getHookContent(self::AFTER_HEAD); ?>
+        <?php
+    }
 
+    /**
+     * Builds the body section of the HTML document with hooks, header content, etc.
+     */   
+    protected function buildBody() {
+        ?>
         <?= $this->getHookContent(self::BEFORE_BODY); ?>
         <body <?= $this->bodyAttr ?>>
         <?= $this->getHookContent(self::TOP_BODY); ?>
         <?php
         echo $this->header;
+    }
     
-        // Additional content can be added here
-
-        echo $this->minifyHTML(ob_get_clean());
+    /**
+     * Builds meta tags in the head section based on the provided array of meta attributes.
+     */
+    protected function buildMetas() {
+        foreach ($this->metas as $meta): ?>
+            <meta <?= $meta ?>>
+        <?php endforeach;
+    }
+    
+    /**
+     * Builds content delivery network (CDN) links based on the provided array of CDNs.
+     */
+    protected function buildCdns() {
+        foreach ($this->cdns as $cdns): ?>
+            <?php foreach ($cdns as $tag => $attributes): ?>
+                <<?= $tag ?> <?= $attributes ?>>
+                <?php if ($tag == "script"): ?>
+                    </<?= $tag ?>>
+                <?php endif; ?>
+            <?php endforeach; ?>
+        <?php endforeach;
+    }
+    
+    /**
+     * Builds stylesheet links in the head section based on the provided array of styles.
+     */
+    protected function buildStyles() {
+        foreach ($this->styles as $style): ?>
+            <link rel="stylesheet" href=<?= $style ?>>
+        <?php endforeach;
+    }
+  
+    /**
+     * Builds script tags in the head or body section based on the provided array of scripts.
+     */
+    protected function buildScripts() {
+        foreach ($this->scripts as $script): ?>
+            <script src=<?= $script ?>></script>
+        <?php endforeach;
     }
 
     /**
