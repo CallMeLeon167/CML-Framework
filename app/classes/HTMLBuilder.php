@@ -9,6 +9,16 @@ namespace CML\Classes;
  */
 abstract class HTMLBuilder {
     use Functions\Functions;
+
+    const BEFORE_HEAD = 'before_head';
+    const TOP_HEAD = 'top_head';
+    const BOTTOM_HEAD = 'bottom_head';
+    const AFTER_HEAD = 'after_head';
+    const BEFORE_BODY = 'before_body';
+    const TOP_BODY = 'top_body';
+    const BOTTOM_BODY = 'bottom_body';
+    const AFTER_BODY = 'after_body';
+
     
     private bool $minifyHTML = false;
     private string $ajaxUrl = "";
@@ -27,14 +37,14 @@ abstract class HTMLBuilder {
     private array $cdns = [];
     private array $hooks = [];
     private array $regHooks = [
-        'before_head',
-        'top_head',
-        'bottom_head',
-        'after_head',
-        'before_body',
-        'top_body',
-        'bottom_body',
-        'after_body',
+        self::BEFORE_HEAD,
+        self::TOP_HEAD,
+        self::BOTTOM_HEAD,
+        self::AFTER_HEAD,
+        self::BEFORE_BODY,
+        self::TOP_BODY,
+        self::BOTTOM_BODY,
+        self::AFTER_BODY,
     ];
 
     /**
@@ -431,9 +441,9 @@ abstract class HTMLBuilder {
         ?>
         <!DOCTYPE html>
         <html lang="<?= $this->lang ?>"<?= $this->htmlAttr?>>
-        <?= $this->getHookContent('before_head'); ?>
+        <?= $this->getHookContent(self::BEFORE_HEAD); ?>
         <head>
-            <?= $this->getHookContent('top_head'); ?>
+            <?= $this->getHookContent(self::TOP_HEAD); ?>
             <meta charset="<?= $this->charset ?>">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <?php foreach ($this->metas as $meta): ?>
@@ -457,13 +467,13 @@ abstract class HTMLBuilder {
             <?php foreach ($this->scripts as $script): ?>
                 <script src=<?= $script ?>></script>
             <?php endforeach; ?>
-            <?= $this->getHookContent('bottom_head'); ?>
+            <?= $this->getHookContent(self::BOTTOM_HEAD); ?>
         </head>
-        <?= $this->getHookContent('after_head'); ?>
+        <?= $this->getHookContent(self::AFTER_HEAD); ?>
 
-        <?= $this->getHookContent('before_body'); ?>
+        <?= $this->getHookContent(self::BEFORE_BODY); ?>
         <body <?= $this->bodyAttr ?>>
-        <?= $this->getHookContent('top_body'); ?>
+        <?= $this->getHookContent(self::TOP_BODY); ?>
         <?php
         echo $this->header;
     
@@ -477,10 +487,10 @@ abstract class HTMLBuilder {
      */
     public function build_end() {
         ob_start();
-        echo $this->minifyHTML($this->getHookContent('bottom_body'));
+        echo $this->minifyHTML($this->getHookContent(self::BEFORE_BODY));
         echo $this->footer;
         echo '</body>';
-        echo $this->getHookContent('after_body');
+        echo $this->getHookContent(self::AFTER_BODY);
         echo '</html>';
         echo $this->minifyHTML(ob_get_clean());
         exit;
