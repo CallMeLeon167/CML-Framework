@@ -125,18 +125,11 @@ class Router extends \CML\Classes\HTMLBuilder{
      * @return array An array containing all defined routes.
      */
     public function getAllRoutes(): array {
-        $allRoutes = [];
-
-        foreach ($this->routes as $method => $routes) {
-            foreach ($routes as $url => $routeData) {
-                $allRoutes[] = [
-                    'method' => $method,
-                    'url' => $url,
-                ];
-            }
-        }
-
-        return $allRoutes;
+        return array_map(function($method, $routes) {
+            return array_map(function($url) use ($method) {
+                return ['method' => $method, 'url' => $url];
+            }, array_keys($routes));
+        }, array_keys($this->routes), $this->routes);
     }
 
     /**
