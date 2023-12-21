@@ -4,6 +4,11 @@ namespace CML\Classes;
 /**
  * Class HTMLBuilder
  *
+ * HTMLBuilder provides methods for building and manipulating HTML documents.
+ * It includes functionality for adding headers, footers, styles, scripts, metas, CDNs, and hooks to the HTML document.
+ * The class also supports HTML minification and provides methods for setting the project name, title, favicon, and tag attributes.
+ * Additionally, it includes methods for rendering components and adding content to the HTML document.
+ *
  * @author CallMeLeon <kontakt@callmeleon.de>
  * @see https://docs.callmeleon.de/cml#html-builder
  */

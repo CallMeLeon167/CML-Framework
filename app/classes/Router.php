@@ -4,6 +4,10 @@ namespace CML\Classes;
 /**
  * Class Router
  *
+ * The Router class handles routing in the CML framework.
+ * It matches the requested URL and HTTP method to the defined routes,
+ * executes the corresponding callback functions, and handles error cases.
+ *
  * @author CallMeLeon <kontakt@callmeleon.de>
  * @see https://docs.callmeleon.de/cml#router
  */
