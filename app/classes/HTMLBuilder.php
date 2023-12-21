@@ -241,7 +241,7 @@ abstract class HTMLBuilder {
         if (file_exists($path)) {
             extract($variables);
             ob_start();
-            include $path;
+            require $path;
             return $this->minifyHTML(ob_get_clean());
         } else {
             trigger_error(htmlentities("Component $component | not found in ".$path), E_USER_ERROR);
@@ -268,7 +268,7 @@ abstract class HTMLBuilder {
             if (file_exists(self::getRootPath($contentFile))) {
                 extract($variables);
                 ob_start();
-                include self::getRootPath($contentFile);
+                require self::getRootPath($contentFile);
                 $property = ob_get_clean();
             } else {
                 trigger_error("$const file does not exist: $contentFile", E_USER_ERROR);
@@ -390,7 +390,7 @@ abstract class HTMLBuilder {
                     echo is_string($content) ? $content : '';
                 } elseif (file_exists(self::getRootPath($contentSource))) {
                     ob_start();
-                    include self::getRootPath($contentSource);
+                    require self::getRootPath($contentSource);
                     echo ob_get_clean();
                 } elseif (is_string($contentSource)) {
                     echo $contentSource;

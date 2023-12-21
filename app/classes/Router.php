@@ -322,7 +322,7 @@ class Router extends \CML\Classes\HTMLBuilder{
                 die;
             } elseif (!empty($this->errorPage)) {
                 parent::build();
-                include($this->errorPage);
+                require($this->errorPage);
                 parent::build_end();
             } else {
                 $this->handleRouteNotFound($url, $method);
@@ -448,7 +448,7 @@ class Router extends \CML\Classes\HTMLBuilder{
         if (file_exists($sitePath)) {
             extract($variables); // Make the variables available
             ob_start();
-            include $sitePath;
+            require $sitePath;
             echo $this->minifyHTML(ob_get_clean());
         } else {
             trigger_error(htmlentities("getSite('$siteName') | Site not found => ".$this->sitesPath.$siteName), E_USER_ERROR);
