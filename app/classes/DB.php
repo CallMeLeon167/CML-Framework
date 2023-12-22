@@ -124,7 +124,10 @@ class DB {
         $result = $stmt->get_result();
         if ($result) {
             while ($row = $result->fetch_assoc()) {
-                $cleanedRow = array_map('htmlspecialchars', $row);
+                $cleanedRow = array_map(function($value) {
+                    return ($value !== null) ? htmlspecialchars($value) : null;
+                }, $row);
+        
                 $sqlArray[] = $cleanedRow;
             }
         } else {
