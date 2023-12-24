@@ -8,7 +8,7 @@ trait Functions{
      *
      * @var string
      */
-    private static string $cml_version = "2.3.5";
+    private static string $cml_version = "2.4";
 
     /**
      * Retrieves the current version of the framework.
@@ -128,6 +128,69 @@ trait Session {
     }
 
     /**
+     * Checks if a specific key exists in the session.
+     *
+     * @param string $key The key to check.
+     *
+     * @return bool True if the key exists, false otherwise.
+     */
+    public function hasSessionData(string $key) {
+        $this->startSession();
+        return isset($_SESSION[$key]);
+    }
+
+    /**
+     * Retrieves all data from the session.
+     *
+     * @return array An associative array of all session data.
+     */
+    public function getAllSessionData() {
+        $this->startSession();
+        return $_SESSION;
+    }
+
+    /**
+     * Retrieves the path where session data is saved.
+     *
+     * @return string The session save path.
+     */
+    public function getSessionSavePath() {
+        return session_save_path();
+    }
+
+    /**
+     * Merges the given associative array with the existing session data.
+     * @param array $data Associative array to merge with the session data.
+     */
+    public function mergeSessionData(array $data) {
+        $this->startSession();
+        $_SESSION = array_merge($_SESSION, $data);
+    }
+
+    /**
+     * Sets the path where session data is saved.
+     *
+     * @param string $path The path to save session data.
+     */
+    public function setSessionSavePath(string $path) {
+        session_save_path($path);
+    }
+
+    /**
+     * Retrieves and removes a value from the session.
+     *
+     * @param string $key The key of the data to retrieve and remove.
+     *
+     * @return mixed|null The data stored under the specified key, or null if not found.
+     */
+    public function pullSessionData(string $key) {
+        $this->startSession();
+        $value = $this->getSessionData($key);
+        $this->unsetSessionData($key);
+        return $value;
+    }
+
+    /**
      * Unsets (removes) a value from the session.
      *
      * @param string $key The key of the data to remove.
@@ -137,6 +200,64 @@ trait Session {
         if (isset($_SESSION[$key])) {
             unset($_SESSION[$key]);
         }
+    }
+
+    /**
+     * Sets a timeout for the session to automatically expire.
+     *
+     * @param int $minutes The number of minutes until the session expires.
+     */
+    public function setSessionTimeout(int $minutes) {
+        $this->startSession();
+        $_SESSION['timeout'] = time() + ($minutes * 60);
+    }
+
+    /**
+     * Checks if the session has timed out.
+     *
+     * @return bool True if the session has timed out, false otherwise.
+     */
+    public function isSessionTimedOut() {
+        $this->startSession();
+        return isset($_SESSION['timeout']) && time() > $_SESSION['timeout'];
+    }
+
+    /**
+     * Regenerates the session id to prevent session fixation attacks.
+     */
+    public function regenerateSessionId() {
+        $this->startSession();
+        session_regenerate_id(true);
+    }
+
+    /**
+     * Sets the session cookie parameters.
+     *
+     * @param int $lifetime Lifetime of the session cookie, defined in seconds.
+     * @param string $path Path on the domain where the cookie will work.
+     * @param string $domain Cookie domain, for example 'www.php.net'. To make cookies visible on all subdomains then the domain must be prefixed with a dot like '.php.net'.
+     * @param bool $secure If true cookie will only be sent over secure connections.
+     * @param bool $httponly If set to true then PHP will attempt to send the httponly flag when setting the session cookie.
+     */
+    public function setSessionCookieParams(int $lifetime, string $path = '/', string $domain = '', bool $secure = false, bool $httponly = true) {
+        session_set_cookie_params($lifetime, $path, $domain, $secure, $httponly);
+    }
+
+    /**
+     * Clears all values from the session.
+     */
+    public function clearSession() {
+        $this->startSession();
+        $_SESSION = array();
+    }
+
+    /**
+     * Checks if the session has been started.
+     *
+     * @return bool True if the session has been started, false otherwise.
+     */
+    public function isSessionStarted() {
+        return session_status() == PHP_SESSION_ACTIVE;
     }
 
     /**
