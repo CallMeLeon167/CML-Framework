@@ -105,6 +105,30 @@ trait Session {
     }
 
     /**
+     * Manages session based on the provided data.
+     *
+     * If $data is a string, retrieves the corresponding session value.
+     * If $data is an array, sets session values based on the key-value pairs in the array.
+     * If $data is neither a string nor an array, returns null.
+     *
+     * @param string|array $data The session data or key-value pairs.
+     *
+     * @return mixed|null The session data or null if not found.
+     */
+    public function session($data){
+        $this->startSession();
+        if (is_string($data)) {
+            return $this->getSessionData($data);
+        } elseif (is_array($data)) {
+            foreach ($data as $key => $value) {
+                $this->setSessionData($key, $value);
+            }
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * Sets a value in the session.
      *
      * @param string $key The key under which the data will be stored.
