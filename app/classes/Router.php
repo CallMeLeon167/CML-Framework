@@ -100,6 +100,13 @@ class Router extends \CML\Classes\HTMLBuilder{
     protected $whereConditions = [];
 
     /**
+     * Stores the named routes with their corresponding URLs.
+     *
+     * @var array
+     */
+    protected array $namedRoutes = [];
+
+    /**
      * Initializes the error reporting configuration based on the PRODUCTION environment variable.
      */
     public function __construct(){
@@ -223,10 +230,10 @@ class Router extends \CML\Classes\HTMLBuilder{
      * @param array|string $methods The HTTP methods (e.g., ['GET', 'POST']) or a single method as a string.
      * @param string $url The URL for the route
      * @param Closure $target The callback function for the route
-     * @param int $statusCode The HTTP status code for the route
+     * @param string $name The name for the route
      * @return object
      */
-    public function addRoute($methods, string $url, \Closure $target, int $statusCode = 0){
+    public function addRoute($methods, string $url, \Closure $target, string $name = '') {
         $methods = (is_array($methods)) ? $methods : [$methods]; // Convert to an array if it's a single method
         $this->currentRoute = $url;
 
@@ -234,16 +241,56 @@ class Router extends \CML\Classes\HTMLBuilder{
             $this->currentMethod = $method;
             $this->routes[$method][$url] = [
                 'target' => $target,
-                'statusCode' => $statusCode,
+                'name' => $name,
                 'ajaxOnly' => false,
                 'params' => [],
-                'where' => $this->whereConditions, // Use where conditions from the router instance
+                'where' => $this->whereConditions,
             ];
+
+            if (!empty($name)) {
+                $this->namedRoutes[$name] = $url;
+            }
         }
 
         $this->whereConditions = []; // Clear where conditions
 
         return $this;
+    }
+
+    /**
+     * Redirect to the specified named route.
+     *
+     * @param string $name The name of the route to redirect to
+     */
+    public function redirectTo(string $name) {
+        if (isset($this->namedRoutes[$name])) {
+            $url = $this->assetUrl($this->namedRoutes[$name]);
+            header("Location: $url");
+            exit;
+        } else {
+            trigger_error("Route with name '$name' not found.", E_USER_ERROR);
+        }
+    }
+
+    /**
+     * Get the URL for a named route with placeholder replacement.
+     *
+     * @param string $name The name of the route
+     * @param array $parameters Associative array of parameter values to replace placeholders
+     * @return string|null The URL for the named route with replaced placeholders or null if not found
+     */
+    public function getNamedRouteUrl(string $name, array $parameters = []): ?string {
+        if (isset($this->namedRoutes[$name])) {
+            $url = $this->namedRoutes[$name];
+
+            // Replace placeholders in the URL with actual values from the parameters array
+            foreach ($parameters as $paramName => $paramValue) {
+                $url = str_replace(":$paramName", $paramValue, $url);
+            }
+
+            return $url;
+        }
+        return null;
     }
     
     /**
@@ -354,11 +401,6 @@ class Router extends \CML\Classes\HTMLBuilder{
     
                 // Check "where" conditions
                 if ($this->checkWhereConditions($matches, $whereConditions)) {
-                    // Set the HTTP status code if provided
-                    if ($routeData['statusCode'] > 0) {
-                        http_response_code($routeData['statusCode']);
-                    }
-    
                     // Execute global middleware function
                     if (!empty($this->globalMiddleware) && !in_array($url, $this->globalMiddleware["url"])) {
                         call_user_func($this->globalMiddleware["function"][0]);
