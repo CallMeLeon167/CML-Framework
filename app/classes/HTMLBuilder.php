@@ -159,7 +159,13 @@ abstract class HTMLBuilder {
      * @param string $attr The attribute information for the CDN link.
      */
     public function addCDN(string $type, string $attr) {
+        $validTypes = ['link', 'script'];
         $type = strtolower($type);
+    
+        if (!in_array($type, $validTypes)) {
+            trigger_error("Invalid CDN type: $type", E_USER_ERROR);
+        }
+    
         $this->cdns[] = [$type => $attr];
     }
 
