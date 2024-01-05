@@ -81,6 +81,28 @@ trait Functions{
 
 
     /**
+     * Execute a method in the specified controller.
+     *
+     * @param string $controllerName The name of the controller in which the method should be called.
+     * @param string $methodName The name of the method to be called.
+     * @param array $params An optional array of parameters to be passed to the method.
+     */
+    public static function useController(string $controllerName, string $methodName, array $params = []) {
+        $controllerClassName = 'CML\\Controllers\\' . $controllerName;
+        if (class_exists($controllerClassName)) {
+            $controllerInstance = new $controllerClassName();
+            if (method_exists($controllerInstance, $methodName)) {
+                return call_user_func([$controllerInstance, $methodName], $params);
+            } else {
+                trigger_error("Method $methodName not found in controller $controllerName.", E_USER_ERROR);
+            }
+        } else {
+            trigger_error("Controller $controllerName not found. Check your controllers folder /controllers/$controllerName.php", E_USER_ERROR);
+        }
+    }
+
+
+    /**
      * Returns the absolute file path to the project's root directory.
      * 
      * @param string $path (optional) A path to append to the root directory.
