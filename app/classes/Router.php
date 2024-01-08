@@ -104,7 +104,7 @@ class Router extends \CML\Classes\HTMLBuilder{
      *
      * @var array
      */
-    protected array $namedRoutes = [];
+    public array $namedRoutes = [];
 
     /**
      * Initializes the error reporting configuration based on the PRODUCTION environment variable.
@@ -252,24 +252,11 @@ class Router extends \CML\Classes\HTMLBuilder{
             }
         }
 
+        global $cml_namedRoutes; $cml_namedRoutes = $this->namedRoutes;
+
         $this->whereConditions = []; // Clear where conditions
 
         return $this;
-    }
-
-    /**
-     * Redirect to the specified named route.
-     *
-     * @param string $name The name of the route to redirect to
-     */
-    public function redirectTo(string $name) {
-        if (isset($this->namedRoutes[$name])) {
-            $url = $this->assetUrl($this->namedRoutes[$name]);
-            header("Location: $url");
-            exit;
-        } else {
-            trigger_error("Route with name '$name' not found.", E_USER_ERROR);
-        }
     }
 
     /**

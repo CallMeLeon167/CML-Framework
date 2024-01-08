@@ -8,7 +8,7 @@ trait Functions{
      *
      * @var string
      */
-    private static string $cml_version = "2.5";
+    private static string $cml_version = "2.5.1";
 
     /**
      * Retrieves the current version of the framework.
@@ -19,6 +19,22 @@ trait Functions{
     public static function getFrameworkVersion():string{
         return self::$cml_version;
     } 
+
+    /**
+     * Redirect to the specified named route.
+     *
+     * @param string $name The name of the route to redirect to
+     */
+    public function redirectTo(string $name) {
+        global $cml_namedRoutes;
+        if (isset($cml_namedRoutes[$name])) {
+            $url = $this->assetUrl($cml_namedRoutes[$name]);
+            header("Location: $url");
+            exit;
+        } else {
+            trigger_error("Route with name '$name' not found.", E_USER_ERROR);
+        }
+    }
 
     /**
      * Generate an absolute URL for an asset based on the provided path.

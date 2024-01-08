@@ -32,4 +32,4 @@ $router->addRoute('GET', '/', function () use ($router) {
     $router->setTitle("Thank you! | CML - Framework");
     $router->build();
     $router->getSite("home.php", $apiData);
-});
+}, "home");
