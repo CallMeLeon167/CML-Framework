@@ -17,7 +17,8 @@
     "psr-4": {
       "CML\\Classes\\": "app/classes/",
       "CML\\Controllers\\": "controllers/",
-      "CML\\Classes\\Functions\\": "app/classes/Functions/"
+      "CML\\Classes\\Functions\\": "app/classes/Functions/",
+      "CML\\Classes\\ORMModel\\": "app/classes/ORMModel/"
     }
   },
   "config": {
