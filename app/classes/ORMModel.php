@@ -42,7 +42,39 @@ class ORMModel {
     }
 
     /**
-     * Find a record by its ID.
+     * Get the first record from the table.
+     *
+     * @return array|null
+     */
+    public function first(): ?array {
+        $query = "SELECT * FROM {$this->table} LIMIT 1";
+        return $this->db->sql2array($query)[0] ?? null;
+    }
+
+    /**
+     * Get the last record from the table.
+     *
+     * @return array|null
+     */
+    public function last(): ?array {
+        $query = "SELECT * FROM {$this->table} ORDER BY {$this->column} DESC LIMIT 1";
+        return $this->db->sql2array($query)[0] ?? null;
+    }
+
+    /**
+     * Get the columns of the table.
+     *
+     * @return array
+     */
+    public function getColumns(): array {
+        $query = "SHOW COLUMNS FROM {$this->table}";
+        $result = $this->db->sql2array($query);
+
+        return array_column($result, 'Field');
+    }
+
+    /**
+     * Find a record.
      *
      * @param mixed $columnName The column to search for.
      * @return array|null The found record as an array, or null if not found.
@@ -106,7 +138,7 @@ class ORMModel {
     }
 
     /**
-     * Delete a record by its ID.
+     * Delete a record.
      *
      * @param mixed $columnName The value of the column to match for deletion.
      * @return void
