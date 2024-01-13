@@ -85,6 +85,18 @@ class ORMModel {
     }
 
     /**
+     * Get records where a specific column is like a value.
+     *
+     * @param string $column The column to search for.
+     * @param mixed $value The value to match.
+     * @return array The found records as an array.
+     */
+    public function whereLike(string $column, $value): array {
+        $query = "SELECT * FROM {$this->table} WHERE {$column} LIKE ?";
+        return $this->db->sql2array($query, ["%{$value}%"]);
+    }
+
+    /**
      * Create a new record.
      *
      * @param array $data The data to be inserted into the database table.
