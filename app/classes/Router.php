@@ -445,20 +445,81 @@ class Router extends \CML\Classes\HTMLBuilder{
     }
 
     /**
-     * Loads and displays a file.
+     * Loads and displays a file with PHP components embedded in HTML tags.
      *
      * @param string $siteName The name of the desired file.
      * @param array $variables An associative array of variables to be made available in the loaded file.
      */
     public function getSite(string $siteName, array $variables = []) {
-        $sitePath = self::getRootPath($this->sitesPath.$siteName);
+        $sitePath = self::getRootPath($this->sitesPath . $siteName);
+
         if (file_exists($sitePath)) {
-            extract($variables); // Make the variables available
+            extract($variables); 
             ob_start();
             require $sitePath;
-            echo $this->minifyHTML(ob_get_clean());
+            $content = ob_get_clean();
+
+            $content = preg_replace_callback('/<(\w+)([^>]*)>([\s\S]*?)<\/\1>|<(\w+)([^>]*)>/', function($matches) {
+                if (isset($matches[4])) {
+                    $tag = $matches[4];
+                    $attributes = $matches[5];
+
+                    $componentName = $tag . '.cml.php';
+                    $componentPath = self::getRootPath(COMPONENTS_PATH . $componentName);
+
+                    if (file_exists($componentPath) && preg_match('~^\p{Lu}~u', $tag)) {
+                        $attributeValues = [];
+                        preg_match_all('/(\w+)="([^"]*)"/', $attributes, $attributeMatches);
+                        foreach ($attributeMatches[1] as $index => $attributeName) {
+                            $attributeValues[$attributeName] = $attributeMatches[2][$index];
+                        }
+
+                        foreach ($attributeValues as $attributeName => $attributeValue) {
+                            $$attributeName = $attributeValue;
+                        }
+
+                        ob_start();
+                        require $componentPath;
+                        return ob_get_clean();
+                    } else {
+                        return $matches[0]; 
+                    }
+                } elseif (!empty($matches[1])) {
+                    $tag = $matches[1];
+                    $attributes = $matches[2];
+                    $slot = $matches[3];
+
+                    if (empty($slot)) {
+                        return $matches[0];
+                    }
+
+                    $componentName = $tag . '.cml.php';
+                    $componentPath = self::getRootPath(COMPONENTS_PATH . $componentName);
+
+                    if (file_exists($componentPath) && preg_match('~^\p{Lu}~u', $tag)) {
+                        $attributeValues = [];
+                        preg_match_all('/(\w+)="([^"]*)"/', $attributes, $attributeMatches);
+                        foreach ($attributeMatches[1] as $index => $attributeName) {
+                            $attributeValues[$attributeName] = $attributeMatches[2][$index];
+                        }
+
+                        foreach ($attributeValues as $attributeName => $attributeValue) {
+                            $$attributeName = $attributeValue;
+                        }
+                        $slot = trim($slot);
+
+                        ob_start();
+                        require $componentPath;
+                        return ob_get_clean();
+                    } else {
+                        return $matches[0]; 
+                    }
+                }
+            }, $content);
+
+            echo $this->minifyHTML($content);
         } else {
-            trigger_error(htmlentities("getSite('$siteName') | Site not found => ".$this->sitesPath.$siteName), E_USER_ERROR);
+            trigger_error(htmlentities("getSite('$siteName') | Site not found => " . $this->sitesPath . $siteName), E_USER_ERROR);
         }
     }
 
