@@ -115,4 +115,11 @@ define('FOOTER_FILE', 'web/components/footer.php');
  */
 define('HEADER_FILE', 'web/components/header.php');
 
+/**
+ * Defines the base URL of the application.
+ * The base URL is determined dynamically based on the server environment.
+ * It includes the protocol (http or https), the host name, and the path to the application.
+ */
+define('BASE_URL', (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . "://" . $_SERVER['HTTP_HOST'] . str_replace($_SERVER['DOCUMENT_ROOT'], '', rtrim(dirname($_SERVER['SCRIPT_FILENAME']), '/\\')) . "/");
+
 ?>
