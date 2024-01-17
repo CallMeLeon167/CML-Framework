@@ -37,6 +37,16 @@ trait Functions{
     }
 
     /**
+     * Generates a complete URL by appending the given path to the base URL.
+     *
+     * @param string $url The path to be appended to the base URL.
+     * @return string The complete URL.
+     */
+    public function url(string $url = ""):string {
+        return BASE_URL . $url;
+    }
+
+    /**
      * Generate an absolute URL for an asset based on the provided path.
      *
      * This function appends the provided asset path to the base URL of the script,
