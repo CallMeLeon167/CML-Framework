@@ -599,46 +599,4 @@ class Router extends \CML\Classes\HTMLBuilder{
 
         return $sanitizedArray;
     }
-
-    /**
-     * Limits the number of requests per IP address within a specified time interval.
-     *
-     * This method checks and restricts the number of requests that can be made from a specific IP address
-     * within a given time interval. If the request count exceeds the limit, it sends an HTTP response with a
-     * status code 429 (Too Many Requests) and outputs the specified message.
-     *
-     * @param int    $limit    The maximum number of allowed requests within the interval.
-     * @param int    $interval The time interval in seconds during which the requests are counted.
-     * @param string $message  The message to be output in case of exceeding the limit (default: "Too Many Requests").
-     */
-    public function rateLimit(int $limit, int $interval, string $message = "To many requests") {
-        $this->startSession();
-    
-        $ip = $_SERVER['REMOTE_ADDR'];
-        $key = 'rate_limit:' . $ip;
-    
-        $data = $this->getSessionData($key);
-        $count = ($data['count']++ ?? 0);
-
-        $lastAccess = ($data['last_access'] ?? 0);
-        $currentTime = time();
-    
-        if ($currentTime - $lastAccess >= $interval) {
-            $count = 1;
-            $lastAccess = $currentTime;
-        } else {
-            $count++;
-        }
-    
-        $this->setSessionData($key,[
-            'count' => $count,
-            'last_access' => $lastAccess,
-        ]);
-
-        if ($this->getSessionData($key)['count'] > $limit) {
-            http_response_code(429);
-            echo json_encode(["error" => $message]);
-            die;
-        }
-    }
 }
