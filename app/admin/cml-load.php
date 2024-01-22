@@ -15,6 +15,7 @@
      */
     if (file_exists($configPath = dirname(__DIR__) . '/config/cml-config.php')) {
         require_once $configPath;
+        define('BASE_URL', (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . "://" . $_SERVER['HTTP_HOST'] . str_replace($_SERVER['DOCUMENT_ROOT'], '', rtrim(dirname($_SERVER['SCRIPT_FILENAME']), '/\\')) . "/");
     } else {
         // If the configuration file is missing, trigger a user error with a descriptive message.
         trigger_error('The cml-config.php file is missing. Please ensure it exists and contains the necessary configuration constants.', E_USER_ERROR);

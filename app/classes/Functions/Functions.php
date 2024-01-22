@@ -55,7 +55,7 @@ trait Functions{
      * @param string $path The path to the asset, relative to the root of the application.
      * @return string The absolute URL of the asset.
      */
-    public function assetUrl(string $path): string {
+    public function assetUrl(string $path = ""): string {
         $baseUrl = dirname($_SERVER['SCRIPT_NAME']);
         return rtrim($baseUrl, '/') . '/' . ltrim($path, '/');
     }
