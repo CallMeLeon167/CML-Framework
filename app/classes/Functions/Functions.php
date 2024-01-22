@@ -25,7 +25,7 @@ trait Functions{
      *
      * @param string $name The name of the route to redirect to
      */
-    public function to_route(string $name) {
+    public function toRoute(string $name) {
         global $cml_namedRoutes;
         if (isset($cml_namedRoutes[$name])) {
             $url = $this->assetUrl($cml_namedRoutes[$name]);
