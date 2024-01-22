@@ -24,23 +24,94 @@ abstract class HTMLBuilder {
     const BOTTOM_BODY = 'bottom_body';
     const AFTER_BODY = 'after_body';
 
-    
+    /**
+     * @var bool Indicates whether the HTML has been built or not.
+     */
+    public bool $builded = false;
+
+    /**
+     * @var bool Indicates whether the HTML should be minified or not.
+     */
     private bool $minifyHTML = false;
+
+    /**
+     * @var string The URL for AJAX requests.
+     */
     private string $ajaxUrl = "";
+
+    /**
+     * @var string The name of the project.
+     */
     private string $projectName = "";
+
+    /**
+     * @var string The title of the web page.
+     */
     private string $title = "";
+
+    /**
+     * @var string The path to the favicon image.
+     */
     private string $favicon = "";
+
+    /**
+     * @var string The HTML code for the header section.
+     */
     private string $header = "";
+
+    /**
+     * @var string The HTML code for the footer section.
+     */
     private string $footer = "";
+
+    /**
+     * @var string The attributes for the body tag.
+     */
     private string $bodyAttr = "";
+
+    /**
+     * @var string The attributes for the html tag.
+     */
     private string $htmlAttr = "";
+
+    /**
+     * @var string The language of the web page.
+     */
     private string $lang = "en";
+
+    /**
+     * @var string The character encoding for the web page.
+     */
     private string $charset = "UTF-8";
+
+    /**
+     * @var array An array of stylesheets to be included in the web page.
+     */
     private array $styles = [];
+
+    /**
+     * @var array An array of JavaScript files to be included in the web page.
+     */
     private array $scripts = [];
+
+    /**
+     * @var array An array of meta tags to be included in the head section of the web page.
+     */
     private array $metas = [];
+
+    /**
+     * @var array An array of CDNs (Content Delivery Networks) to be included in the web page.
+     */
     private array $cdns = [];
+
+    /**
+     * @var array An array of hooks for customizing the HTML output.
+     */
     private array $hooks = [];
+
+    /**
+     * @var array An array of predefined hooks for customizing the HTML output.
+     */
     private array $regHooks = [
         self::BEFORE_HEAD,
         self::TOP_HEAD,
@@ -185,15 +256,9 @@ abstract class HTMLBuilder {
      * accessible in JavaScript.
      */
     public function setAjaxUrl(){
-        $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
-        $servername = $_SERVER['SERVER_NAME'];
-        $currentPath = dirname($_SERVER['PHP_SELF']);
-        $fullUrl = $protocol . '://' . $servername . ($currentPath !== '/' ? $currentPath : '');
-        $ajaxUrl = $fullUrl."/app/admin/cml-ajax.php";
-        $this->ajaxUrl = $ajaxUrl;
+        $this->ajaxUrl = $this->url("app/admin/cml-ajax.php");
     }
 
-    
     /**
      * Register a hook to place content at a specific location in the HTML document.
      *
@@ -448,11 +513,14 @@ abstract class HTMLBuilder {
      * Builds the complete HTML structure.
      */
     public function build() {
-        ob_start();
-        $this->buildHtmlStart();
-        $this->buildHead();
-        $this->buildBody();
-        echo $this->minifyHTML(ob_get_clean());
+        if($this->builded === false){
+            $this->builded = true;
+            ob_start();
+            $this->buildHtmlStart();
+            $this->buildHead();
+            $this->buildBody();
+            echo $this->minifyHTML(ob_get_clean());
+        }
     }
     
     /**
