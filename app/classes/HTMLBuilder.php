@@ -321,7 +321,7 @@ abstract class HTMLBuilder {
         }
 
         if (filesize(self::getRootPath($fullPath)) !== 0) {
-            $container[] = '"' . self::assetUrl($fullPath) . '"' . $attributes;
+            $container[] = '"' . self::url($fullPath) . '"' . $attributes;
         }
     }
 
@@ -478,7 +478,7 @@ abstract class HTMLBuilder {
             <?php $this->buildMetas(); ?>
             <title><?= empty($this->title) ? APP_NAME : $this->title?></title>
             <?= !empty($this->ajaxUrl) ? "<script>let ajax_url = '{$this->ajaxUrl}'</script>" : ''?>
-            <link rel="icon" type="image/x-icon" href="<?= self::assetUrl($this->favicon) ?>">
+            <link rel="icon" type="image/x-icon" href="<?= self::url($this->favicon) ?>">
             <?php $this->buildCdns(); ?>
             <?php $this->buildStyles(); ?>
             <?php $this->buildScripts(); ?>
