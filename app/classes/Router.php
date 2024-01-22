@@ -452,76 +452,51 @@ class Router extends \CML\Classes\HTMLBuilder{
      */
     public function getSite(string $siteName, array $variables = []) {
         $sitePath = self::getRootPath($this->sitesPath . $siteName);
-
-        if (file_exists($sitePath)) {
-            extract($variables); 
-            ob_start();
-            require $sitePath;
-            $content = ob_get_clean();
-
-            $content = preg_replace_callback('/<(\w+)([^>]*)>([\s\S]*?)<\/\1>|<(\w+)([^>]*)>/', function($matches) {
-                if (isset($matches[4])) {
-                    $tag = $matches[4];
-                    $attributes = $matches[5];
-
-                    $componentName = $tag . '.cml.php';
-                    $componentPath = self::getRootPath(COMPONENTS_PATH . $componentName);
-
-                    if (file_exists($componentPath) && preg_match('~^\p{Lu}~u', $tag)) {
-                        $attributeValues = [];
-                        preg_match_all('/(\w+)="([^"]*)"/', $attributes, $attributeMatches);
-                        foreach ($attributeMatches[1] as $index => $attributeName) {
-                            $attributeValues[$attributeName] = $attributeMatches[2][$index];
-                        }
-
-                        foreach ($attributeValues as $attributeName => $attributeValue) {
-                            $$attributeName = $attributeValue;
-                        }
-
-                        ob_start();
-                        require $componentPath;
-                        return ob_get_clean();
-                    } else {
-                        return $matches[0]; 
-                    }
-                } elseif (!empty($matches[1])) {
-                    $tag = $matches[1];
-                    $attributes = $matches[2];
-                    $slot = $matches[3];
-
-                    if (empty($slot)) {
-                        return $matches[0];
-                    }
-
-                    $componentName = $tag . '.cml.php';
-                    $componentPath = self::getRootPath(COMPONENTS_PATH . $componentName);
-
-                    if (file_exists($componentPath) && preg_match('~^\p{Lu}~u', $tag)) {
-                        $attributeValues = [];
-                        preg_match_all('/(\w+)="([^"]*)"/', $attributes, $attributeMatches);
-                        foreach ($attributeMatches[1] as $index => $attributeName) {
-                            $attributeValues[$attributeName] = $attributeMatches[2][$index];
-                        }
-
-                        foreach ($attributeValues as $attributeName => $attributeValue) {
-                            $$attributeName = $attributeValue;
-                        }
-                        $slot = trim($slot);
-
-                        ob_start();
-                        require $componentPath;
-                        return ob_get_clean();
-                    } else {
-                        return $matches[0]; 
-                    }
-                }
-            }, $content);
-
-            echo $this->minifyHTML($content);
-        } else {
+    
+        if (!file_exists($sitePath)) {
             trigger_error(htmlentities("getSite('$siteName') | Site not found => " . $this->sitesPath . $siteName), E_USER_ERROR);
+            return;
         }
+    
+        extract($variables);
+        ob_start();
+        require $sitePath;
+        $content = ob_get_clean();
+    
+        $content = preg_replace_callback('/<(\w+)([^>]*)>([\s\S]*?)<\/\1>|<(\w+)([^>]*)>/', function($matches) {
+            $tag = $matches[4] ?? $matches[1];
+            $attributes = $matches[5] ?? $matches[2];
+            $slot = $matches[3] ?? null;
+    
+            $componentName = $tag . '.cml.php';
+            $componentPath = self::getRootPath(COMPONENTS_PATH . $componentName);
+    
+            if (file_exists($componentPath) && preg_match('~^\p{Lu}~u', $tag)) {
+                $attributeValues = [];
+                preg_match_all('/(\w+)="([^"]*)"/', $attributes, $attributeMatches);
+                foreach ($attributeMatches[1] as $index => $attributeName) {
+                    $attributeValues[$attributeName] = $attributeMatches[2][$index];
+                }
+    
+                foreach ($attributeValues as $attributeName => $attributeValue) {
+                    $$attributeName = $attributeValue;
+                }
+    
+                if (!empty($slot)) {
+                    $slot = trim($slot);
+                }
+    
+                ob_start();
+                require $componentPath;
+                return ob_get_clean();
+            } else {
+                return $matches[0];
+            }
+        }, $content);
+    
+        echo $this->minifyHTML($content);
     }
+    
 
     /**
      * Set the route to be accessible only via AJAX requests.
