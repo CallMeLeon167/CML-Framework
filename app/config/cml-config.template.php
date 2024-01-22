@@ -70,9 +70,9 @@ define('ERRORLOG_FILE', '/errorlogfile.log');
 
 /** 
  * The name of the application.
- * Replace 'CML - Framework' with the actual name of your application.
+ * Replace 'MyApplication' with the actual name of your application.
  */
-define('APP_NAME', 'CML - Framework');
+define('APP_NAME', 'MyApplication');
 
 /** 
  * Path to CSS files.
@@ -102,16 +102,4 @@ define('SITES_PATH', 'web/sites/');
  * Specify the folder path to the components.
  */
 define('COMPONENTS_PATH', 'web/components/');
-
-/** 
- * File path to the footer.
- * Specify the file path to the footer component.
- */
-define('FOOTER_FILE', 'web/components/footer.php');
-
-/** 
- * File path to the header.
- * Specify the file path to the header component.
- */
-define('HEADER_FILE', 'web/components/header.php');
 ?>

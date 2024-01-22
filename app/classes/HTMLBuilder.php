@@ -94,7 +94,7 @@ abstract class HTMLBuilder {
      * @param array $variables Associative array of variables to be extracted and made available in the included file.
      */
     public function addHeader(string $header = '', array $variables = []) {
-        $this->addContent(HEADER_FILE, $header, $this->header, $variables);
+        $this->addContent(COMPONENTS_PATH.'header.php', $header, $this->header, $variables);
     }
 
     /**
@@ -104,7 +104,7 @@ abstract class HTMLBuilder {
      * @param array $variables Associative array of variables to be extracted and made available in the included file.
      */
     public function addFooter(string $footer = '', array $variables = []) {
-        $this->addContent(FOOTER_FILE, $footer, $this->footer, $variables);
+        $this->addContent(COMPONENTS_PATH.'footer.php', $footer, $this->footer, $variables);
     }
 
     /**
@@ -257,15 +257,15 @@ abstract class HTMLBuilder {
     /**
      * Generic function to add content (header or footer) to the HTML document.
      *
-     * @param string $const
+     * @param string $path The path to the content file.
      * @param string $content The content to add.
      * @param string &$property The property to store the content in.
      * @param array $variables Associative array of variables to be extracted and made available in the included file.
      */
-    protected function addContent(string $const, string $content, string &$property, array $variables = []) {
-        $contentFile = $const ?? '';
+    protected function addContent(string $path, string $content, string &$property, array $variables = []) {
+        $contentFile = $path ?? '';
         if (empty($contentFile) && empty($content)) {
-            return trigger_error("Could not set the $const", E_USER_ERROR);
+            return trigger_error("Could not set the $path", E_USER_ERROR);
         }
 
         if (!empty($content)) {
@@ -277,7 +277,7 @@ abstract class HTMLBuilder {
                 require self::getRootPath($contentFile);
                 $property = ob_get_clean();
             } else {
-                trigger_error("$const file does not exist: $contentFile", E_USER_ERROR);
+                trigger_error("$path file does not exist: $contentFile", E_USER_ERROR);
             }
         }
     }
