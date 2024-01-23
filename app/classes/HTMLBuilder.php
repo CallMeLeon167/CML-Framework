@@ -616,9 +616,13 @@ abstract class HTMLBuilder {
         ob_start();
         echo $this->minifyHTML($this->getHookContent(self::BEFORE_BODY));
         echo $this->footer;
-        echo '</body>';
+        if ($this->builded) {
+            echo '</body>';
+        }
         echo $this->getHookContent(self::AFTER_BODY);
-        echo '</html>';
+        if ($this->builded) {
+            echo '</html>';
+        }
         echo $this->minifyHTML(ob_get_clean());
         exit;
     }
