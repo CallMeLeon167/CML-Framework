@@ -67,9 +67,16 @@ class Router extends \CML\Classes\HTMLBuilder{
     /**
      * Stores the Page to show if a route is not defined.
      *
-     * @var string
+     * @var array
      */
-    public string $errorPage = "";
+    public array $errorPage = [];
+    
+    /**
+     * Array of error page variables.
+     *
+     * @var array
+     */
+    public array $errorPageVariables = [];
 
     /**
      * Indicates whether the route is an API route.
@@ -187,13 +194,13 @@ class Router extends \CML\Classes\HTMLBuilder{
      *
      * @param string $siteName The name of the desired file.
      */
-    public function setErrorPage(string $siteName){
-        $sitePath = self::getRootPath($this->sitesPath.$siteName);
-
-        if (file_exists($sitePath)) {
-            return $this->errorPage = $sitePath;
+    public function setErrorPage(string $siteName, array $variables = [], string $htmlTitle = "404 - Not Found"){
+        if (file_exists(self::getRootPath($this->sitesPath.$siteName))) {
+            $this->errorPage['page'] = $siteName;
+            $this->errorPage['title'] = $htmlTitle;
+            $this->errorPageVariables = $variables;
         } else {
-            return trigger_error(htmlentities("Could not find the file $this->sitesPath.$siteName", E_USER_ERROR));
+            return trigger_error(htmlentities("Could not find the file $this->sitesPath"."$siteName", E_USER_ERROR));
         }
     }
 
@@ -354,9 +361,9 @@ class Router extends \CML\Classes\HTMLBuilder{
             if (!empty($this->redirectUrl)) {
                 header("Location: " . $this->redirectUrl);
                 die;
-            } elseif (!empty($this->errorPage)) {
-                parent::build();
-                require($this->errorPage);
+            } elseif (isset($this->errorPage['page'])) {
+                $this->setTitle($this->errorPage['title']);
+                $this->getSite($this->errorPage['page'], $this->errorPageVariables);
                 parent::build_end();
             } else {
                 $this->handleRouteNotFound($url, $method);
