@@ -401,26 +401,32 @@ abstract class HTMLBuilder {
     protected static function compressFile(string $path, string $configPath, string $fileExtension): string {
         $newFileName = str_replace($fileExtension, ".min{$fileExtension}", $path);
         $filePath = self::getRootPath($configPath ? $configPath . $path : $path);
-    
+
         if (!is_readable($filePath)) {
-            return trigger_error(htmlentities($filePath) . " - File does not exists or is not readable", E_USER_ERROR);
+            return trigger_error(htmlentities($filePath) . " - File does not exist or is not readable", E_USER_ERROR);
         }
-    
+
         $fileContent = file_get_contents($filePath);
-    
+
         if ($fileContent === false || $fileContent === '') {
             return '';
         }
-    
+
         $fileContent = preg_replace(
             ['/\/\/[^\n\r]*/', '/\/\*[\s\S]*?\*\//', '/\s*([{}:;,=()])\s*/', '/;\s*}/', '/\s+/'],
             ['', '', '$1', '}', ' '],
             $fileContent
         );
-    
-        $filePath = self::getRootPath($configPath) . $newFileName;
-        file_put_contents($filePath, $fileContent);
-    
+
+        $compressedFilePath = self::getRootPath($configPath) . $newFileName;
+
+        
+        if (file_exists($compressedFilePath) && file_get_contents($compressedFilePath) === $fileContent) {
+            return $newFileName;
+        }
+        
+        file_put_contents($compressedFilePath, $fileContent);
+
         return $newFileName;
     }
 
