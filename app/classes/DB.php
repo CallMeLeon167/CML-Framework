@@ -18,6 +18,13 @@ class DB {
     private $conn;
 
     /**
+     * Indicates whether the database connection is established or not.
+     *
+     * @var bool
+     */
+    public $connected = false;
+
+    /**
      * Stores sql path.
      *
      * @var string
@@ -27,9 +34,12 @@ class DB {
     /**
      * Constructor of the DB class. Calls the methods to load environment variables and establish a connection to the database.
      */
-    public function __construct() {
+    public function __construct(bool $autoconnect = true) {
         $this->sqlPath = SQL_PATH ?? '';
-        $this->connect(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME); 
+        if ($autoconnect) {
+            $this->connected = true;
+            $this->connect(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME); 
+        }
     }
 
     /**
@@ -53,6 +63,7 @@ class DB {
             trigger_error("Connection failed! ".$this->conn->connect_error, E_USER_ERROR);
         }
         $this->conn->set_charset(DB_CHARSET);
+        $this->connected = true;
     }
 
     /**
@@ -289,7 +300,9 @@ class DB {
      * Closes the database connection.
      */
     public function close() {
-        $this->conn->close();
+        if($this->connected){
+            $this->conn->close();
+        }
     }
 }
 ?>
