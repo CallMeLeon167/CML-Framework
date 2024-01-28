@@ -458,7 +458,6 @@ class Router extends \CML\Classes\HTMLBuilder{
      * @param array $variables An associative array of variables to be made available in the loaded file.
      */
     public function getSite(string $siteName, array $variables = []) {
-        $this->build();
         $sitePath = self::getRootPath($this->sitesPath . $siteName);
     
         if (!file_exists($sitePath)) {
@@ -501,7 +500,8 @@ class Router extends \CML\Classes\HTMLBuilder{
                 return $matches[0];
             }
         }, $content);
-    
+        
+        $this->build();
         echo $this->minifyHTML($content);
     }
     
