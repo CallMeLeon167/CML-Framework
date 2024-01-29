@@ -480,9 +480,9 @@ class Router extends \CML\Classes\HTMLBuilder{
     
             if (file_exists($componentPath) && preg_match('~^\p{Lu}~u', $tag)) {
                 $attributeValues = [];
-                preg_match_all('/(\w+)="([^"]*)"/', $attributes, $attributeMatches);
+                preg_match_all('/(\w+)(?:="([^"]*)")?/', $attributes, $attributeMatches);
                 foreach ($attributeMatches[1] as $index => $attributeName) {
-                    $attributeValues[$attributeName] = $attributeMatches[2][$index];
+                    $attributeValues[$attributeName] = $attributeMatches[2][$index] ?? null;
                 }
     
                 foreach ($attributeValues as $attributeName => $attributeValue) {
