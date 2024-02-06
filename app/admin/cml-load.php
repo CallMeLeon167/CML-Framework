@@ -22,17 +22,17 @@
     }
 
     /**
-     * Loads functions from functions.php
-     */
-    if (file_exists($functions = dirname(__DIR__, 2).'/functions.php')){
-        require_once $functions;
-    }
-
-    /**
      * Loads error handler from cml-error.php
      */
     if (file_exists($handler = __DIR__.'/cml-error.php')){
         require_once $handler;
+    }
+
+    /**
+     * Loads functions from functions.php
+     */
+    if (file_exists($functions = dirname(__DIR__, 2).'/functions.php')){
+        require_once $functions;
     }
 
 ?>
