@@ -533,7 +533,7 @@ abstract class HTMLBuilder {
             $this->buildHtmlStart();
             $this->buildHead();
             $this->buildBody();
-            echo $this->minifyHTML(ob_get_clean());
+            echo $this->minifyHTML(preg_replace('/\h*<([^>]*)>\h*/', '<$1>', ob_get_clean()));
         }
     }
     
@@ -577,8 +577,7 @@ abstract class HTMLBuilder {
         ?>
         <?= $this->getHookContent(self::BEFORE_BODY); ?>
         <body <?= $this->bodyAttr ?>>
-        <?= $this->getHookContent(self::TOP_BODY); ?>
-        <?php
+        <?= $this->getHookContent(self::TOP_BODY); ?><?php
         echo $this->header;
     }
     
@@ -631,11 +630,11 @@ abstract class HTMLBuilder {
         echo $this->minifyHTML($this->getHookContent(self::BEFORE_BODY));
         echo $this->footer;
         if ($this->builded) {
-            echo '</body>';
+            echo PHP_EOL.'</body>';
         }
         echo $this->getHookContent(self::AFTER_BODY);
         if ($this->builded) {
-            echo '</html>';
+            echo PHP_EOL.'</html>';
         }
         echo $this->minifyHTML(ob_get_clean());
         exit;
