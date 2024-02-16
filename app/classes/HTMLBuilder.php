@@ -27,7 +27,7 @@ abstract class HTMLBuilder {
     /**
      * @var bool Indicates whether the HTML has been built or not.
      */
-    public bool $builded = false;
+    private bool $builded = false;
 
     /**
      * @var bool Indicates whether the HTML should be minified or not.
@@ -38,6 +38,11 @@ abstract class HTMLBuilder {
      * @var string The URL for AJAX requests.
      */
     private string $ajaxUrl = "";
+
+    /**
+     * @var string The name of the JavaScript variable to store the Ajax URL
+     */
+    private string $ajaxVar = "";
 
     /**
      * @var string The name of the project.
@@ -254,8 +259,11 @@ abstract class HTMLBuilder {
      *
      * Constructs the Ajax URL to be used internally, and the resulting URL is made
      * accessible in JavaScript.
+     *
+     * @param string $var The name of the JavaScript variable to store the Ajax URL. Default value is "ajax_url".
      */
-    public function setAjaxUrl(){
+    public function setAjaxUrl(string $var = "ajax_url"){
+        $this->ajaxVar = $var;
         $this->ajaxUrl = $this->url("app/admin/cml-ajax.php");
     }
 
@@ -551,7 +559,7 @@ abstract class HTMLBuilder {
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <?php $this->buildMetas(); ?>
             <title><?= empty($this->title) ? APP_NAME : $this->title?></title>
-            <?= !empty($this->ajaxUrl) ? "<script>let ajax_url = '{$this->ajaxUrl}'</script>" : ''?>
+            <?= !empty($this->ajaxUrl) ? "<script>let {$this->ajaxVar} = '{$this->ajaxUrl}'</script>" : ''?>
             <link rel="icon" type="image/x-icon" href="<?= self::url($this->favicon) ?>">
             <?php $this->buildCdns(); ?>
             <?php $this->buildStyles(); ?>

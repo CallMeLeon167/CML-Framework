@@ -28,10 +28,22 @@
         require_once $handler;
     }
 
-    /**
-     * Loads functions from functions.php
-     */
     if (file_exists($functions = dirname(__DIR__, 2).'/functions.php')){
+        $cml_ajax_functions = array();
+        /**
+         * Adds a function to the list of AJAX functions.
+         *
+         * This function allows you to register one or more functions to be called via AJAX.
+         * The registered functions will be stored in the global variable $cml_ajax_functions.
+         */
+        function ajax(...$function) {
+            global $cml_ajax_functions;
+            $cml_ajax_functions = array_merge($cml_ajax_functions ?? [], $function);
+        }
+
+        /**
+         * Loads functions from functions.php
+         */
         require_once $functions;
     }
 
