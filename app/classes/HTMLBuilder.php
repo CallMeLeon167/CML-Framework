@@ -574,10 +574,9 @@ abstract class HTMLBuilder {
      * Builds the body section of the HTML document with hooks, header content, etc.
      */   
     protected function buildBody() {
-        ?>
-        <?= $this->getHookContent(self::BEFORE_BODY); ?>
-        <body <?= $this->bodyAttr ?>>
-        <?= $this->getHookContent(self::TOP_BODY); ?><?php
+        echo $this->getHookContent(self::BEFORE_BODY);
+        echo "<body{$this->bodyAttr}>";
+        echo $this->getHookContent(self::TOP_BODY); 
         echo $this->header;
     }
     
