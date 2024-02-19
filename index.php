@@ -10,7 +10,7 @@ $router = new Router();
 //Project settings
 $router->activateMinifyHTML();
 $router->setErrorRedirect("/");
-$router->setFavicon("web/favicon.ico");
+$router->setFavicon("favicon.ico");
 $router->addMeta('name="theme-color" content="black"');
 
 //Global CDNs
