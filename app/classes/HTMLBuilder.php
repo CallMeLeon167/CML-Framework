@@ -68,26 +68,26 @@ abstract class HTMLBuilder {
      * @var string The HTML code for the footer section.
      */
     private string $footer = "";
-
-    /**
-     * @var string The attributes for the body tag.
-     */
-    private string $bodyAttr = "";
-
-    /**
-     * @var string The attributes for the html tag.
-     */
-    private string $htmlAttr = "";
-
+    
     /**
      * @var string The language of the web page.
      */
     private string $lang = "en";
-
+    
     /**
      * @var string The character encoding for the web page.
      */
     private string $charset = "UTF-8";
+
+    /**
+     * @var array The attributes for the body tag.
+     */
+    private array $bodyAttr = [];
+
+    /**
+     * @var array The attributes for the html tag.
+     */
+    private array $htmlAttr = [];
 
     /**
      * @var array An array of stylesheets to be included in the web page.
@@ -188,8 +188,8 @@ abstract class HTMLBuilder {
      *
      * @param string $attr The HTML tag attributes to be added.
      */
-    public function addHtmlTagAttributes(string $attr = '') {
-        $this->htmlAttr = $attr;
+    public function addHtmlTagAttributes(string $attr) {
+        $this->htmlAttr[] = $attr;
     }
 
     /**
@@ -197,8 +197,8 @@ abstract class HTMLBuilder {
      *
      * @param string $attr The body tag attributes to be added.
      */
-    public function addBodyTagAttributes(string $attr = '') {
-        $this->bodyAttr = $attr;
+    public function addBodyTagAttributes(string $attr) {
+        $this->bodyAttr[] = $attr;
     }
 
     /**
@@ -367,6 +367,22 @@ abstract class HTMLBuilder {
             $htmlAttributes .= " $key=\"$value\"";
         }
         return $htmlAttributes;
+    }
+
+    /**
+     * Converts an array of attributes into a string representation.
+     *
+     * @param array $attributes The array of attributes.
+     * @return string The string representation of the attributes.
+     */
+    protected function stringToAttributes(array $attributes): string {
+        $attr = "";
+        if (!empty($attributes)) {
+            foreach ($attributes as $attribute) {
+                $attr .= " $attribute";
+            }
+        }
+        return $attr;
     }
     
     /**
@@ -541,9 +557,10 @@ abstract class HTMLBuilder {
      * Builds the opening HTML tags and outputs any content hooks before the head.
      */
     protected function buildHtmlStart() {
+        $attr = $this->stringToAttributes($this->htmlAttr);
         ?>
         <!DOCTYPE html>
-        <html lang="<?= $this->lang ?>"<?= $this->htmlAttr?>>
+        <html lang="<?= $this->lang ?>"<?= $attr?>>
         <?= $this->getHookContent(self::BEFORE_HEAD); ?>
         <?php
     }
@@ -574,8 +591,9 @@ abstract class HTMLBuilder {
      * Builds the body section of the HTML document with hooks, header content, etc.
      */   
     protected function buildBody() {
+        $attr = $this->stringToAttributes($this->bodyAttr);
         echo $this->getHookContent(self::BEFORE_BODY);
-        echo "<body{$this->bodyAttr}>";
+        echo "<body{$attr}>";
         echo $this->getHookContent(self::TOP_BODY); 
         echo $this->header;
     }
