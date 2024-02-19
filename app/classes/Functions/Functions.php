@@ -56,8 +56,7 @@ trait Functions{
      * @return string The absolute URL of the asset.
      */
     public function assetUrl(string $path = ""): string {
-        $baseUrl = dirname($_SERVER['SCRIPT_NAME']);
-        return rtrim($baseUrl, '/') . '/' . ltrim($path, '/');
+        return rtrim(dirname($_SERVER['SCRIPT_NAME'], IS_AJAX ? 3 : 1), '/') . '/' . ltrim($path, '/');
     }
 
     /**
@@ -175,7 +174,7 @@ trait Functions{
      * @return bool
      */
     public function isAjaxRequest(): bool {
-        return !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+        return IS_AJAX;
     }
 
     /**
