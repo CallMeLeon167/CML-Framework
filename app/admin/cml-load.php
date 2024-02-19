@@ -38,7 +38,7 @@
          */
         function ajax(...$function) {
             global $cml_ajax_functions;
-            $cml_ajax_functions = array_merge($cml_ajax_functions ?? [], $function);
+            $cml_ajax_functions = array_merge($cml_ajax_functions, $function);
         }
 
         /**
