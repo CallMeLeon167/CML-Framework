@@ -29,6 +29,15 @@
         require_once $handler;
     }
 
+    function useTrait($functionName, ...$parameters) {
+        $class = new class {
+            use CML\Classes\Functions\Functions;
+            use CML\Classes\Functions\Session;
+        };
+    
+        return $class->$functionName(...$parameters);
+    }
+
     if (file_exists($functions = dirname(__DIR__, 2).'/functions.php')){
         $cml_ajax_functions = array();
         /**
