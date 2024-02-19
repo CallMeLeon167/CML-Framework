@@ -2,7 +2,7 @@
 require_once __DIR__ . "/cml-load.php";
 
 /** Validate Ajax requests */
-if (!(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest')) {
+if (!(new class { use CML\Classes\Functions\Functions; })->isAjaxRequest()) {
     http_response_code(403);
     die("Access denied");
 }
