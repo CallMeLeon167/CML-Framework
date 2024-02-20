@@ -111,7 +111,7 @@
                 </div>
                 <div class='error-versions'>
                     <span>Date/Time: " . date('Y-m-d H:i:s') . "</span>
-                    <span>CML Version: v".(new class { use CML\Classes\Functions\Functions; })::getFrameworkVersion()."</span>
+                    <span>CML Version: v" . useTrait("getFrameworkVersion") . "</span>
                     <span>PHP ".phpversion()."</span>
                 </div>
             </div>
@@ -174,7 +174,7 @@
                     generateTable($_GET, "Get Data");
                     generateTable($_POST, "Post Data");
                     generateTable($_FILES, "File Upload Data");
-                    (new class { use CML\Classes\Functions\Session; })->startSession();
+                    useTrait('startSession');
                     generateTable($_SESSION, "Session Data");
                     generateTable($_ENV, "Environment Variables");
                     generateTable($_COOKIE, "Cookie Data");
