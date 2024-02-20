@@ -23,19 +23,25 @@
     }
 
     /**
-     * Loads error handler from cml-error.php
+     * Executes a function from the CML\Classes\Functions namespace using the provided function name and parameters.
+     *
+     * @param string $functionName The name of the function to execute.
+     * @param mixed  ...$parameters The parameters to pass to the function.
+     * @return mixed The result of the executed function.
      */
-    if (file_exists($handler = __DIR__.'/cml-error.php')){
-        require_once $handler;
-    }
-
     function useTrait($functionName, ...$parameters) {
         $class = new class {
             use CML\Classes\Functions\Functions;
             use CML\Classes\Functions\Session;
         };
-    
         return $class->$functionName(...$parameters);
+    }
+
+    /**
+     * Loads error handler from cml-error.php
+     */
+    if (file_exists($handler = __DIR__.'/cml-error.php')){
+        require_once $handler;
     }
 
     if (file_exists($functions = dirname(__DIR__, 2).'/functions.php')){
