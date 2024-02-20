@@ -29,7 +29,7 @@
      * @param mixed  ...$parameters The parameters to pass to the function.
      * @return mixed The result of the executed function.
      */
-    function useTrait($functionName, ...$parameters) {
+    function useTrait(string $functionName, ...$parameters) {
         $class = new class {
             use CML\Classes\Functions\Functions;
             use CML\Classes\Functions\Session;
