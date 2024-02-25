@@ -41,14 +41,7 @@ class DB {
             $this->connect(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME); 
         }
     }
-
-    /**
-     * Destructor for the class. Automatically closes the database connection upon object destruction.
-     */
-    public function __destruct() {
-        $this->close();
-    }
-
+    
     /**
      * Establishes a connection to the database.
      *
