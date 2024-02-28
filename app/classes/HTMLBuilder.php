@@ -170,7 +170,7 @@ abstract class HTMLBuilder {
      * @param array $variables Associative array of variables to be extracted and made available in the included file.
      */
     public function addHeader(string $header = '', array $variables = []) {
-        $this->addContent(COMPONENTS_PATH.'header.php', $header, $this->header, $variables);
+        $this->_addContent(COMPONENTS_PATH.'header.php', $header, $this->header, $variables);
     }
 
     /**
@@ -180,7 +180,7 @@ abstract class HTMLBuilder {
      * @param array $variables Associative array of variables to be extracted and made available in the included file.
      */
     public function addFooter(string $footer = '', array $variables = []) {
-        $this->addContent(COMPONENTS_PATH.'footer.php', $footer, $this->footer, $variables);
+        $this->_addContent(COMPONENTS_PATH.'footer.php', $footer, $this->footer, $variables);
     }
 
     /**
@@ -292,7 +292,7 @@ abstract class HTMLBuilder {
      * @param bool $fromRoot Whether the path is relative to the document root.
      */
     public function addStyle(string $href, $attributes = "", bool $fromRoot = false) {
-        if ($href) $this->addResource($href, $this->styles, $attributes, $fromRoot);
+        if ($href) $this->_addResource($href, $this->styles, $attributes, $fromRoot);
     }
 
     /**
@@ -303,7 +303,7 @@ abstract class HTMLBuilder {
      * @param bool $fromRoot Whether the path is relative to the document root.
      */
     public function addScript(string $src, $attributes = "", bool $fromRoot = false) {
-        if ($src) $this->addResource($src, $this->scripts, $attributes, $fromRoot);
+        if ($src) $this->_addResource($src, $this->scripts, $attributes, $fromRoot);
     }
 
     /**
@@ -320,7 +320,7 @@ abstract class HTMLBuilder {
         $moduleDir = self::getRootPath('/node_modules/' . $lowercaseModuleName);
     
         if (is_dir($moduleDir)) {
-            $files = $this->recursiveFileSearch($moduleDir, $extension);
+            $files = $this->_recursiveFileSearch($moduleDir, $extension);
             if (!empty($files)) {
                 $linkPath = str_replace(self::getRootPath(), '', $files[0]);
                 $extension = strtolower(pathinfo(".$extension", PATHINFO_EXTENSION));
@@ -352,10 +352,10 @@ abstract class HTMLBuilder {
      * @param string $extension The file extension to search for.
      * @return array An array of file paths matching the specified extension.
      */
-    protected function recursiveFileSearch(string $dir, string $extension): array {
+    protected function _recursiveFileSearch(string $dir, string $extension): array {
         $files = glob($dir . "/*.$extension");
         foreach (glob($dir . '/*', GLOB_ONLYDIR) as $subdir) {
-            $files = array_merge($files, $this->recursiveFileSearch($subdir, $extension));
+            $files = array_merge($files, $this->_recursiveFileSearch($subdir, $extension));
         }
         return $files;
     }
@@ -388,7 +388,7 @@ abstract class HTMLBuilder {
      * @param string &$property The property to store the content in.
      * @param array $variables Associative array of variables to be extracted and made available in the included file.
      */
-    protected function addContent(string $path, string $content, string &$property, array $variables = []) {
+    protected function _addContent(string $path, string $content, string &$property, array $variables = []) {
         $contentFile = $path ?? '';
         if (empty($contentFile) && empty($content)) {
             return trigger_error("Could not set the $path", E_USER_ERROR);
@@ -414,7 +414,7 @@ abstract class HTMLBuilder {
      * @param array $attributes
      * @return string
      */
-    protected function arrayToAttributes(array $attributes): string {
+    protected function _arrToHtmlAttrs(array $attributes): string {
         $htmlAttributes = '';
         foreach ($attributes as $key => $value) {
             $htmlAttributes .= " $key=\"$value\"";
@@ -428,7 +428,7 @@ abstract class HTMLBuilder {
      * @param array $attributes The array of attributes.
      * @return string The string representation of the attributes.
      */
-    protected function stringToAttributes(array $attributes): string {
+    protected function _arrToAttrsString(array $attributes): string {
         $attr = "";
         if (!empty($attributes)) {
             foreach ($attributes as $attribute) {
@@ -446,7 +446,7 @@ abstract class HTMLBuilder {
      * @param string|array $attributes Additional attributes for the HTML element (e.g., 'media="screen"', 'async', 'defer', etc.).
      * @param bool $fromRoot Whether the path is relative to the document root.
      */
-    protected function addResource(string $path, array &$container, $attributes = "", bool $fromRoot = false) {
+    protected function _addResource(string $path, array &$container, $attributes = "", bool $fromRoot = false) {
         $const = $container === $this->styles ? 'STYLE_PATH' : 'SCRIPT_PATH';
 
         $fullPath = $fromRoot ? $path : (constant($const) ?? '') . $path;
@@ -459,7 +459,7 @@ abstract class HTMLBuilder {
         if (!is_array($attributes)) {
             $attributes = !empty($attributes) ? " $attributes" : "";
         } else {
-            $attributes = $this->arrayToAttributes($attributes);
+            $attributes = $this->_arrToHtmlAttrs($attributes);
         }
 
         if (filesize(self::getRootPath($fullPath)) !== 0) {
@@ -475,7 +475,7 @@ abstract class HTMLBuilder {
      * @param string $fileExtension The file extension to use for the compressed file.
      * @return string The path to the compressed file.
      */
-    protected static function compressFile(string $path, string $configPath, string $fileExtension): string {
+    protected static function _compressFile(string $path, string $configPath, string $fileExtension): string {
         $newFileName = str_replace($fileExtension, ".min{$fileExtension}", $path);
         $filePath = self::getRootPath($configPath ? $configPath . $path : $path);
 
@@ -517,9 +517,9 @@ abstract class HTMLBuilder {
         $fileExtension = pathinfo($path, PATHINFO_EXTENSION);
         
         if ($fileExtension === 'css') {
-            return self::compressFile($path, STYLE_PATH ?? '', '.css');
+            return self::_compressFile($path, STYLE_PATH ?? '', '.css');
         } elseif ($fileExtension === 'js') {
-            return self::compressFile($path, SCRIPT_PATH ?? '', '.js');
+            return self::_compressFile($path, SCRIPT_PATH ?? '', '.js');
         } else {
             return $path;
         }
@@ -531,10 +531,10 @@ abstract class HTMLBuilder {
      * @param string $hookName The name of the hook (e.g., 'before_head', 'after_head', 'top_body', etc.).
      * @return string The content for the specified hook.
      */
-    protected function getHookContent(string $hookName) {
+    protected function _getHookContent(string $hookName) {
         if (isset($this->hooks[$hookName])) {
             $hooks = $this->hooks[$hookName];
-            $this->sortByKey($hooks, "level");
+            $this->_sortByKey($hooks, "level");
 
             foreach ($hooks as $hook) {
                 $contentSource = $hook['source'];
@@ -562,7 +562,7 @@ abstract class HTMLBuilder {
      * @param array $array The array to be sorted (passed by reference).
      * @param string $key The key by which the array should be sorted.
      */
-    protected function sortByKey(array &$array, $key) {
+    protected function _sortByKey(array &$array, $key) {
         usort($array, function($a, $b) use ($key) {
             return $b[$key] - $a[$key];
         });
@@ -599,9 +599,9 @@ abstract class HTMLBuilder {
         if($this->builded === false){
             $this->builded = true;
             ob_start();
-            $this->buildHtmlStart();
-            $this->buildHead();
-            $this->buildBody();
+            $this->_buildHtmlStart();
+            $this->_buildHead();
+            $this->_buildBody();
             echo $this->minifyHTML(preg_replace('/\h*<([^>]*)>\h*/', '<$1>', ob_get_clean()));
         }
     }
@@ -609,52 +609,52 @@ abstract class HTMLBuilder {
     /**
      * Builds the opening HTML tags and outputs any content hooks before the head.
      */
-    protected function buildHtmlStart() {
-        $attr = $this->stringToAttributes($this->htmlAttr);
+    protected function _buildHtmlStart() {
+        $attr = $this->_arrToAttrsString($this->htmlAttr);
         ?>
         <!DOCTYPE html>
         <html lang="<?= $this->lang ?>"<?= $attr?>>
-        <?= $this->getHookContent(self::BEFORE_HEAD); ?>
+        <?= $this->_getHookContent(self::BEFORE_HEAD); ?>
         <?php
     }
     
     /**
      * Builds the head section of the HTML document with meta tags, title, scripts, and styles.
      */
-    protected function buildHead() {
+    protected function _buildHead() {
         ?>
         <head>
-            <?= $this->getHookContent(self::TOP_HEAD); ?>
+            <?= $this->_getHookContent(self::TOP_HEAD); ?>
             <meta charset="<?= $this->charset ?>">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <?php $this->buildMetas(); ?>
+            <?php $this->_buildMetas(); ?>
             <title><?= empty($this->title) ? APP_NAME : $this->title?></title>
             <?= !empty($this->ajaxUrl) ? "<script>let {$this->ajaxVar} = '{$this->ajaxUrl}'</script>" : ''?>
             <link rel="icon" type="image/x-icon" href="<?= self::url($this->favicon) ?>">
-            <?php $this->buildCdns(); ?>
-            <?php $this->buildStyles(); ?>
-            <?php $this->buildScripts(); ?>
-            <?= $this->getHookContent(self::BOTTOM_HEAD); ?>
+            <?php $this->_buildCdns(); ?>
+            <?php $this->_buildStyles(); ?>
+            <?php $this->_buildScripts(); ?>
+            <?= $this->_getHookContent(self::BOTTOM_HEAD); ?>
         </head>
-        <?= $this->getHookContent(self::AFTER_HEAD); ?>
+        <?= $this->_getHookContent(self::AFTER_HEAD); ?>
         <?php
     }
 
     /**
      * Builds the body section of the HTML document with hooks, header content, etc.
      */   
-    protected function buildBody() {
-        $attr = $this->stringToAttributes($this->bodyAttr);
-        echo $this->getHookContent(self::BEFORE_BODY);
+    protected function _buildBody() {
+        $attr = $this->_arrToAttrsString($this->bodyAttr);
+        echo $this->_getHookContent(self::BEFORE_BODY);
         echo "<body{$attr}>";
-        echo $this->getHookContent(self::TOP_BODY); 
+        echo $this->_getHookContent(self::TOP_BODY); 
         echo $this->header;
     }
     
     /**
      * Builds meta tags in the head section based on the provided array of meta attributes.
      */
-    protected function buildMetas() {
+    protected function _buildMetas() {
         foreach ($this->metas as $meta): ?>
             <meta <?= $meta ?>>
         <?php endforeach;
@@ -663,7 +663,7 @@ abstract class HTMLBuilder {
     /**
      * Builds content delivery network (CDN) links based on the provided array of CDNs.
      */
-    protected function buildCdns() {
+    protected function _buildCdns() {
         foreach ($this->cdns as $cdns): ?>
             <?php foreach ($cdns as $tag => $attributes): ?>
                 <<?= $tag ?> <?= $attributes ?>>
@@ -677,7 +677,7 @@ abstract class HTMLBuilder {
     /**
      * Builds stylesheet links in the head section based on the provided array of styles.
      */
-    protected function buildStyles() {
+    protected function _buildStyles() {
         foreach ($this->styles as $style): ?>
             <link rel="stylesheet" href=<?= $style ?>>
         <?php endforeach;
@@ -686,7 +686,7 @@ abstract class HTMLBuilder {
     /**
      * Builds script tags in the head or body section based on the provided array of scripts.
      */
-    protected function buildScripts() {
+    protected function _buildScripts() {
         foreach ($this->scripts as $script): ?>
             <script src=<?= $script ?>></script>
         <?php endforeach;
@@ -695,14 +695,14 @@ abstract class HTMLBuilder {
     /**
      * Close the application correctly.
      */
-    protected function build_end() {
+    protected function _build_end() {
         ob_start();
-        echo $this->minifyHTML($this->getHookContent(self::BEFORE_BODY));
+        echo $this->minifyHTML($this->_getHookContent(self::BEFORE_BODY));
         echo $this->footer;
         if ($this->builded) {
             echo PHP_EOL.'</body>';
         }
-        echo $this->getHookContent(self::AFTER_BODY);
+        echo $this->_getHookContent(self::AFTER_BODY);
         if ($this->builded) {
             echo PHP_EOL.'</html>';
         }

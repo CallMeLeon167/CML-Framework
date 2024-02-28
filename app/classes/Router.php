@@ -124,7 +124,7 @@ class Router extends \CML\Classes\HTMLBuilder{
      * Match the defined routes.
      */
     public function __destruct() {
-        $this->matchRoute();
+        $this->_matchRoute();
     }
 
     /**
@@ -329,7 +329,7 @@ class Router extends \CML\Classes\HTMLBuilder{
     /**
      * Compares the requested method and URL to defined routes, processes them, and throws an exception if no match is found.
      */
-    protected function matchRoute() {
+    protected function _matchRoute() {
 
         # URL Validation
         $url = $_SERVER['REQUEST_URI']; // Get the URL from the current page
@@ -341,19 +341,19 @@ class Router extends \CML\Classes\HTMLBuilder{
 
         $method = $_SERVER['REQUEST_METHOD']; // Indicates the client's HTTP request method (e.g., GET, POST, etc.)
 
-        $alias = $this->findOriginalUrlForAlias($url);
+        $alias = $this->_findOriginalUrlForAlias($url);
         if ($alias !== null) {
             $url = $alias; // Use the original URL
         }
 
         // Process the given action based on the HTTP request method (e.g., GET, POST, etc.)
         if (isset($this->routes[$method])) {
-            $this->processRoutes($url, $this->routes[$method]);
+            $this->_processRoutes($url, $this->routes[$method]);
         }
 
         // Process wildcard routes for all methods
         if (isset($this->routes['*'])) {
-            $this->processRoutes($url, $this->routes['*']);
+            $this->_processRoutes($url, $this->routes['*']);
         }
 
         // Redirect to the specified URL if the route is not found and a redirect URL is set
@@ -364,7 +364,7 @@ class Router extends \CML\Classes\HTMLBuilder{
             } elseif (isset($this->errorPage['page'])) {
                 $this->setTitle($this->errorPage['title']);
                 $this->getSite($this->errorPage['page'], $this->errorPageVariables);
-                parent::build_end();
+                parent::_build_end();
             } else {
                 $this->handleRouteNotFound($url, $method);
             }
@@ -377,7 +377,7 @@ class Router extends \CML\Classes\HTMLBuilder{
      * @param string $url The route URL
      * @param array $routes Routes with the appropriate action
      */
-    protected function processRoutes(string $url, array $routes) {
+    protected function _processRoutes(string $url, array $routes) {
         foreach ($routes as $routeUrl => $routeData) {
             // Check if the current route is restricted to AJAX requests
             if ($routeData['ajaxOnly'] && !$this->isAjaxRequest()) {
@@ -394,25 +394,25 @@ class Router extends \CML\Classes\HTMLBuilder{
                 $whereConditions = array_merge($routeData['where'], $this->whereConditions);
     
                 // Check "where" conditions
-                if ($this->checkWhereConditions($matches, $whereConditions)) {
+                if ($this->_checkWhereConditions($matches, $whereConditions)) {
                     // Execute global middleware function
                     if (!empty($this->globalMiddleware) && !in_array($url, $this->globalMiddleware["url"])) {
                         call_user_func($this->globalMiddleware["function"][0]);
                     }
     
                     // Execute middleware functions before the target function
-                    $this->executeMiddleware('before', $url);
+                    $this->_executeMiddleware('before', $url);
     
                     // Call the target function with the extracted parameter values
-                    $parameterValues = $this->sanitizeStringsArray(array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY));
+                    $parameterValues = $this->_sanitizeStringsArray(array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY));
                     $this->currentRouteParams = $parameterValues;
                     call_user_func_array($routeData['target'], $parameterValues);
     
                     // Execute middleware functions after the target function
-                    $this->executeMiddleware('after', $url);
+                    $this->_executeMiddleware('after', $url);
     
                     // Close the application
-                    (!$this->isApi && !$routeData['ajaxOnly']) ? parent::build_end() : exit;
+                    (!$this->isApi && !$routeData['ajaxOnly']) ? parent::_build_end() : exit;
                 }
             }
         }
@@ -426,7 +426,7 @@ class Router extends \CML\Classes\HTMLBuilder{
      *
      * @return bool True if all conditions are met, false otherwise.
      */
-    protected function checkWhereConditions(array $parameterValues, array $whereConditions):bool {
+    protected function _checkWhereConditions(array $parameterValues, array $whereConditions):bool {
         foreach ($whereConditions as $paramName => $condition) {
             if (isset($parameterValues[$paramName]) && !preg_match($condition, $parameterValues[$paramName])) {
                 return false;
@@ -442,7 +442,7 @@ class Router extends \CML\Classes\HTMLBuilder{
      * @param string $position The position of the middleware (before or after)
      * @param string $url The URL for which the middleware should be executed
      */
-    protected function executeMiddleware(string $position, string $url) {
+    protected function _executeMiddleware(string $position, string $url) {
         if (!empty($this->middlewares)) {
             $mdPosition = array_search($url, $this->middlewares["route"]);
             if (is_int($mdPosition) && $this->middlewares['position'][$mdPosition] === $position) {
@@ -539,7 +539,7 @@ class Router extends \CML\Classes\HTMLBuilder{
      * @param string $alias The alias URL
      * @return string|null The original URL if found, null otherwise
      */
-    protected function findOriginalUrlForAlias(string $alias) {
+    protected function _findOriginalUrlForAlias(string $alias) {
         return $this->aliases[$alias] ?? null;
     }
 
@@ -549,7 +549,7 @@ class Router extends \CML\Classes\HTMLBuilder{
      * @param array $inputArray The array of strings to sanitize.
      * @return array The sanitized array.
      */
-    protected function sanitizeStringsArray(array $inputArray): array {
+    protected function _sanitizeStringsArray(array $inputArray): array {
         $sanitizedArray = [];
 
         foreach ($inputArray as $k => $input) {
