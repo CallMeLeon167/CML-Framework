@@ -695,7 +695,7 @@ abstract class HTMLBuilder {
     /**
      * Close the application correctly.
      */
-    public function build_end() {
+    protected function build_end() {
         ob_start();
         echo $this->minifyHTML($this->getHookContent(self::BEFORE_BODY));
         echo $this->footer;
