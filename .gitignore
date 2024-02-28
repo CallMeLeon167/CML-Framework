@@ -1,5 +1,6 @@
 /.idea
 /vendor
+/node_modules
 errorlogfile.log
 cml-config.php
 *min.js
