@@ -306,6 +306,59 @@ abstract class HTMLBuilder {
         if ($src) $this->addResource($src, $this->scripts, $attributes, $fromRoot);
     }
 
+    /**
+     * Retrieves the path of a module file based on the module name and extension.
+     *
+     * @param string $moduleName The name of the module.
+     * @param string $extension The file extension to search for (default: 'min.js').
+     * @param bool $autoAdd Determines whether to automatically add the module file to the HTML document (default: true).
+     * @param string $attributes Additional attributes to add to the HTML tag (default: empty string).
+     * @return string The path of the module file.
+     */
+    public function node_module(string $moduleName, string $extension = 'min.js', bool $autoAdd = true, $attributes = ""): string {
+        $lowercaseModuleName = strtolower($moduleName);
+        $moduleDir = self::getRootPath('/node_modules/' . $lowercaseModuleName);
+    
+        if (is_dir($moduleDir)) {
+            $files = $this->recursiveFileSearch($moduleDir, $extension);
+            if (!empty($files)) {
+                $linkPath = str_replace(self::getRootPath(), '', $files[0]);
+                $extension = strtolower(pathinfo(".$extension", PATHINFO_EXTENSION));
+                switch ($extension) {
+                    case 'css':
+                        if ($autoAdd) {
+                            $this->addStyle($linkPath, $attributes, true);
+                        }
+                        break;
+                    case 'js':
+                        if ($autoAdd) {
+                            $this->addScript($linkPath, $attributes, true);
+                        }
+                        break;
+                }
+                return $linkPath;
+            } else {
+                trigger_error("No file with extension '$extension' found for module '$moduleName'.", E_USER_ERROR);
+            }
+        } else {
+            trigger_error("Module '$moduleName' not found.", E_USER_ERROR);
+        }
+    }
+
+    /**
+     * Recursively searches for files with a specific extension in a directory.
+     *
+     * @param string $dir The directory to search in.
+     * @param string $extension The file extension to search for.
+     * @return array An array of file paths matching the specified extension.
+     */
+    protected function recursiveFileSearch(string $dir, string $extension): array {
+        $files = glob($dir . "/*.$extension");
+        foreach (glob($dir . '/*', GLOB_ONLYDIR) as $subdir) {
+            $files = array_merge($files, $this->recursiveFileSearch($subdir, $extension));
+        }
+        return $files;
+    }
 
     /**
      * Renders a specified component with optional variables and includes it in the output.
@@ -395,8 +448,8 @@ abstract class HTMLBuilder {
      */
     protected function addResource(string $path, array &$container, $attributes = "", bool $fromRoot = false) {
         $const = $container === $this->styles ? 'STYLE_PATH' : 'SCRIPT_PATH';
-        
-        $fullPath = $fromRoot ? "/$path" : (constant($const) ?? '') . $path;
+
+        $fullPath = $fromRoot ? $path : (constant($const) ?? '') . $path;
 
         if (!file_exists(self::getRootPath($fullPath))) {
             $resourceType = $container === $this->styles ? 'stylesheet' : 'script';
