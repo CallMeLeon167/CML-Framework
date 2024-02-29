@@ -478,6 +478,7 @@ abstract class HTMLBuilder {
     protected static function _compressFile(string $path, string $configPath, string $fileExtension): string {
         $newFileName = str_replace($fileExtension, ".min{$fileExtension}", $path);
         $filePath = self::getRootPath($configPath ? $configPath . $path : $path);
+        $compressDir = "_min/";
 
         if (!is_readable($filePath)) {
             return trigger_error(htmlentities($filePath) . " - File does not exist or is not readable", E_USER_ERROR);
@@ -495,16 +496,21 @@ abstract class HTMLBuilder {
             $fileContent
         );
 
-        $compressedFilePath = self::getRootPath($configPath) . $newFileName;
+        $compressedPath = self::getRootPath($configPath) . $compressDir;
 
-        
-        if (file_exists($compressedFilePath) && file_get_contents($compressedFilePath) === $fileContent) {
-            return $newFileName;
+        if (!file_exists($compressedPath)) {
+            mkdir($compressedPath);
         }
-        
+
+        $compressedFilePath = $compressedPath . $newFileName;
+
+        if (file_exists($compressedFilePath) && file_get_contents($compressedFilePath) === $fileContent) {
+            return $compressDir.$newFileName;
+        }
+
         file_put_contents($compressedFilePath, $fileContent);
 
-        return $newFileName;
+        return $compressDir.$newFileName;
     }
 
     /**
