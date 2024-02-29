@@ -3,5 +3,5 @@
 /node_modules
 errorlogfile.log
 cml-config.php
-*min.js
-*min.css
+/web/css/_min/*
+/web/js/_min/*
