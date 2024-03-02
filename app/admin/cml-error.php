@@ -49,6 +49,36 @@
         if (file_exists($errorfile)){
             error_log("[ID: {$id}] ", 3, $errorfile);
         }
+
+        if(IS_AJAX){
+            http_response_code(500);
+            useTrait('startSession');
+            echo json_encode(
+                ['PHPError' => [
+                    'errormessage' => htmlspecialchars($errstr),
+                    'errorline' => $errline,
+                    'errorfile' => $errfile,
+                    'errortype' => $errorTypeString,
+                    'id' => $id,
+                    'date' => date('Y-m-d H:i:s'),
+                    'cml-version' => useTrait("getFrameworkVersion"),
+                    'php-version' => phpversion(),
+                    'trace' => $trace,
+                    'server-data' => [
+                        'server' => $_SERVER,
+                        'get' => $_GET, 
+                        'post' => $_POST, 
+                        'file' => $_FILES, 
+                        'session' => $_SESSION, 
+                        'env' => $_ENV, 
+                        'cookie' => $_COOKIE, 
+                        'http-status' => http_response_code(), 
+                        'headers' => getallheaders()
+                    ]
+                ]]
+            );
+            exit;
+        }
         
         ob_start();
         echo "
