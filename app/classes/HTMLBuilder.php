@@ -716,4 +716,3 @@ abstract class HTMLBuilder {
         exit;
     }
 }
-?>
