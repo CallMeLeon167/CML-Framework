@@ -27,7 +27,7 @@ class Router extends \CML\Classes\HTMLBuilder{
      *
      * @var string
      */
-    protected string $currentRoute = '';
+    public string $currentRoute = '';
 
     /**
      * Stores the current HTTP request method.
@@ -114,7 +114,17 @@ class Router extends \CML\Classes\HTMLBuilder{
     public array $namedRoutes = [];
 
     /**
-     * Initializes the error reporting configuration based on the PRODUCTION environment variable.
+     * An array to store metadata for routes.
+     * 
+     * @var array
+     */
+    public array $routeMetadata = [];
+
+    /**
+     * Router constructor.
+     * 
+     * Initializes a new instance of the Router class.
+     * Sets the sitesPath property to the value of the constant SITES_PATH, or an empty string if it is not defined.
      */
     public function __construct(){
         $this->sitesPath = SITES_PATH ?? '';
@@ -264,6 +274,51 @@ class Router extends \CML\Classes\HTMLBuilder{
         $this->whereConditions = []; // Clear where conditions
 
         return $this;
+    }
+
+    /**
+     * Retrieves or sets the metadata for the current route.
+     *
+     * @param mixed $metadata The metadata to retrieve or set. If null, retrieves the entire metadata array.
+     *                        If a string, retrieves the value of the specified metadata key.
+     *                        If an array, sets the entire metadata array.
+     * @return mixed The requested metadata or null if not found.
+     */
+    public function meta($metadata = null, string $routeUrl = '') {
+        if (empty($routeUrl)) {
+            $routeUrl = $this->currentRoute;
+        }
+    
+        if (is_null($metadata)) {
+            return $this->routeMetadata[$routeUrl] ?? null;
+        }
+    
+        if (is_array($metadata) && !empty($metadata)) {
+            return $this->routeMetadata[$routeUrl] = $metadata;
+        }
+    
+        if (is_string($metadata) && !empty($metadata) && isset($this->routeMetadata[$routeUrl][$metadata])) {
+            return $this->routeMetadata[$routeUrl][$metadata];
+        }
+    
+        return null;
+    }
+
+    /**
+     * Retrieves the metadata for all routes.
+     *
+     * @return array The metadata for all routes.
+     */
+    public function allMetas() {
+        $metadata = [];
+        $routes = $this->getAllRoutes()[0];
+
+        foreach ($routes as $data) {
+            $url = $data["url"];
+            $metadata[$url] = $this->meta(null, $url);
+        }
+
+        return $metadata;
     }
 
     /**
