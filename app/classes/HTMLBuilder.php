@@ -239,7 +239,7 @@ abstract class HTMLBuilder {
         $type = strtolower($type);
     
         if (!in_array($type, $validTypes)) {
-            trigger_error("Invalid CDN type: $type", E_USER_ERROR);
+            trigger_error("Invalid CDN type: $type", E_USER_WARNING);
         }
     
         $this->cdns[] = [$type => $attr];
@@ -276,7 +276,7 @@ abstract class HTMLBuilder {
      */
     public function addHook(string $hookName, $contentSource, int $level = 0) {
         if(!in_array($hookName, $this->regHooks)){
-            trigger_error("Invalid hook name: $hookName", E_USER_ERROR);
+            trigger_error("Invalid hook name: $hookName", E_USER_WARNING);
         }
         $this->hooks[$hookName][] = [
             'source' => $contentSource,
@@ -376,7 +376,7 @@ abstract class HTMLBuilder {
             require $path;
             return $this->minifyHTML(ob_get_clean());
         } else {
-            trigger_error(htmlentities("Component $component | not found in ".$path), E_USER_ERROR);
+            trigger_error(htmlentities("Component $component | not found in ".$path), E_USER_WARNING);
         }
     }
 
@@ -403,7 +403,7 @@ abstract class HTMLBuilder {
                 require self::getRootPath($contentFile);
                 $property = ob_get_clean();
             } else {
-                trigger_error("$path file does not exist: $contentFile", E_USER_ERROR);
+                trigger_error("$path file does not exist: $contentFile", E_USER_WARNING);
             }
         }
     }
@@ -453,7 +453,7 @@ abstract class HTMLBuilder {
 
         if (!file_exists(self::getRootPath($fullPath))) {
             $resourceType = $container === $this->styles ? 'stylesheet' : 'script';
-            return trigger_error("Could not find $resourceType file => '" . htmlentities($fullPath) . "'", E_USER_ERROR);
+            return trigger_error("Could not find $resourceType file => '" . htmlentities($fullPath) . "'", E_USER_WARNING);
         }
 
         if (!is_array($attributes)) {
@@ -555,7 +555,7 @@ abstract class HTMLBuilder {
                 } elseif (is_string($contentSource)) {
                     echo $contentSource;
                 } else {
-                    trigger_error("Invalid content source for the hook: $hookName", E_USER_ERROR);
+                    trigger_error("Invalid content source for the hook: $hookName", E_USER_WARNING);
                 }
             }
         }

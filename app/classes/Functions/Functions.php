@@ -119,7 +119,7 @@ trait Functions{
             if (method_exists($controllerInstance, $methodName)) {
                 return call_user_func([$controllerInstance, $methodName], $params);
             } else {
-                trigger_error("Method $methodName not found in controller $controllerName.", E_USER_ERROR);
+                trigger_error("Method $methodName not found in controller $controllerName.", E_USER_WARNING);
             }
         } else {
             trigger_error("Controller $controllerName not found. Check your controllers folder /controllers/$controllerName.php", E_USER_ERROR);
