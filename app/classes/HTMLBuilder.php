@@ -174,6 +174,13 @@ abstract class HTMLBuilder {
     }
 
     /**
+     * Removes the header from the HTML document.
+     */
+    public function removeHeader(){
+        $this->header = "";
+    }
+
+    /**
      * Adds a footer element to the HTML document.
      *
      * @param string $footer The footer element to add.
@@ -181,6 +188,13 @@ abstract class HTMLBuilder {
      */
     public function addFooter(string $footer = '', array $variables = []) {
         $this->_addContent(COMPONENTS_PATH.'footer.php', $footer, $this->footer, $variables);
+    }
+
+    /**
+     * Removes the footer from the HTML document.
+     */
+    public function removeFooter(){
+        $this->footer = "";
     }
 
     /**
