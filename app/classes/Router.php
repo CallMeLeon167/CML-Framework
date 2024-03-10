@@ -153,11 +153,17 @@ class Router extends \CML\Classes\HTMLBuilder{
      * @return array An array containing all defined routes.
      */
     public function getAllRoutes(): array {
-        return array_map(function($method, $routes) {
-            return array_map(function($url) use ($method) {
-                return ['method' => $method, 'url' => $url];
-            }, array_keys($routes));
-        }, array_keys($this->routes), $this->routes);
+        $allRoutes = [];
+        foreach ($this->routes as $method => $routes) {
+            foreach ($routes as $url => $route) {
+                $allRoutes[] = [
+                    'method' => $method, 
+                    'url' => $url, 
+                    'name' => $route['name'],
+                ];
+            }
+        }
+        return $allRoutes;
     }
 
     /**
@@ -311,7 +317,7 @@ class Router extends \CML\Classes\HTMLBuilder{
      */
     public function allMetas() {
         $metadata = [];
-        $routes = $this->getAllRoutes()[0];
+        $routes = $this->getAllRoutes();
 
         foreach ($routes as $data) {
             $url = $data["url"];
