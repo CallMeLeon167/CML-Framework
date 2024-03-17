@@ -3,13 +3,13 @@ RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} !-f 
 RewriteCond %{REQUEST_FILENAME} !-d 
 
-RewriteRule ^(.*)$ index.php?/$1 [L]
-RewriteRule ^app/classes(/.*)$ index.php?/$1 [L]
-RewriteRule ^app/config(/.*)$ index.php?/$1 [L]
-RewriteRule ^app/$ index.php?/$1 [L]
-RewriteRule ^app/admin/cml-error.php$ index.php?/$1 [L]
-RewriteRule ^app/admin/cml-load.php$ index.php?/$1 [L]
-RewriteRule ^controllers(/.*)$ index.php?/$1 [L]
-RewriteRule ^web/components(/.*)$ index.php?/$1 [L]
-RewriteRule ^web/sites(/.*)$ index.php?/$1 [L]
-RewriteRule ^sql(/.*)$ index.php?/$1 [L]
+RewriteRule ^(.*)$ index.php/?route=$1 [L]
+RewriteRule ^app/classes(/.*)$ index.php/?route=$1 [L]
+RewriteRule ^app/config(/.*)$ index.php/?route=$1 [L]
+RewriteRule ^app/$ index.php/?route=$1 [L]
+RewriteRule ^app/admin/cml-error.php$ index.php/?route=$1 [L]
+RewriteRule ^app/admin/cml-load.php$ index.php/?route=$1 [L]
+RewriteRule ^controllers(/.*)$ index.php/?route=$1 [L]
+RewriteRule ^web/components(/.*)$ index.php/?route=$1 [L]
+RewriteRule ^web/sites(/.*)$ index.php/?route=$1 [L]
+RewriteRule ^sql(/.*)$ index.php/?route=$1 [L]

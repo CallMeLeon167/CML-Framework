@@ -97,7 +97,7 @@ class Router extends \CML\Classes\HTMLBuilder{
      *
      * @var string
      */
-    public string $sitesPath;
+    public string $sitesPath = SITES_PATH ?? '';
     
     /**
      * An array to store "where" conditions for route parameters.
@@ -127,7 +127,7 @@ class Router extends \CML\Classes\HTMLBuilder{
      * Sets the sitesPath property to the value of the constant SITES_PATH, or an empty string if it is not defined.
      */
     public function __construct(){
-        $this->sitesPath = SITES_PATH ?? '';
+        $_GET = array_merge($_GET, $this->getQueryParams());
     }
 
     /**
