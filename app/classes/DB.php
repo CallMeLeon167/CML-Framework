@@ -18,6 +18,11 @@ class DB {
     private $conn;
 
     /**
+     * @var bool $autoclose Determines whether the database connection should be automatically closed.
+     */
+    private $autoclose;
+
+    /**
      * Indicates whether the database connection is established or not.
      *
      * @var bool
@@ -29,16 +34,22 @@ class DB {
      *
      * @var string
      */
-    public string $sqlPath;
+    public string $sqlPath = SQL_PATH ?? '';
     
     /**
      * Constructor of the DB class. Calls the methods to load environment variables and establish a connection to the database.
      */
-    public function __construct(bool $autoconnect = true) {
-        $this->sqlPath = SQL_PATH ?? '';
+    public function __construct(bool $autoconnect = true, bool $autoclose = false) {
+        $this->autoclose = $autoclose;
         if ($autoconnect) {
             $this->connected = true;
             $this->connect(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME); 
+        }
+    }
+
+    public function __destruct() {
+        if ($this->autoclose === true) {
+            $this->close();
         }
     }
     
@@ -294,6 +305,7 @@ class DB {
      */
     public function close() {
         if($this->connected){
+            $this->connected = false;
             $this->conn->close();
         }
     }
