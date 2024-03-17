@@ -30,5 +30,5 @@ $router->addFooter();
 $router->addRoute('GET', '/', function () use ($router) {
     $apiData = $router->useController("ApiController", "getRepoData", ['url' => 'https://docs.callmeleon.de/data']);
     $router->setTitle("Thank you! | CML - Framework");
-    $router->getSite("home.php", $apiData);
+    $router->view("home.php", $apiData);
 }, "home");

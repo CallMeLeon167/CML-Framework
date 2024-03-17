@@ -513,6 +513,17 @@ class Router extends \CML\Classes\HTMLBuilder{
     }
 
     /**
+     * Renders the specified view with optional variables.
+     *
+     * @param string $siteName The name of the view to render.
+     * @param array $variables An optional array of variables to pass to the view.
+     * @return void
+     */
+    public function view(string $siteName, array $variables = []){
+        $this->getSite($siteName, $variables);
+    }
+
+    /**
      * Loads and displays a file with PHP components embedded in HTML tags.
      *
      * @param string $siteName The name of the desired file.
@@ -522,7 +533,7 @@ class Router extends \CML\Classes\HTMLBuilder{
         $sitePath = self::getRootPath($this->sitesPath . $siteName);
     
         if (!file_exists($sitePath)) {
-            trigger_error(htmlentities("getSite('$siteName') | Site not found => " . $this->sitesPath . $siteName), E_USER_ERROR);
+            trigger_error(htmlentities("'$siteName' | Site not found => " . $this->sitesPath . $siteName), E_USER_ERROR);
             return;
         }
     
