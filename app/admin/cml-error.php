@@ -181,7 +181,7 @@
                     <span class='error-file'>" . getFilePath($errfile) . ":{$errline}</span>
                     </div>
                     <div class='file-content'>
-                    <pre><code class='language-php'>";
+                    <pre><code>";
                     
                     // Display code snippet around the error line
                     $lines = file($errfile);
