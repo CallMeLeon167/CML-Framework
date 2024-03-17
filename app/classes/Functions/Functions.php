@@ -43,7 +43,7 @@ trait Functions{
      * @return string The complete URL.
      */
     public function url(string $url = ""):string {
-        return BASE_URL . $url;
+        return BASE_URL . ltrim($url, "/");
     }
 
     /**
