@@ -72,12 +72,12 @@ abstract class HTMLBuilder {
     /**
      * @var string The language of the web page.
      */
-    private string $lang = "en";
+    private string $langAttr = "en";
     
     /**
      * @var string The character encoding for the web page.
      */
-    private string $charset = "UTF-8";
+    private string $charsetAttr = "UTF-8";
 
     /**
      * @var array The attributes for the body tag.
@@ -201,6 +201,7 @@ abstract class HTMLBuilder {
      * Set HTML tag attributes for the document.
      *
      * @param string $attr The HTML tag attributes to be added.
+     * @deprecated since version 2.8, to be removed in 3.0. Use html_filter() instead.
      */
     public function addHtmlTagAttributes(string $attr) {
         $this->htmlAttr[] = $attr;
@@ -210,36 +211,64 @@ abstract class HTMLBuilder {
      * Set body tag attributes for the document.
      *
      * @param string $attr The body tag attributes to be added.
+     * @deprecated since version 2.8, to be removed in 3.0. Use html_filter() instead.
      */
     public function addBodyTagAttributes(string $attr) {
         $this->bodyAttr[] = $attr;
     }
 
     /**
+     * Applies a filter to the specified HTML tag attribute.
+     *
+     * @param string $htmlFilter The HTML tag to filter (e.g., 'html', 'body', 'lang', 'title', 'charset').
+     * @param \Closure $function The filter function to apply.
+     * @return mixed The filtered attribute value.
+     */
+    public function html_filter(string $htmlFilter, \Closure $function) {
+        $accepted = ['html', 'body', 'lang', 'title', 'charset'];
+        $htmlFilter = strtolower($htmlFilter);
+
+        if (!in_array($htmlFilter, $accepted)) {
+            trigger_error("Invalid HTML tag: $htmlFilter", E_USER_WARNING);
+        }
+
+        if($htmlFilter == 'title'){
+            $filter = call_user_func($function, $this->title);
+            return $this->title = $filter;
+        } else {
+            $filter = call_user_func($function, $this->{$htmlFilter . 'Attr'});
+            return $this->{$htmlFilter . 'Attr'} = $filter;
+        }
+    }
+
+    /**
      * Set the lang attribute for the document.
      * 
      * @param string $lang The lang attribute of the document.
+     * @deprecated since version 2.8, to be removed in 3.0. Use html_filter() instead.
      */
     public function setLang(string $lang) {
-        $this->lang = $lang;
+        $this->langAttr = $lang;
     }
 
     /**
      * Get the lang attribute of the document.
      * 
      * @return string The lang attribute of the document.
+     * @deprecated since version 2.8, to be removed in 3.0. Use html_filter() instead.
      */
     public function getLang():string {
-        return $this->lang;
+        return $this->langAttr;
     }
 
     /**
      * Set the charset for the document.
      * 
      * @param string $charset The charset attribute of the document.
+     * @deprecated since version 2.8, to be removed in 3.0. Use html_filter() instead.
      */
     public function setCharset(string $charset) {
-        $this->charset = $charset;
+        $this->charsetAttr = $charset;
     }
 
     /**
@@ -435,22 +464,6 @@ abstract class HTMLBuilder {
         }
         return $htmlAttributes;
     }
-
-    /**
-     * Converts an array of attributes into a string representation.
-     *
-     * @param array $attributes The array of attributes.
-     * @return string The string representation of the attributes.
-     */
-    protected function _arrToAttrsString(array $attributes): string {
-        $attr = "";
-        if (!empty($attributes)) {
-            foreach ($attributes as $attribute) {
-                $attr .= " $attribute";
-            }
-        }
-        return $attr;
-    }
     
     /**
      * Adds a resource link to the HTML document.
@@ -630,10 +643,10 @@ abstract class HTMLBuilder {
      * Builds the opening HTML tags and outputs any content hooks before the head.
      */
     protected function _buildHtmlStart() {
-        $attr = $this->_arrToAttrsString($this->htmlAttr);
+        $attr = $this->_arrToHtmlAttrs($this->htmlAttr);
         ?>
         <!DOCTYPE html>
-        <html lang="<?= $this->lang ?>"<?= $attr?>>
+        <html lang="<?= $this->langAttr ?>"<?= $attr?>>
         <?= $this->_getHookContent(self::BEFORE_HEAD); ?>
         <?php
     }
@@ -645,7 +658,7 @@ abstract class HTMLBuilder {
         ?>
         <head>
             <?= $this->_getHookContent(self::TOP_HEAD); ?>
-            <meta charset="<?= $this->charset ?>">
+            <meta charset="<?= $this->charsetAttr ?>">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <?php $this->_buildMetas(); ?>
             <title><?= empty($this->title) ? APP_NAME : $this->title?></title>
@@ -664,7 +677,7 @@ abstract class HTMLBuilder {
      * Builds the body section of the HTML document with hooks, header content, etc.
      */   
     protected function _buildBody() {
-        $attr = $this->_arrToAttrsString($this->bodyAttr);
+        $attr = $this->_arrToHtmlAttrs($this->bodyAttr);
         echo $this->_getHookContent(self::BEFORE_BODY);
         echo "<body{$attr}>";
         echo $this->_getHookContent(self::TOP_BODY); 
