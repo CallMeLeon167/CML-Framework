@@ -230,6 +230,7 @@ abstract class HTMLBuilder {
 
         if (!in_array($htmlFilter, $accepted)) {
             trigger_error("Invalid HTML tag: $htmlFilter", E_USER_WARNING);
+            return null;
         }
 
         if($htmlFilter == 'title'){
