@@ -5,30 +5,30 @@ use CML\Classes\Router;
 use CML\Classes\DB;
 
 $db = new DB();
-$router = new Router();
+$app = new Router();
 
 //Project settings
-$router->activateMinifyHTML();
-$router->setErrorRedirect("/");
-$router->setFavicon("favicon.ico");
-$router->addMeta('name="theme-color" content="black"');
+$app->activateMinifyHTML();
+$app->setErrorRedirect("/");
+$app->setFavicon("favicon.ico");
+$app->addMeta('name="theme-color" content="black"');
 
 //Global CDNs
-$router->addCDN("link", 'rel="preconnect" href="https://fonts.googleapis.com"');
-$router->addCDN("link", 'rel="preconnect" href="https://fonts.gstatic.com" crossorigin');
-$router->addCDN("link", 'href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;400;600&display=swap" rel="stylesheet"');
+$app->addCDN("link", 'rel="preconnect" href="https://fonts.googleapis.com"');
+$app->addCDN("link", 'rel="preconnect" href="https://fonts.gstatic.com" crossorigin');
+$app->addCDN("link", 'href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;400;600&display=swap" rel="stylesheet"');
 
 //Global Styles
-$router->addStyle($router->compress("styles.css"));
+$app->addStyle($app->compress("styles.css"));
 
 //Global Scripts
-$router->addScript($router->compress("scripts.js"));
+$app->addScript($app->compress("scripts.js"));
 
 //Global HTML
-$router->addFooter();
+$app->addFooter();
 
-$router->addRoute('GET', '/', function () use ($router) {
-    $apiData = $router->useController("ApiController", "getRepoData", ['url' => 'https://docs.callmeleon.de/data']);
-    $router->setTitle("Thank you! | CML - Framework");
-    $router->view("home.php", $apiData);
+$app->addRoute('GET', '/', function () use ($app) {
+    $apiData = $app->useController("ApiController", "getRepoData", ['url' => 'https://docs.callmeleon.de/data']);
+    $app->setTitle("Thank you! | CML - Framework");
+    $app->view("home.php", $apiData);
 }, "home");
