@@ -539,59 +539,60 @@ class Router extends \CML\Classes\HTMLBuilder{
         }
     }
 
+
     /**
-     * Renders the specified view with optional variables.
+     * Processes a file by including it and capturing the output.
      *
-     * @param string $siteName The name of the view to render.
-     * @param array $variables An optional array of variables to pass to the view.
-     * @return void
+     * @param string $sitePath The path to the file to be processed.
+     * @param array $variables An optional array of variables to be extracted and made available to the included file.
+     * @return string The captured output of the included file.
      */
-    public function view(string $siteName, array $variables = []){
-        $this->getSite($siteName, $variables);
+    protected function _processFile(string $sitePath, array $variables = []): string {
+        if (!file_exists($sitePath)) {
+            trigger_error(htmlentities("'$sitePath' | Site not found"), E_USER_ERROR);
+            return '';
+        }
+
+        extract($variables);
+        ob_start();
+        require $sitePath;
+        return ob_get_clean();
     }
 
     /**
      * Loads and displays a file with PHP components embedded in HTML tags.
      *
-     * @param string $siteName The name of the desired file.
-     * @param array $variables An associative array of variables to be made available in the loaded file.
+     * @param string $siteName The name of the view to render.
+     * @param array $variables An optional array of variables to pass to the view.
+     * @return void
      */
-    public function getSite(string $siteName, array $variables = []) {
+    public function view(string $siteName, array $variables = []) {
         $sitePath = self::getRootPath($this->sitesPath . $siteName);
-    
-        if (!file_exists($sitePath)) {
-            trigger_error(htmlentities("'$siteName' | Site not found => " . $this->sitesPath . $siteName), E_USER_ERROR);
-            return;
-        }
-    
-        extract($variables);
-        ob_start();
-        require $sitePath;
-        $content = ob_get_clean();
-    
+        $content = $this->_processFile($sitePath, $variables);
+
         $content = preg_replace_callback('/<(\w+)([^>]*)>([\s\S]*?)<\/\1>|<(\w+)([^>]*)>/', function($matches) {
             $tag = $matches[4] ?? $matches[1];
             $attributes = $matches[5] ?? $matches[2];
             $slot = $matches[3] ?? null;
-    
+
             $componentName = $tag . '.cml.php';
             $componentPath = self::getRootPath(COMPONENTS_PATH . $componentName);
-    
+
             if (file_exists($componentPath) && preg_match('~^\p{Lu}~u', $tag)) {
                 $attributeValues = [];
                 preg_match_all('/(\w+)(?:="([^"]*)")?/', $attributes, $attributeMatches);
                 foreach ($attributeMatches[1] as $index => $attributeName) {
                     $attributeValues[$attributeName] = $attributeMatches[2][$index] ?? null;
                 }
-    
+
                 foreach ($attributeValues as $attributeName => $attributeValue) {
                     $$attributeName = $attributeValue;
                 }
-    
+
                 if (!empty($slot)) {
                     $slot = trim($slot);
                 }
-    
+
                 ob_start();
                 require $componentPath;
                 return ob_get_clean();
@@ -603,6 +604,21 @@ class Router extends \CML\Classes\HTMLBuilder{
         $this->build();
         echo $this->minifyHTML($content);
     }
+
+    /**
+     * Renders the specified view with optional variables.
+     *
+     * @param string $siteName The name of the desired file.
+     * @param array $variables An associative array of variables to be made available in the loaded file.
+     */
+    public function getSite(string $siteName, array $variables = []) {
+        $sitePath = self::getRootPath($this->sitesPath . $siteName);
+        $content = $this->_processFile($sitePath, $variables);
+
+        $this->build();
+        echo $this->minifyHTML($content);
+    }
+
     
 
     /**
