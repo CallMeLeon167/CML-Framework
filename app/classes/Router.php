@@ -100,13 +100,6 @@ class Router extends \CML\Classes\HTMLBuilder{
     public string $sitesPath = SITES_PATH ?? '';
     
     /**
-     * An array to store "where" conditions for route parameters.
-     *
-     * @var array
-     */
-    protected $whereConditions = [];
-
-    /**
      * Stores the named routes with their corresponding URLs.
      *
      * @var array
@@ -120,11 +113,10 @@ class Router extends \CML\Classes\HTMLBuilder{
      */
     public array $routeMetadata = [];
 
+
     /**
-     * Router constructor.
-     * 
-     * Initializes a new instance of the Router class.
-     * Sets the sitesPath property to the value of the constant SITES_PATH, or an empty string if it is not defined.
+     * Constructor method for the Router class.
+     * Merges the $_GET superglobal array with the query parameters obtained from the getQueryParams() method.
      */
     public function __construct(){
         $_GET = array_merge($_GET, $this->getQueryParams());
@@ -266,8 +258,6 @@ class Router extends \CML\Classes\HTMLBuilder{
                 'target' => $target,
                 'name' => $name,
                 'ajaxOnly' => false,
-                'params' => [],
-                'where' => $this->whereConditions,
             ];
 
             if (!empty($name)) {
@@ -275,9 +265,8 @@ class Router extends \CML\Classes\HTMLBuilder{
             }
         }
 
-        global $cml_namedRoutes; $cml_namedRoutes = $this->namedRoutes;
-
-        $this->whereConditions = []; // Clear where conditions
+        global $cml_namedRoutes; 
+        $cml_namedRoutes = $this->namedRoutes;
 
         return $this;
     }
@@ -349,15 +338,32 @@ class Router extends \CML\Classes\HTMLBuilder{
     }
     
     /**
-     * Add a "where" condition for a route parameter.
+     * Sets a "where" condition for the current route.
      *
      * @param string $param The name of the parameter to which the condition applies.
      * @param string $condition The regular expression condition for the parameter.
-     *
      * @return $this The router instance for method chaining.
      */
     public function where(string $param, string $condition) {
-        $this->whereConditions[$param] = $condition;
+        if (!empty($this->currentRoute)) {
+            $this->routes[$this->currentMethod][$this->currentRoute]['where'] = [$param => $condition];
+        }
+
+        return $this;
+    }
+
+    /**
+     * Sets a "where in" condition for the current route.
+     *
+     * @param string $param The parameter to apply the "where in" condition to.
+     * @param array $in The array of values to check against for the "where in" condition.
+     * @return $this The current instance of the Router class.
+     */
+    public function whereIn(string $param, array $in) {
+        if (!empty($this->currentRoute)) {
+            $this->routes[$this->currentMethod][$this->currentRoute]['whereIn'] = [$param => $in];
+        }
+
         return $this;
     }
 
@@ -409,16 +415,16 @@ class Router extends \CML\Classes\HTMLBuilder{
 
         // Process the given action based on the HTTP request method (e.g., GET, POST, etc.)
         if (isset($this->routes[$method])) {
-            $this->_processRoutes($url, $this->routes[$method]);
+            $process = $this->_processRoutes($url, $this->routes[$method]);
         }
 
         // Process wildcard routes for all methods
         if (isset($this->routes['*'])) {
-            $this->_processRoutes($url, $this->routes['*']);
+            $process = $this->_processRoutes($url, $this->routes['*']);
         }
 
         // Redirect to the specified URL if the route is not found and a redirect URL is set
-        if (!isset($this->routes[$method][$url])) {
+        if (!isset($this->routes[$method][$url]) || $process === false) {
             if (!empty($this->redirectUrl)) {
                 header("Location: " . $this->redirectUrl);
                 die;
@@ -451,11 +457,14 @@ class Router extends \CML\Classes\HTMLBuilder{
     
             // Check if the current URL matches the pattern
             if (preg_match('#^' . $pattern . '$#', $url, $matches)) {
-                // Merge "where" conditions from the route with global "where" conditions
-                $whereConditions = array_merge($routeData['where'], $this->whereConditions);
-    
+
+                // Check "whereIn" conditions
+                if(!empty($routeData['whereIn']) && $this->_checkWhereIn($matches, $routeData['whereIn'])) {
+                    return false;
+                }
+
                 // Check "where" conditions
-                if ($this->_checkWhereConditions($matches, $whereConditions)) {
+                if ($this->_checkWhereConditions($matches, $routeData['where'] ?? array())) {
                     // Execute global middleware function
                     if (!empty($this->globalMiddleware) && !in_array($url, $this->globalMiddleware["url"])) {
                         call_user_func($this->globalMiddleware["function"][0]);
@@ -474,6 +483,8 @@ class Router extends \CML\Classes\HTMLBuilder{
     
                     // Close the application
                     (!$this->isApi && !$routeData['ajaxOnly']) ? parent::_build_end() : exit;
+                } else {
+                    return false;
                 }
             }
         }
@@ -490,6 +501,22 @@ class Router extends \CML\Classes\HTMLBuilder{
     protected function _checkWhereConditions(array $parameterValues, array $whereConditions):bool {
         foreach ($whereConditions as $paramName => $condition) {
             if (isset($parameterValues[$paramName]) && !preg_match($condition, $parameterValues[$paramName])) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    /**
+     * Checks if the parameter values satisfy the given where conditions.
+     *
+     * @param array $parameterValues The parameter values to check.
+     * @param array $whereConditions The where conditions to satisfy.
+     * @return bool Returns true if the parameter values satisfy the where conditions, false otherwise.
+     */
+    protected function _checkWhereIn(array $parameterValues, array $whereConditions): bool {
+        foreach ($whereConditions as $paramName => $conditions) {
+            if (isset($parameterValues[$paramName]) && in_array($parameterValues[$paramName], $conditions)) {
                 return false;
             }
         }
