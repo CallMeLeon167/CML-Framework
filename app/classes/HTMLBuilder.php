@@ -166,10 +166,10 @@ abstract class HTMLBuilder {
     /**
      * Adds a header element to the HTML document.
      *
-     * @param string $header The header element to add.
+     * @param string|array $header The header element to add  or variables if array.
      * @param array $variables Associative array of variables to be extracted and made available in the included file.
      */
-    public function addHeader(string $header = '', array $variables = []) {
+    public function addHeader($header = '', array $variables = []) {
         $this->_addContent(COMPONENTS_PATH.'header.php', $header, $this->header, $variables);
     }
 
@@ -183,10 +183,10 @@ abstract class HTMLBuilder {
     /**
      * Adds a footer element to the HTML document.
      *
-     * @param string $footer The footer element to add.
+     * @param string|array $footer The footer element to add  or variables if array.
      * @param array $variables Associative array of variables to be extracted and made available in the included file.
      */
-    public function addFooter(string $footer = '', array $variables = []) {
+    public function addFooter($footer = '', array $variables = []) {
         $this->_addContent(COMPONENTS_PATH.'footer.php', $footer, $this->footer, $variables);
     }
 
@@ -428,19 +428,25 @@ abstract class HTMLBuilder {
      * Generic function to add content (header or footer) to the HTML document.
      *
      * @param string $path The path to the content file.
-     * @param string $content The content to add.
+     * @param string|array $contentOrVariable The content to add or variables if array.
      * @param string &$property The property to store the content in.
      * @param array $variables Associative array of variables to be extracted and made available in the included file.
      */
-    protected function _addContent(string $path, string $content, string &$property, array $variables = []) {
+    protected function _addContent(string $path, $contentOrVariable, string &$property, array $variables = []) {
         $contentFile = $path ?? '';
-        if (empty($contentFile) && empty($content)) {
+        if (empty($contentFile) && empty($contentOrVariable)) {
             return trigger_error("Could not set the $path", E_USER_ERROR);
         }
 
-        if (!empty($content)) {
-            $property = $content;
+        if(is_array($contentOrVariable)) {
+            extract($contentOrVariable);
+            goto a;
+        }
+
+        if (!empty($contentOrVariable)) {
+            $property = $contentOrVariable;
         } else {
+            a:
             if (file_exists(self::getRootPath($contentFile))) {
                 extract($variables);
                 ob_start();
