@@ -244,9 +244,9 @@ class DB
      *
      * @param string $query The SQL query to execute.
      * @param array $params An optional array of parameters to bind to the query.
-     * @return int The number of affected rows.
+     * @return array The number of affected rows.
      */
-    public function sql2db(string $query, array $params = []): int
+    public function sql2db(string $query, array $params = []): array
     {
         if (!$this->connected) {
             trigger_error("No database connected!", E_USER_ERROR);
@@ -287,13 +287,18 @@ class DB
         $executionTime = round($executionTime < 1 ? $executionTime * 1000 : $executionTime, $executionTime < 1 ? 0 : 2) . ($executionTime < 1 ? ' ms' : ' s');
 
         $affectedRows = $stmt->affected_rows;
+        $insertId = $stmt->insert_id;
+
         $callData = $this->_traceFunctionCalls('sql2db');
 
         $this->cml_db_update_amount();
         $this->cml_db_update_request_query(array_merge(['query' => $query, 'params' => $params, 'affected_rows' => $affectedRows, 'executionTime' => $executionTime], $callData));
 
         $stmt->close();
-        return $affectedRows;
+        return [
+            "affectedRows" => $affectedRows,
+            "insertId" => $insertId
+        ];
     }
 
     /**
