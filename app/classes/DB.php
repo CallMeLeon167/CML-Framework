@@ -493,17 +493,18 @@ class DB
      *
      * @param string $name The name of the data.
      * @param string $value The value of the data.
-     * @param bool $htmlSpecialChars Whether to apply htmlspecialchars to the value or not.
-     *
+     * @param bool $htmlSpecialChars Whether to apply HTML special characters encoding to the value.
+     * @return array The result of the database operation.
+     * 
      * @throws Exception
      */
-    public function setData(string $name, string $value, bool $htmlSpecialChars = false): void
+    public function setData(string $name, string $value, bool $htmlSpecialChars = false): array
     {
         $this->checkDataTable();
         $query = "INSERT INTO `cml_data` (`data_name`, `data_value`, `data_created`)
                   VALUES ('$name', '$value', now())
                   ON DUPLICATE KEY UPDATE `data_value` = " . ($htmlSpecialChars ? '?' : "'$value'") . ", `data_lastModify` = now()";
-        $this->sql2db($query, $htmlSpecialChars ? [$value] : []);
+        return $this->sql2db($query, $htmlSpecialChars ? [$value] : []);
     }
 
     /**
@@ -525,8 +526,9 @@ class DB
      * Deletes data from the database based on the given name.
      *
      * @param string $name The name of the data to be deleted.
+     * @return array The result of the delete operation.
      */
-    public function deleteData(string $name): int
+    public function deleteData(string $name): array
     {
         $this->checkDataTable();
         return $this->sql2db("DELETE FROM `cml_data` WHERE `data_name` = '$name'");
