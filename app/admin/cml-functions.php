@@ -59,3 +59,75 @@ function cml_config(mixed $config = null): mixed
         }
     }
 }
+
+/**
+ * Sets the 'selected' attribute for an HTML element if the given value matches the check value.
+ *
+ * @param mixed $value The value to compare against the check value.
+ * @param string $check The check value. Defaults to "true".
+ * @param bool $echo Whether to echo the 'selected' attribute or return it as a string. Defaults to true.
+ * @return string If $echo is true, the function echoes the 'selected' attribute. Returns the 'selected' attribute as a string.
+ */
+function selected($value, $check = "true", $echo = true)
+{
+    return _attr_helper('selected', $value, $check, $echo);
+}
+
+/**
+ * Sets the 'disabled' attribute for an HTML element if the given value matches the check value.
+ *
+ * @param mixed $value The value to compare against the check value.
+ * @param string $check The check value. Defaults to "true".
+ * @param bool $echo Whether to echo the 'disabled' attribute or return it as a string. Defaults to true.
+ * @return string If $echo is true, the function echoes the 'disabled' attribute. Returns the 'disabled' attribute as a string.
+ */
+function disabled($value, $check = "true", $echo = true)
+{
+    return _attr_helper('disabled', $value, $check, $echo);
+}
+
+/**
+ * Sets the 'readonly' attribute for an HTML element if the given value matches the check value.
+ *
+ * @param mixed $value The value to compare against the check value.
+ * @param string $check The check value. Defaults to "true".
+ * @param bool $echo Whether to echo the 'readonly' attribute or return it as a string. Defaults to true.
+ * @return string If $echo is true, the function echoes the 'readonly' attribute. Returns the 'readonly' attribute as a string.
+ */
+function readonly($value, $check = "true", $echo = true)
+{
+    return _attr_helper('readonly', $value, $check, $echo);
+}
+
+/**
+ * Sets the 'required' attribute for an HTML element if the given value matches the check value.
+ *
+ * @param mixed $value The value to compare against the check value.
+ * @param string $check The check value. Defaults to "true".
+ * @param bool $echo Whether to echo the 'required' attribute or return it as a string. Defaults to true.
+ * @return string If $echo is true, the function echoes the 'required' attribute. Returns the 'required' attribute as a string.
+ */
+function required($value, $check = "true", $echo = true)
+{
+    return _attr_helper('required', $value, $check, $echo);
+}
+
+/**
+ * Helper function to generate and optionally echo an HTML attribute if the given value matches the check value.
+ *
+ * @param string $attr The HTML attribute to set (e.g., 'selected', 'disabled').
+ * @param mixed $value The value to compare against the check value.
+ * @param string $check The check value. Defaults to "true".
+ * @param bool $echo Whether to echo the attribute or return it as a string. Defaults to true.
+ * @return string If $echo is true, the function echoes the attribute. Returns the attribute as a string.
+ */
+function _attr_helper($attr, $value, $check, $echo = true)
+{
+    $result = ($value == $check) ? " $attr=\"$attr\"" : '';
+
+    if ($echo) {
+        echo $result;
+    }
+
+    return $result;
+}
