@@ -731,12 +731,26 @@ abstract class HTMLBuilder extends Cache
     public function minifyHTML(string $html): string
     {
         if ($this->minifyHTML === true) {
-            // Remove spaces, line breaks, and tabs
+            // Replace temporary <pre> tags
+            $html = preg_replace_callback('/<pre\b[^>]*>(.*?)<\/pre>/is', function ($matches) {
+                return '<pre>' . base64_encode($matches[1]) . '</pre>';
+            }, $html);
+
+            // Remove spaces, line breaks, and tabs outside of <pre> tags
             $minified = preg_replace('/\s+/', ' ', $html);
+
             // Remove HTML comments
             $minified = preg_replace('/<!--(.|\s)*?-->/', '', $minified);
+
             // Remove unnecessary spaces around tags
-            return preg_replace('/>\s+</', '><', $minified);
+            $minified = preg_replace('/>\s+</', '><', $minified);
+
+            // Wiederherstellen der <pre> Tag Inhalte
+            $minified = preg_replace_callback('/<pre>(.*?)<\/pre>/is', function ($matches) {
+                return '<pre>' . base64_decode($matches[1]) . '</pre>';
+            }, $minified);
+
+            return $minified;
         } else {
             return $html;
         }
