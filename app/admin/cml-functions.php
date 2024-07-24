@@ -61,6 +61,19 @@ function cml_config(mixed $config = null): mixed
 }
 
 /**
+ * Sets the 'checked' attribute for an HTML element if the given value matches the check value.
+ *
+ * @param mixed $value The value to compare against the check value.
+ * @param string $check The check value. Defaults to "true".
+ * @param bool $echo Whether to echo the 'checked' attribute or return it as a string. Defaults to true.
+ * @return string If $echo is true, the function echoes the 'checked' attribute. Returns the 'checked' attribute as a string.
+ */
+function checked($value, $check = "true", $echo = true)
+{
+    return _attr_helper('checked', $value, $check, $echo);
+}
+
+/**
  * Sets the 'selected' attribute for an HTML element if the given value matches the check value.
  *
  * @param mixed $value The value to compare against the check value.
