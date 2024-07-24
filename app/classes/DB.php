@@ -211,9 +211,8 @@ class DB
         }
 
         $sqlContent = file_get_contents($filepath);
-        $queries = explode(';', $sqlContent);
 
-        return array_map(fn ($query) => $this->sql2array(trim($query), $params), array_filter($queries));
+        return $this->sql2array(trim($sqlContent), $params);
     }
 
     /**
@@ -222,7 +221,7 @@ class DB
      * @param string $fileName The filename of the SQL query.
      * @param array $params Parameters for the SQL query (optional).
      */
-    public function sqlFile2db(string $fileName, array $params = []): void
+    public function sqlFile2db(string $fileName, array $params = []): array
     {
         $filepath = self::getRootPath($this->sqlPath . $fileName);
 
@@ -231,13 +230,9 @@ class DB
         }
 
         $sqlContent = file_get_contents($filepath);
-        $queries = array_filter(array_map('trim', explode(';', $sqlContent)));
 
-        foreach ($queries as $query) {
-            $this->sql2db($query, $params);
-        }
+        return $this->sql2db(trim($sqlContent), $params);
     }
-
 
     /**
      * Executes a SQL query on the database and returns the number of affected rows.
@@ -252,52 +247,78 @@ class DB
             trigger_error("No database connected!", E_USER_ERROR);
         }
 
-        $stmt = $this->conn->prepare($query);
+        $queries = strpos($query, ';') !== false ? array_filter(array_map('trim', explode(';', $query))) : [$query];
 
-        if (!$stmt) {
-            trigger_error("SQL Error: " . $this->conn->error, E_USER_ERROR);
-        }
+        $results = [];
+        $totalAffectedRows = 0;
+        $lastInsertId = 0;
+        $totalExecutionTime = 0;
 
-        if (!empty($params)) {
-            $types = "";
-            $values = [];
+        foreach ($queries as $singleQuery) {
+            $stmt = $this->conn->prepare($singleQuery);
 
-            foreach ($params as $param) {
-                if (is_int($param)) {
-                    $types .= "i";
-                } elseif (is_string($param)) {
-                    $types .= "s";
-                    $param = $this->cleanInput($param);
-                } elseif (is_double($param)) {
-                    $types .= "d";
-                } else {
-                    $types .= "s";
-                }
-                $values[] = $param;
+            if (!$stmt) {
+                trigger_error("SQL Error: " . $this->conn->error, E_USER_ERROR);
             }
 
-            array_unshift($values, $types);
+            if (!empty($params)) {
+                $types = "";
+                $values = [];
 
-            call_user_func_array(array($stmt, 'bind_param'), $this->refValues($values));
+                foreach ($params as $param) {
+                    if (is_int($param)) {
+                        $types .= "i";
+                    } elseif (is_string($param)) {
+                        $types .= "s";
+                        $param = $this->cleanInput($param);
+                    } elseif (is_double($param)) {
+                        $types .= "d";
+                    } else {
+                        $types .= "s";
+                    }
+                    $values[] = $param;
+                }
+
+                array_unshift($values, $types);
+
+                call_user_func_array(array($stmt, 'bind_param'), $this->refValues($values));
+            }
+
+            $startTime = microtime(true);
+            $stmt->execute();
+            $executionTime = microtime(true) - $startTime;
+            $totalExecutionTime += $executionTime;
+
+            $affectedRows = $stmt->affected_rows;
+            $insertId = $stmt->insert_id;
+
+            $totalAffectedRows += $affectedRows;
+            if ($insertId > 0) {
+                $lastInsertId = $insertId;
+            }
+
+            $results[] = [
+                "query" => $singleQuery,
+                "affectedRows" => $affectedRows,
+                "insertId" => $insertId,
+                "executionTime" => round($executionTime < 1 ? $executionTime * 1000 : $executionTime, $executionTime < 1 ? 0 : 2) . ($executionTime < 1 ? ' ms' : ' s')
+            ];
+
+            $stmt->close();
         }
 
-        $startTime = microtime(true);
-        $stmt->execute();
-        $executionTime = microtime(true) - $startTime;
-        $executionTime = round($executionTime < 1 ? $executionTime * 1000 : $executionTime, $executionTime < 1 ? 0 : 2) . ($executionTime < 1 ? ' ms' : ' s');
-
-        $affectedRows = $stmt->affected_rows;
-        $insertId = $stmt->insert_id;
+        $totalExecutionTime = round($totalExecutionTime < 1 ? $totalExecutionTime * 1000 : $totalExecutionTime, $totalExecutionTime < 1 ? 0 : 2) . ($totalExecutionTime < 1 ? ' ms' : ' s');
 
         $callData = $this->_traceFunctionCalls('sql2db');
 
         $this->cml_db_update_amount();
-        $this->cml_db_update_request_query(array_merge(['query' => $query, 'params' => $params, 'affected_rows' => $affectedRows, 'executionTime' => $executionTime], $callData));
+        $this->cml_db_update_request_query(array_merge(['query' => $query, 'params' => $params, 'affected_rows' => $totalAffectedRows, 'executionTime' => $totalExecutionTime], $callData));
 
-        $stmt->close();
         return [
-            "affectedRows" => $affectedRows,
-            "insertId" => $insertId
+            "affectedRows" => $totalAffectedRows,
+            "insertId" => $lastInsertId,
+            "executionTime" => $totalExecutionTime,
+            "results" => $results
         ];
     }
 
