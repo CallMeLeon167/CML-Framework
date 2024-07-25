@@ -18,11 +18,77 @@ class Router extends \CML\Classes\HTMLBuilder
     use Functions\Session;
 
     /**
+     * @var array Stores the indexing status and sitemap data for each route
+     */
+    protected array $routeIndexData = [];
+
+    /**
+     * @var array Stores the indexing status for each route
+     */
+    protected array $routeIndexStatus = [];
+
+    /**
      * Stores the defined routes.
      *
      * @var array
      */
     protected array $routes = [];
+
+    /**
+     * Stores the named routes with their corresponding URLs.
+     *
+     * @var array
+     */
+    public array $namedRoutes = [];
+
+    /**
+     * An array to store metadata for routes.
+     * 
+     * @var array
+     */
+    public array $routeMetadata = [];
+
+    /**
+     * Stores route-specific middleware functions.
+     *
+     * @var array
+     */
+    protected array $middlewares = [];
+
+    /**
+     * Stores global middleware functions.
+     *
+     * @var array
+     */
+    protected array $globalMiddleware = [];
+
+    /**
+     * Stores route aliases.
+     *
+     * @var array
+     */
+    protected array $aliases = [];
+
+    /**
+     * Stores the Page to show if a route is not defined.
+     *
+     * @var array
+     */
+    public array $errorPage = [];
+
+    /**
+     * Array of error page variables.
+     *
+     * @var array
+     */
+    public array $errorPageVariables = [];
+
+    /**
+     * Stores the parameters of the current route.
+     *
+     * @var array
+     */
+    protected array $currentRouteParams = [];
 
     /**
      * Stores the currently requested route.
@@ -53,26 +119,6 @@ class Router extends \CML\Classes\HTMLBuilder
      */
     protected string $currentMethod = '';
 
-    /**
-     * Stores route-specific middleware functions.
-     *
-     * @var array
-     */
-    protected array $middlewares = [];
-
-    /**
-     * Stores global middleware functions.
-     *
-     * @var array
-     */
-    protected array $globalMiddleware = [];
-
-    /**
-     * Stores route aliases.
-     *
-     * @var array
-     */
-    protected array $aliases = [];
 
     /**
      * Stores the URL to redirect to if a route is not defined.
@@ -82,18 +128,11 @@ class Router extends \CML\Classes\HTMLBuilder
     public string $redirectUrl = "";
 
     /**
-     * Stores the Page to show if a route is not defined.
+     * Stores sites path.
      *
-     * @var array
+     * @var string
      */
-    public array $errorPage = [];
-
-    /**
-     * Array of error page variables.
-     *
-     * @var array
-     */
-    public array $errorPageVariables = [];
+    public string $sitesPath = "";
 
     /**
      * Indicates whether the route is an API route.
@@ -103,35 +142,6 @@ class Router extends \CML\Classes\HTMLBuilder
     public bool $isApi = false;
 
     /**
-     * Stores the parameters of the current route.
-     *
-     * @var array
-     */
-    protected array $currentRouteParams = [];
-
-    /**
-     * Stores sites path.
-     *
-     * @var string
-     */
-    public string $sitesPath = "";
-
-    /**
-     * Stores the named routes with their corresponding URLs.
-     *
-     * @var array
-     */
-    public array $namedRoutes = [];
-
-    /**
-     * An array to store metadata for routes.
-     * 
-     * @var array
-     */
-    public array $routeMetadata = [];
-
-
-    /**
      * Constructor method for the Router class.
      * Merges the $_GET superglobal array with the query parameters obtained from the getQueryParams() method.
      */
@@ -139,6 +149,7 @@ class Router extends \CML\Classes\HTMLBuilder
     {
         $this->sitesPath = cml_config('SITES_PATH');
         $_GET = array_merge($_GET, $this->getQueryParams());
+        $this->registerSitemapRoute();
     }
 
     /**
@@ -158,6 +169,96 @@ class Router extends \CML\Classes\HTMLBuilder
     {
         self::setHeader('Content-Type', 'application/json');
         return $this->isApi = true;
+    }
+
+    /**
+     * Sets the indexing status and sitemap data for the current route
+     *
+     * @param bool $indexable True if the route should be indexable, false otherwise
+     * @param array $sitemapData Additional sitemap data (lastmod, changefreq, priority)
+     * @return $this
+     */
+    public function setIndexable(bool $indexable = true, array $sitemapData = [])
+    {
+        if (!empty($this->currentRoute)) {
+            $this->routeIndexData[$this->currentRoute] = [
+                'indexable' => $indexable,
+                'lastmod' => $sitemapData['lastmod'] ?? null,
+                'changefreq' => $sitemapData['changefreq'] ?? null,
+                'priority' => $sitemapData['priority'] ?? null,
+            ];
+        }
+        return $this;
+    }
+
+
+    /**
+     * Returns the indexing status of a route
+     *
+     * @param string $route The route to check
+     * @return bool True if the route is indexable, false otherwise
+     */
+    public function isIndexable(string $route): bool
+    {
+        if (!cml_config('PRODUCTION')) {
+            return false;
+        }
+        return $this->routeIndexData[$route]['indexable'] ?? true; // Default is indexable
+    }
+
+    /**
+     * Generates the sitemap
+     *
+     * @return string The generated sitemap as an XML string
+     */
+    public function generateSitemap(): string
+    {
+        $xml = new \SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>');
+
+        foreach ($this->getAllRoutes() as $route) {
+            if ($this->isIndexable($route['url'])) {
+                $url = $xml->addChild('url');
+                $url->addChild('loc', $this->url($route['url']));
+
+                $sitemapData = $this->routeIndexData[$route['url']] ?? [];
+
+                if (!empty($sitemapData['lastmod'])) {
+                    $url->addChild('lastmod', date('c', strtotime($sitemapData['lastmod'])));
+                }
+
+                if (!empty($sitemapData['changefreq'])) {
+                    $url->addChild('changefreq', $sitemapData['changefreq']);
+                }
+
+                if (!empty($sitemapData['priority'])) {
+                    $url->addChild('priority', number_format($sitemapData['priority'], 1));
+                }
+            }
+        }
+
+        return $xml->asXML();
+    }
+
+    /**
+     * Registers the sitemap route
+     */
+    protected  function registerSitemapRoute()
+    {
+        $this->addRoute('GET', '/sitemap.xml', function () {
+            $this->isApi();
+            header('Content-Type: application/xml');
+            echo $this->generateSitemap();
+        })->setIndexable(false); // The sitemap itself should not be indexed
+    }
+
+    /**
+     * Sets the robots meta tag based on the indexing status of the current route
+     */
+    protected function setRobotsMetaTag()
+    {
+        $indexable = $this->isIndexable($this->currentUrl);
+        $content = $indexable ? 'index, follow' : 'noindex, nofollow';
+        $this->addMeta('name="robots" content="' . $content . '"');
     }
 
     /**

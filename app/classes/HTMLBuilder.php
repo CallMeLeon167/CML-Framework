@@ -773,10 +773,23 @@ abstract class HTMLBuilder extends Cache
     }
 
     /**
+     * Sets the robots meta tag based on the indexing status of the current route
+     */
+    protected function setRobotsMetaTag()
+    {
+        if ($this instanceof Router && method_exists($this, 'isIndexable')) {
+            $indexable = $this->isIndexable($this->currentUrl);
+            $content = $indexable ? 'index, follow' : 'noindex, nofollow';
+            $this->addMeta('name="robots" content="' . $content . '"');
+        }
+    }
+
+    /**
      * Builds the complete HTML structure.
      */
     protected function buildHTML(string $outputContent = "")
     {
+        $this->setRobotsMetaTag();
         $cacheKey = $this->currentUrl;
         $this->checkCache($cacheKey);
 
