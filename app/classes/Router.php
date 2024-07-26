@@ -142,6 +142,13 @@ class Router extends \CML\Classes\HTMLBuilder
     public bool $isApi = false;
 
     /**
+     * Indicates whether the sitemap is enabled or not.
+     *
+     * @var bool
+     */
+    private bool $sitemapEnabled = true;
+
+    /**
      * Constructor method for the Router class.
      * Merges the $_GET superglobal array with the query parameters obtained from the getQueryParams() method.
      */
@@ -149,7 +156,6 @@ class Router extends \CML\Classes\HTMLBuilder
     {
         $this->sitesPath = cml_config('SITES_PATH');
         $_GET = array_merge($_GET, $this->getQueryParams());
-        $this->registerSitemapRoute();
     }
 
     /**
@@ -157,6 +163,7 @@ class Router extends \CML\Classes\HTMLBuilder
      */
     public function __destruct()
     {
+        $this->registerSitemapRoute();
         $this->_matchRoute();
     }
 
@@ -240,15 +247,27 @@ class Router extends \CML\Classes\HTMLBuilder
     }
 
     /**
+     * Disables the sitemap functionality.
+     *
+     * This method sets the $sitemapEnabled property to false, indicating that the sitemap functionality is disabled.
+     */
+    public function disableSitemap()
+    {
+        $this->sitemapEnabled = false;
+    }
+
+    /**
      * Registers the sitemap route
      */
     protected  function registerSitemapRoute()
     {
-        $this->addRoute('GET', '/sitemap.xml', function () {
-            $this->isApi();
-            header('Content-Type: application/xml');
-            echo $this->generateSitemap();
-        })->setIndexable(false); // The sitemap itself should not be indexed
+        if ($this->sitemapEnabled == true) {
+            $this->addRoute('GET', '/sitemap.xml', function () {
+                $this->isApi();
+                self::setHeader('Content-Type', 'application/xml');
+                echo $this->generateSitemap();
+            })->setIndexable(false); // The sitemap itself should not be indexed
+        }
     }
 
     /**
