@@ -38,7 +38,7 @@ class FileUploader
     protected $errorMessages = [
         'FILE_NOT_UPLOADED' => 'No file uploaded with name %s',
         'UPLOAD_ERROR' => 'Upload error: %s',
-        'FILE_SIZE_EXCEEDED' => 'File size exceeds the maximum allowed size: %s',
+        'FILE_SIZE_EXCEEDED' => 'File size exceeds the maximum allowed size of %s',
         'FILE_EXTENSION_NOT_ALLOWED' => "File extension '%s' is not allowed. Allowed extensions: %s",
         'MOVE_FAILED' => 'Failed to move uploaded file',
         'INVALID_UPLOAD_DIRECTORY' => 'Invalid upload directory: %s',
@@ -69,7 +69,7 @@ class FileUploader
         if (!is_writable($this->uploadDirectory)) {
             throw new \InvalidArgumentException(sprintf($this->errorMessages['UPLOAD_DIRECTORY_NOT_WRITABLE'], $this->uploadDirectory));
         }
-        $this->allowedExtensions = $allowedExtensions;
+        $this->allowedExtensions = array_map('strtolower', $allowedExtensions);
         $this->maxFileSize = $maxFileSize;
         $this->errorMessages = array_merge($this->errorMessages, $customErrorMessages);
     }
@@ -81,11 +81,12 @@ class FileUploader
      * @param string|null $customFilename Optional custom filename (without extension).
      * @return array An array containing the upload status, errors (if any), and filename.
      */
-    public function upload(string $fileInputName, $customFilename = null)
+    public function upload($fileInputName, $customFilename = null)
     {
         $status = true;
         $errors = [];
         $filename = '';
+
         if (!isset($_FILES[$fileInputName])) {
             $status = false;
             $errors['FILE_NOT_UPLOADED'] = sprintf($this->errorMessages['FILE_NOT_UPLOADED'], $fileInputName);
@@ -94,7 +95,7 @@ class FileUploader
 
             if ($file['error'] !== UPLOAD_ERR_OK) {
                 $status = false;
-                $errors['UPLOAD_ERROR'] = sprintf($this->errorMessages['UPLOAD_ERROR'], $this->getUploadErrorMessage($file['error']));
+                $errors['UPLOAD_ERROR'] = $this->getUploadErrorMessage($file['error'], $fileInputName);
             } else {
                 if ($file['size'] == 0) {
                     $status = false;
@@ -209,7 +210,8 @@ class FileUploader
     {
         $filename = pathinfo($originalFilename, PATHINFO_FILENAME);
         $extension = pathinfo($originalFilename, PATHINFO_EXTENSION);
-        return $filename . '_' . uniqid() . '.' . $extension;
+        $uniqueName = $this->sanitizeFilename($filename) . '_' . uniqid();
+        return $uniqueName . '.' . $extension;
     }
 
     /**
@@ -232,21 +234,22 @@ class FileUploader
      * Gets the error message for a specific upload error code.
      *
      * @param int $errorCode The upload error code.
+     * @param string $fileInputName The name of the file input field.
      * @return string The error message.
      */
-    protected function getUploadErrorMessage($errorCode)
+    protected function getUploadErrorMessage($errorCode, $fileInputName)
     {
         $errorMessages = [
-            UPLOAD_ERR_INI_SIZE => $this->errorMessages['FILE_SIZE_EXCEEDED'],
-            UPLOAD_ERR_FORM_SIZE => $this->errorMessages['FILE_SIZE_EXCEEDED'],
+            UPLOAD_ERR_INI_SIZE => sprintf($this->errorMessages['FILE_SIZE_EXCEEDED'], ini_get('upload_max_filesize')),
+            UPLOAD_ERR_FORM_SIZE => sprintf($this->errorMessages['FILE_SIZE_EXCEEDED'], 'form defined size'),
             UPLOAD_ERR_PARTIAL => $this->errorMessages['PARTIAL_UPLOAD'],
-            UPLOAD_ERR_NO_FILE => $this->errorMessages['FILE_NOT_UPLOADED'],
+            UPLOAD_ERR_NO_FILE => sprintf($this->errorMessages['FILE_NOT_UPLOADED'], $fileInputName),
             UPLOAD_ERR_NO_TMP_DIR => $this->errorMessages['NO_TMP_DIR'],
             UPLOAD_ERR_CANT_WRITE => $this->errorMessages['CANT_WRITE_FILE'],
             UPLOAD_ERR_EXTENSION => $this->errorMessages['PHP_EXTENSION_STOPPED_UPLOAD'],
         ];
 
-        return $errorMessages[$errorCode] ?? "Unknown upload error";
+        return $errorMessages[$errorCode] ?? sprintf($this->errorMessages['UPLOAD_ERROR'], "Unknown error (code $errorCode)");
     }
 
     /**
