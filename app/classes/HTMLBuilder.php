@@ -107,7 +107,6 @@ abstract class HTMLBuilder extends Cache
      */
     private string $charsetAttr = "UTF-8";
 
-    private array $customBarElements = [];
 
     /**
      * @var string Stores the currently url.
@@ -118,6 +117,21 @@ abstract class HTMLBuilder extends Cache
      * @var string Stores the currently name of route.
      */
     public string $currentRouteName;
+
+    /**
+     * @var array Store inline styles for HTML elements.
+     */
+    protected $inlineStyles = [];
+
+    /**
+     * @var array Store inline scripts for HTML elements.
+     */
+    protected $inlineScripts = [];
+
+    /**
+     * @var array Store custom bar elements for HTML elements.
+     */
+    private array $customBarElements = [];
 
     /**
      * @var array The attributes for the body tag.
@@ -785,6 +799,46 @@ abstract class HTMLBuilder extends Cache
     }
 
     /**
+     * Add inline CSS style
+     *
+     * @param string $style
+     */
+    public function addInlineStyle(string $style)
+    {
+        $this->inlineStyles[] = $style;
+    }
+
+    /**
+     * Add inline JavaScript
+     *
+     * @param string $script
+     */
+    public function addInlineScript(string $script)
+    {
+        $this->inlineScripts[] = $script;
+    }
+
+    /**
+     * Build inline styles
+     */
+    protected function _buildInlineStyles()
+    {
+        if (!empty($this->inlineStyles)) {
+            echo "<style>\n" . implode("\n", $this->inlineStyles) . "\n</style>\n";
+        }
+    }
+
+    /**
+     * Build inline scripts
+     */
+    protected function _buildInlineScripts()
+    {
+        if (!empty($this->inlineScripts)) {
+            echo "<script>\n" . implode("\n", $this->inlineScripts) . "\n</script>\n";
+        }
+    }
+
+    /**
      * Builds the complete HTML structure.
      */
     protected function buildHTML(string $outputContent = "")
@@ -813,7 +867,9 @@ abstract class HTMLBuilder extends Cache
             <?php $this->_styleInfoBar() ?>
             <?php $this->_buildCdns(); ?>
             <?php $this->_buildStyles(); ?>
+            <?php $this->_buildInlineStyles(); ?>
             <?php $this->_buildScripts(); ?>
+            <?php $this->_buildInlineScripts(); ?>
             <?= $this->_getHookContent(self::BOTTOM_HEAD); ?>
         </head>
         <?= $this->_getHookContent(self::AFTER_HEAD); ?>
