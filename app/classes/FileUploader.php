@@ -6,6 +6,11 @@ namespace CML\Classes;
  * Class FileUploader
  * 
  * A class for handling file uploads.
+ * This class provides methods for handling file uploads, including validating file types, 
+ * moving uploaded files to a specified directory, and generating unique file names.
+ *
+ * @author CallMeLeon <kontakt@callmeleon.de>
+ * @see https://docs.callmeleon.de/file-uploader
  */
 class FileUploader
 {
