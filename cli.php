@@ -48,7 +48,7 @@ switch ($command) {
             checkUpdate($checkUpdate);
         } else {
             updateCML();
-            updateCLI();
+            updateFiles();
             echo "\nUpdate complete!\n\n";
             echo "Your now on Version: v" . useTrait('getFrameworkVersion');
         }
@@ -163,7 +163,7 @@ function updateCML($url = "https://api.github.com/repos/CallMeLeon167/CML-Framew
     }
 }
 
-function updateCLI()
+function updateFiles()
 {
     $rootUrl = 'https://api.github.com/repos/CallMeLeon167/CML-Framework/contents/';
     $ch = curl_init();
@@ -172,17 +172,21 @@ function updateCLI()
     curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0');
     $response = curl_exec($ch);
     curl_close($ch);
-
     $response = json_decode($response);
-    if ($response) {
-        $file_name = "cli.php";
-        $key = array_search($file_name, array_column($response, 'name'));
 
-        if ($key !== false) {
-            $cli_php_object = $response[$key];
-            $cliUrl = $cli_php_object->download_url;
-            file_put_contents(__DIR__ . '/cli.php', file_get_contents($cliUrl));
-            echo "Update " . $cli_php_object->name . " complete!\n";
+    if ($response) {
+        $filesToUpdate = ['cli.php', '.htaccess', 'robots.txt', '.gitignore'];
+
+        foreach ($filesToUpdate as $file_name) {
+            $key = array_search($file_name, array_column($response, 'name'));
+            if ($key !== false) {
+                $file_object = $response[$key];
+                $fileUrl = $file_object->download_url;
+                file_put_contents(__DIR__ . '/' . $file_name, file_get_contents($fileUrl));
+                echo "Update " . $file_object->name . " complete!\n";
+            } else {
+                echo "File " . $file_name . " not found in the repository.\n";
+            }
         }
     }
 }
