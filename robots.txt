@@ -1,0 +1,16 @@
+# Block all web crawlers from accessing the following directories
+User-agent: *
+Disallow: /app/
+Disallow: /cache/
+Disallow: /controllers/
+Disallow: /sql/
+Disallow: /vendor/
+Disallow: /web/components/
+Disallow: /web/sites/
+
+# Allow access to CSS and JS files
+Allow: /web/css/
+Allow: /web/js/
+
+# Specify the location of the sitemap
+Sitemap: /sitemap.xml
