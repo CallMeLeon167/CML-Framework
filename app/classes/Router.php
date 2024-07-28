@@ -28,6 +28,11 @@ class Router extends \CML\Classes\HTMLBuilder
     protected array $routeIndexStatus = [];
 
     /**
+     * @var array Stores custom hardcoded routes for the sitemap.
+     */
+    protected array $customSitemapRoutes = [];
+
+    /**
      * Stores the defined routes.
      *
      * @var array
@@ -224,26 +229,57 @@ class Router extends \CML\Classes\HTMLBuilder
 
         foreach ($this->getAllRoutes() as $route) {
             if ($this->isIndexable($route['url'])) {
-                $url = $xml->addChild('url');
-                $url->addChild('loc', $this->url($route['url']));
-
-                $sitemapData = $this->routeIndexData[$route['url']] ?? [];
-
-                if (!empty($sitemapData['lastmod'])) {
-                    $url->addChild('lastmod', date('c', strtotime($sitemapData['lastmod'])));
-                }
-
-                if (!empty($sitemapData['changefreq'])) {
-                    $url->addChild('changefreq', $sitemapData['changefreq']);
-                }
-
-                if (!empty($sitemapData['priority'])) {
-                    $url->addChild('priority', number_format($sitemapData['priority'], 1));
-                }
+                $this->addUrlToSitemap($xml, $route['url'], $this->routeIndexData[$route['url']] ?? []);
             }
         }
 
+        foreach ($this->customSitemapRoutes as $url => $sitemapData) {
+            $this->addUrlToSitemap($xml, $url, $sitemapData);
+        }
+
         return $xml->asXML();
+    }
+
+    /**
+     * Add a custom route to the sitemap.
+     *
+     * @param string $url The URL of the custom route
+     * @param array $sitemapData Additional sitemap data (lastmod, changefreq, priority)
+     * @return $this
+     */
+    public function sitemapAdd(string $url, array $sitemapData = [])
+    {
+        $this->customSitemapRoutes[$url] = [
+            'lastmod' => $sitemapData['lastmod'] ?? null,
+            'changefreq' => $sitemapData['changefreq'] ?? null,
+            'priority' => $sitemapData['priority'] ?? null,
+        ];
+        return $this;
+    }
+
+    /**
+     * Helper method to add a URL to the sitemap XML
+     *
+     * @param \SimpleXMLElement $xml The XML object
+     * @param string $url The URL to add
+     * @param array $sitemapData The sitemap data for the URL
+     */
+    private function addUrlToSitemap(\SimpleXMLElement $xml, string $url, array $sitemapData)
+    {
+        $urlElement = $xml->addChild('url');
+        $urlElement->addChild('loc', $this->url($url));
+
+        if (!empty($sitemapData['lastmod'])) {
+            $urlElement->addChild('lastmod', date('c', strtotime($sitemapData['lastmod'])));
+        }
+
+        if (!empty($sitemapData['changefreq'])) {
+            $urlElement->addChild('changefreq', $sitemapData['changefreq']);
+        }
+
+        if (!empty($sitemapData['priority'])) {
+            $urlElement->addChild('priority', number_format($sitemapData['priority'], 1));
+        }
     }
 
     /**
