@@ -759,7 +759,7 @@ abstract class HTMLBuilder extends Cache
             // Remove unnecessary spaces around tags
             $minified = preg_replace('/>\s+</', '><', $minified);
 
-            // Wiederherstellen der <pre> Tag Inhalte
+            // Restore the <pre> tag contents
             $minified = preg_replace_callback('/<pre>(.*?)<\/pre>/is', function ($matches) {
                 return '<pre>' . base64_decode($matches[1]) . '</pre>';
             }, $minified);
