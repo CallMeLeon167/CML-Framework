@@ -35,37 +35,41 @@ class PluginManager
      */
     private function loadPlugins(string $pluginDir)
     {
-        $pluginFiles = $this->getPluginFiles($pluginDir);
-        foreach ($pluginFiles as $pluginFile) {
-            require_once $pluginFile;
-            $className = basename($pluginFile, '.php');
-            if (class_exists($className)) {
-                $plugin = new $className();
-                if (method_exists($plugin, 'register')) {
-                    $this->plugins[] = $plugin;
-                    $this->extractPluginHeader($pluginFile);
+        $pluginFolders = glob($pluginDir . '/*', GLOB_ONLYDIR);
+
+        foreach ($pluginFolders as $folder) {
+            $mainPluginFile = $this->findMainPluginFile($folder);
+
+            if ($mainPluginFile) {
+                require_once $mainPluginFile;
+                $className = basename($folder);
+                if (class_exists($className)) {
+                    $plugin = new $className();
+                    if (method_exists($plugin, 'register')) {
+                        $this->plugins[] = $plugin;
+                        $this->extractPluginHeader($mainPluginFile);
+                    }
                 }
             }
         }
     }
 
     /**
-     * Recursively retrieves all PHP files within a directory.
+     * Finds the main plugin file in a given directory.
      *
-     * @param string $dir The directory to search for PHP files.
-     * @return array An array of PHP file paths.
+     * @param string $dir The directory to search for the main plugin file.
+     * @return string|null The path to the main plugin file, or null if not found.
      */
-    private function getPluginFiles(string $dir): array
+    private function findMainPluginFile(string $dir): ?string
     {
-        $files = [];
-        foreach (glob($dir . '/*') as $file) {
-            if (is_dir($file)) {
-                $files = array_merge($files, $this->getPluginFiles($file));
-            } elseif (pathinfo($file, PATHINFO_EXTENSION) === 'php') {
-                $files[] = $file;
+        $files = glob($dir . '/*.php');
+        foreach ($files as $file) {
+            $content = file_get_contents($file);
+            if (strpos($content, 'Plugin Name:') !== false) {
+                return $file;
             }
         }
-        return $files;
+        return null;
     }
 
     /**
