@@ -3,9 +3,11 @@ require_once 'app/admin/cml-load.php';
 
 use CML\Classes\Router as App;
 use CML\Classes\DB;
+use CML\Classes\PluginManager;
 
 $db = new DB(false);
 $app = new App();
+new PluginManager($app);
 
 //Project settings
 $app->activateMinifyHTML();

@@ -18,6 +18,11 @@ class Router extends \CML\Classes\HTMLBuilder
     use Functions\Session;
 
     /**
+     * @var array This private property holds an array of plugin information.
+     */
+    private array $pluginInfo = [];
+
+    /**
      * @var array Stores the indexing status and sitemap data for each route
      */
     protected array $routeIndexData = [];
@@ -181,6 +186,26 @@ class Router extends \CML\Classes\HTMLBuilder
     {
         self::setHeader('Content-Type', 'application/json');
         return $this->isApi = true;
+    }
+
+    /**
+     * Adds plugin information to the router.
+     *
+     * @param array $info The plugin information to add.
+     */
+    public function addPluginInfo(array $info)
+    {
+        $this->pluginInfo[] = $info;
+    }
+
+    /**
+     * Retrieves the plugin information from the router.
+     *
+     * @return array The plugin information.
+     */
+    public function getPluginInfo(): array
+    {
+        return $this->pluginInfo;
     }
 
     /**
