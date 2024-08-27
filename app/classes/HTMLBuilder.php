@@ -107,7 +107,6 @@ abstract class HTMLBuilder extends Cache
      */
     private string $charsetAttr = "UTF-8";
 
-
     /**
      * @var string Stores the currently url.
      */
@@ -117,6 +116,11 @@ abstract class HTMLBuilder extends Cache
      * @var string Stores the currently name of route.
      */
     public string $currentRouteName;
+
+    /**
+     * @var array $jsExportVars holds an array of JavaScript export variables.
+     */
+    private array $jsExportVars = [];
 
     /**
      * @var array Store inline styles for HTML elements.
@@ -799,6 +803,58 @@ abstract class HTMLBuilder extends Cache
     }
 
     /**
+     * Exports data as JavaScript object.
+     *
+     * @param string $objectName The name of the JavaScript object.
+     * @param array $dataArray The data to be exported.
+     * @return string The JavaScript code representing the exported object.
+     */
+    public function jsExport(string $objectName, array $dataArray): string
+    {
+        if (!preg_match('/^[a-zA-Z_$][a-zA-Z0-9_$]*$/', $objectName)) {
+            throw new \InvalidArgumentException("Invalid JavaScript-Objektname");
+        }
+
+        $js_output = "var $objectName = {";
+        $elements = [];
+
+        foreach ($dataArray as $key => $value) {
+            $js_value = json_encode($value, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
+
+            if (is_bool($value)) {
+                $js_value = $value ? 'true' : 'false';
+            } elseif (is_null($value)) {
+                $js_value = 'null';
+            } elseif (is_string($value) && preg_match('/^function\s*\(/', $value)) {
+                $js_value = $value;
+            } elseif (is_resource($value)) {
+                $js_value = 'null';
+            } elseif (is_object($value)) {
+                $js_value = json_encode(get_object_vars($value), JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
+            }
+
+            $elements[] = json_encode((string)$key, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) . ": " . $js_value;
+        }
+
+        $js_output .= implode(", ", $elements);
+        $js_output .= "};";
+
+        $this->jsExportVars[$objectName] = "<script>$js_output</script>";
+
+        return $js_output;
+    }
+
+    /**
+     * Builds and echoes JavaScript export variables.
+     */
+    protected function _buildJsExport()
+    {
+        foreach ($this->jsExportVars as $jsExportVar) {
+            echo $jsExportVar;
+        }
+    }
+
+    /**
      * Add inline CSS style
      *
      * @param string $style
@@ -868,6 +924,7 @@ abstract class HTMLBuilder extends Cache
             <?php $this->_buildCdns(); ?>
             <?php $this->_buildStyles(); ?>
             <?php $this->_buildInlineStyles(); ?>
+            <?php $this->_buildJsExport(); ?>
             <?php $this->_buildScripts(); ?>
             <?php $this->_buildInlineScripts(); ?>
             <?= $this->_getHookContent(self::BOTTOM_HEAD); ?>
