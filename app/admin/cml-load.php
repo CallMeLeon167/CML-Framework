@@ -47,6 +47,14 @@ if (file_exists($cml_functions = __DIR__ . '/cml-functions.php')) {
     unset($cml_functions);
 }
 
+/**
+ * Loads helper functions from cml-helper-functions.php
+ */
+if (file_exists($cml_helper_functions = __DIR__ . '/cml-helper-functions.php')) {
+    require_once $cml_helper_functions;
+    unset($cml_helper_functions);
+}
+
 header('X-Powered-By: CML-Framework/' .  useTrait()::getFrameworkVersion() . " - PHP/" . phpversion());
 
 /**
