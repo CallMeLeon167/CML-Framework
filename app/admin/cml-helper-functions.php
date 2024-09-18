@@ -279,5 +279,3 @@ function generate_nonce_field(string $action = '', string $inputName = 'nonce', 
     $nonce = generate_nonce($action, $expiration);
     return '<input type="hidden" name="' . esc_html($inputName) . '" value="' . esc_html($nonce) . '">';
 }
-
-generate_nonce();
