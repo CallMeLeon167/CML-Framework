@@ -35,8 +35,25 @@ function ajax(...$function)
 /**
  * Retrieves or sets the CML configuration values.
  *
- * @param mixed|null $config (optional) The configuration key or an array of key-value pairs to set.
- * @return mixed The CML configuration values if no parameter is provided, or the value of the specified configuration key.
+ * @param string|array|null $config (optional) The configuration key or an array of key-value pairs to set.
+ * @param string    DB_NAME The name of the MySQL database.
+ * @param string    DB_USER MySQL database username for authentication.
+ * @param string    DB_PASSWORD MySQL database password for authentication.
+ * @param string    DB_HOST MySQL hostname or IP address.
+ * @param string    DB_CHARSET Database Charset to use in creating database tables (e.g., 'utf8mb4').
+ * @param bool      PRODUCTION Set the development mode. True for production, false for development.
+ * @param string    NONCE_KEY A secret key used for security purposes.
+ * @param bool      CML_DEBUG Enable enhanced error display for better debugging.
+ * @param bool      CML_DEBUG_BAR Enable or disable the debug bar.
+ * @param string    ERRORLOG_FILE Define the path to the log file.
+ * @param string    APP_NAME The name of the application.
+ * @param string    STYLE_PATH Path to CSS files.
+ * @param string    SCRIPT_PATH Path to JavaScript files.
+ * @param string    SQL_PATH Path to SQL files.
+ * @param string    SITES_PATH Path to site files.
+ * @param string    COMPONENTS_PATH Specify the folder path to the components.
+ * @param string    CACHE_PATH Defines the path where the cache files will be stored.
+ * @return mixed    The CML configuration values if no parameter is provided, or the value of the specified configuration key.
  */
 function cml_config(mixed $config = null)
 {
