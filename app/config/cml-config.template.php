@@ -52,6 +52,12 @@ define('DB_CHARSET', 'utf8mb4');
  */
 define('PRODUCTION', false);
 
+/**
+ * Define a constant NONCE_KEY with a secret key value.
+ * This key is used for security purposes, such as creating and verifying nonces.
+ */
+define('NONCE_KEY', 'mysecretkey');
+
 /** 
  * Enable enhanced error display for better debugging.
  * Set to true to activate improved error messages.

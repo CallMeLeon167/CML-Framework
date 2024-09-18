@@ -221,3 +221,63 @@ function sanitize_filename(string $filename): string
     $filename = preg_replace('/\.+/', '.', $filename);
     return trim($filename);
 }
+
+/**
+ * Generate a nonce
+ *
+ * @param string $action An optional string to tie the nonce to a specific action
+ * @param int $expiration Expiration time in seconds (default: 1 hour)
+ * @return string The generated nonce
+ */
+function generate_nonce(string $action = '', int $expiration = 3600): string
+{
+    $expires = time() + $expiration;
+    $key = cml_config('NONCE_KEY') ?? cml_config('APP_NAME');
+    $data = pack('Na*', $expires, $action);
+    $hash = hash_hmac('sha256', $data, $key, true);
+    return rtrim(strtr(base64_encode($hash . $data), '+/', '-_'), '=');
+}
+
+/**
+ * Verify a nonce
+ *
+ * @param string $nonce The nonce to verify
+ * @param string $action The action string used when generating the nonce
+ * @return bool True if the nonce is valid, false otherwise
+ */
+function verify_nonce(string $nonce, string $action = ''): bool
+{
+    $key = cml_config('NONCE_KEY') ?? cml_config('APP_NAME');
+    $decoded = base64_decode(strtr($nonce, '-_', '+/'));
+    if (strlen($decoded) < 32) {
+        return false;
+    }
+
+    $hash = substr($decoded, 0, 32);
+    $data = substr($decoded, 32);
+    $expires = unpack('N', substr($data, 0, 4))[1];
+    $action_check = substr($data, 4);
+
+    if (time() > $expires || $action !== $action_check) {
+        return false;
+    }
+
+    $expected = hash_hmac('sha256', $data, $key, true);
+    return hash_equals($expected, $hash);
+}
+
+/**
+ * Generate an HTML input field with a nonce
+ *
+ * @param string $action An optional string to tie the nonce to a specific action
+ * @param string $inputName Name of the input field (default: 'nonce')
+ * @param int $expiration Expiration time in seconds (default: 1 hour)
+ * @return string The HTML input field with the generated nonce
+ */
+function generate_nonce_field(string $action = '', string $inputName = 'nonce', int $expiration = 3600): string
+{
+    $nonce = generate_nonce($action, $expiration);
+    return '<input type="hidden" name="' . esc_html($inputName) . '" value="' . esc_html($nonce) . '">';
+}
+
+generate_nonce();
