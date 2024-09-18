@@ -279,3 +279,14 @@ function generate_nonce_field(string $action = '', string $inputName = 'nonce', 
     $nonce = generate_nonce($action, $expiration);
     return '<input type="hidden" name="' . esc_html($inputName) . '" value="' . esc_html($nonce) . '">';
 }
+
+/**
+ * Get the file extension from a filename
+ *
+ * @param string $filename The filename
+ * @return string The file extension (lowercase) or an empty string if no extension
+ */
+function get_file_extension(string $filename): string
+{
+    return strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+}
