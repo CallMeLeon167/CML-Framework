@@ -1,4 +1,5 @@
 /.idea
+/.ddev
 /vendor
 /node_modules
 errorlogfile.log
