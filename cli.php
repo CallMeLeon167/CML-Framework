@@ -28,6 +28,10 @@ switch ($command) {
         createController($controllerName, $useDatabase);
         break;
 
+    case 'config':
+        createConfig();
+        break;
+
     case 'create:dump':
         $noInsert = isset($options['--no-insert']);
         $onlyInserts = isset($options['--only-insert']);
@@ -121,6 +125,92 @@ class {$controllerName} {
     } else {
         echo "Error creating the controller\n";
     }
+}
+
+function createConfig()
+{
+    $configPath = useTrait('getRootPath') . 'app/config/';
+    $templateFile = $configPath . 'cml-config.template.php';
+    $newConfigFile = $configPath . 'cml-config.php';
+
+    if (!file_exists($templateFile)) {
+        echo "Error: Template file 'cml-config.template.php' not found in {$configPath}\n";
+        return;
+    }
+
+    if (file_exists($newConfigFile)) {
+        echo "Warning: 'cml-config.php' already exists. Do you want to overwrite it? (y/n): ";
+        $answer = trim(fgets(STDIN));
+        if (strtolower($answer) !== 'y') {
+            echo "Operation cancelled.\n";
+            return;
+        }
+    }
+
+    $configContent = file_get_contents($templateFile);
+
+    echo "Do you want to set up the configuration interactively? (y/n): ";
+    $setupInteractively = strtolower(trim(fgets(STDIN))) === 'y';
+
+    if ($setupInteractively) {
+        $configContent = setupConfigInteractively($configContent);
+    }
+
+    if (file_put_contents($newConfigFile, $configContent)) {
+        echo "Config file created successfully: {$newConfigFile}\n";
+    } else {
+        echo "Error: Failed to create config file.\n";
+    }
+}
+
+function setupConfigInteractively($configContent)
+{
+    $constants = [
+        'DB_NAME' => 'Enter the name of the MySQL database (default: mydb): ',
+        'DB_USER' => 'Enter the MySQL database username (default: root): ',
+        'DB_PASSWORD' => 'Enter the MySQL database password (default: ): ',
+        'DB_HOST' => 'Enter the MySQL hostname or IP address (default: localhost): ',
+        'DB_CHARSET' => 'Enter the database charset (default: utf8mb4): ',
+        'PRODUCTION' => 'Is this a production environment? (default: false) (true/false): ',
+        'NONCE_KEY' => 'Enter a secret key for NONCE_KEY (default: [generated string]): ',
+        'CML_DEBUG' => 'Enable enhanced error display? (default: true) (true/false): ',
+        'CML_DEBUG_BAR' => 'Enable debug bar? (default: false) (true/false): ',
+        'ERRORLOG_FILE' => 'Enter the path to the error log file (default: /errorlogfile.log): ',
+        'APP_NAME' => 'Enter the name of your application (default: MyApplication): ',
+    ];
+
+    foreach ($constants as $constant => $prompt) {
+        echo $prompt;
+        $value = trim(fgets(STDIN));
+
+        if ($value === '') {
+            switch ($constant) {
+                case 'NONCE_KEY':
+                    $value = substr(str_shuffle('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[]{};:,.<>?'), 0, 30);
+                    break;
+                default:
+                    continue 2;
+            }
+        }
+
+        if (in_array($constant, ['PRODUCTION', 'CML_DEBUG', 'CML_DEBUG_BAR'])) {
+            $value = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+            if ($value === null) {
+                echo "Invalid input. Please enter 'true' or 'false'. Using default value.\n";
+                $value = false;
+            }
+        }
+
+        $pattern = "/define\('$constant',\s*(.*?)\);/";
+        if (is_bool($value)) {
+            $replacement = "define('$constant', " . ($value ? 'true' : 'false') . ");";
+        } else {
+            $replacement = "define('$constant', '$value');";
+        }
+        $configContent = preg_replace($pattern, $replacement, $configContent);
+    }
+
+    return $configContent;
 }
 
 function version()
@@ -275,6 +365,7 @@ function help()
     echo "Usage: php cli.php [command] [options]\n\n";
     echo "Available commands:\n";
     echo "  help \t\t\t\t\t\t\t\t\tShows CML Framework command list\n";
+    echo "  config\t\t\t\t\t\t\t\tCreate a new config file from template\n";
     echo "  create:controller [ControllerName] [--db|--database]\t\t\tCreate a new controller\n";
     echo "  create:dump [FileName] [--no-insert] [--only-insert] [--no-drop]\tCreate a database dump\n";
     echo "  cml:version\t\t\t\t\t\t\t\tShow CML Framework version\n";
